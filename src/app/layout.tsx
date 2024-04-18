@@ -3,10 +3,10 @@
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import StyledComponentsRegistry from "@/lib/registry";
-import { createGlobalStyle } from "styled-components";
 
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import GlobalStyle from "@/styles/globalStyle";
 
 const noto = Noto_Sans_KR({
   subsets: ["latin"], // 또는 preload: false
@@ -35,17 +35,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-const GlobalStyle = createGlobalStyle`
-  html {
-    height: 100%;
-    margin: 0;
-  } 
-
-  body {
-    height: 100%;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-  }
-`;
