@@ -2,9 +2,5 @@
 import styled from "styled-components";
 
 export default function Home() {
-  return <Page>메인</Page>;
+  return <div>메인페이지</div>;
 }
-
-const Page = styled.div`
- min-height: calc(100% - 50px - 40px);
-`;

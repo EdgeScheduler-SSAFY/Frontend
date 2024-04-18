@@ -1,7 +1,7 @@
 "use client";
 
 import type { Metadata } from "next";
-import { Noto_Sans_KR } from 'next/font/google';
+import { Noto_Sans_KR } from "next/font/google";
 import StyledComponentsRegistry from "@/lib/registry";
 import { createGlobalStyle } from "styled-components";
 
@@ -9,9 +9,8 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 
 const noto = Noto_Sans_KR({
-  subsets: ['latin'], // 또는 preload: false
+  subsets: ["latin"], // 또는 preload: false
 });
-
 
 // export const metadata: Metadata = {
 //   title: "Create Next App",
@@ -38,14 +37,15 @@ export default function RootLayout({
 }
 
 const GlobalStyle = createGlobalStyle`
+  html {
+    height: 100%;
+    margin: 0;
+  } 
+
   body {
-    min-height: 100vh;
+    height: 100%;
+    margin: 0;
     display: flex;
     flex-direction: column;
-  }
-
-  main {
-    flex-grow: 1; 
-    margin-bottom: -24px;
   }
 `;
