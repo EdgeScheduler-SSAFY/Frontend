@@ -11,6 +11,7 @@ export default function Header() {
       <NavLink>
         <StyledLink href="/schedule">일정관리</StyledLink>
         <StyledLink href="/meeting">회의생성</StyledLink>
+        <StyledLink href="/myPage/alarmLog">마이페이지</StyledLink>
       </NavLink>
       <LoginLink>
         <StyledLink href="/login">로그인</StyledLink>
