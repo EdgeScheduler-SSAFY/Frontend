@@ -3,10 +3,12 @@
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import StyledComponentsRegistry from "@/lib/registry";
+import { ThemeProvider } from "styled-components";
 
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import GlobalStyle from "@/styles/globalStyle";
+import { theme, ColorsTypes} from "@/styles/theme";
 
 const noto = Noto_Sans_KR({
   subsets: ["latin"], // 또는 preload: false
@@ -25,12 +27,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={noto.className}>
-        <GlobalStyle />
-        <StyledComponentsRegistry>
-          <Header />
-          <main>{children}</main>
-          <Footer />
-        </StyledComponentsRegistry>
+        <ThemeProvider theme={theme}>
+          <GlobalStyle />
+          <StyledComponentsRegistry>
+            <Header />
+            <main>{children}</main>
+            <Footer />
+          </StyledComponentsRegistry>
+        </ThemeProvider>
       </body>
     </html>
   );
