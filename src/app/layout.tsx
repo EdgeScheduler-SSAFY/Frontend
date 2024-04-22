@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import type { Metadata } from "next";
-import { Noto_Sans_KR } from "next/font/google";
-import StyledComponentsRegistry from "@/lib/registry";
-import { ThemeProvider } from "styled-components";
+import type { Metadata } from 'next';
+import { Noto_Sans_KR } from 'next/font/google';
+import StyledComponentsRegistry from '@/lib/registry';
+import { ThemeProvider } from 'styled-components';
 
-import Header from "@/components/header";
-import Footer from "@/components/footer";
-import GlobalStyle from "@/styles/globalStyle";
-import { theme, ColorsTypes} from "@/styles/theme";
+import Header from '@/components/header';
+import Footer from '@/components/footer';
+import GlobalStyle from '@/styles/globalStyle';
+import * as theme from '@/styles/theme';
 
 const noto = Noto_Sans_KR({
-  subsets: ["latin"], // 또는 preload: false
+  subsets: ['latin'], // 또는 preload: false
 });
 
 // export const metadata: Metadata = {
