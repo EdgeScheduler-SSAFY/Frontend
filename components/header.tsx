@@ -1,12 +1,22 @@
-"use client";
-import Link from "next/link";
-import styled from "styled-components";
+'use client';
+import Link from 'next/link';
+import styled from 'styled-components';
+
+import { Color } from '@/components/color';
+import { ColorName } from '@/src/app/type/interface';
+import Image from 'next/image';
 
 export default function Header() {
   return (
     <HeaderNav>
       <MainLogo>
-        <StyledLink href="/">Edge Scheduler</StyledLink>
+        <StyledLink href="/">
+          <Image src="/images/edgeScheduler.png" alt="edgeSchedulerLogo" height={50} width={50} />
+          <LogoName color="blue">Edge </LogoName>
+          <LogoName color="green">Sch</LogoName>
+          <LogoName color="orange">edu</LogoName>
+          <LogoName color="yellow">ler</LogoName>
+        </StyledLink>
       </MainLogo>
       <NavLink>
         <StyledLink href="/schedule">일정관리</StyledLink>
@@ -27,24 +37,31 @@ const HeaderNav = styled.header`
   padding: 0 2rem;
   border-bottom: 1px solid;
   height: 50px;
-  background-color: ${(props: any) => props.theme.colors.slate100};
 `;
 
 const MainLogo = styled.div`
-flex: 3;
+  flex: 3;
+  font-weight: 900;
+  font-size: larger;
+`;
+
+const LogoName = styled.span<{ color: ColorName }>`
+  color: ${(props) => Color(props.color)};
 `;
 
 const NavLink = styled.div`
   display: flex;
   justify-content: space-evenly;
-  flex: 5; 
+  flex: 5;
 `;
 const LoginLink = styled.div`
   display: flex;
   justify-content: space-evenly;
-  flex: 2; 
+  flex: 2;
 `;
 
 const StyledLink = styled(Link)`
+  display: flex;
   text-decoration: none;
+  align-items: center;
 `;
