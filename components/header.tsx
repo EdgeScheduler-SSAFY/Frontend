@@ -27,6 +27,7 @@ const HeaderNav = styled.header`
   padding: 0 2rem;
   border-bottom: 1px solid;
   height: 50px;
+  background-color: ${(props: any) => props.theme.colors.slate100};
 `;
 
 const MainLogo = styled.div`
