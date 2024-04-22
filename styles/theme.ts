@@ -1,22 +1,48 @@
-import { DefaultTheme } from "styled-components";
+import { DefaultTheme } from 'styled-components';
 
-const colors = {
-  slate50: "#f8fafc",
-  slate100: "#f1f5f9",
-  slate200: "#e2e8f0",
-  slate300: "#cbd5e1",
-  slate400: "#94a3b8",
-  slate500: "#64748b",
-  slate600: "#475569",
-  slate700: "#334155",
-  slate800: "#1e293b",
-  slate900: "#0f172a",
-}
-
-export type ColorsTypes = typeof colors;
-
-const theme: DefaultTheme = {
-  colors,
+export const colors = {
+  black: '#2f2f2f',
+  black50: '#ececec',
+  black100: '#c4c4c4',
+  black200: '#a8a8a8',
+  black300: '#808080',
+  black400: '#686868',
+  black500: '#424242',
+  black600: '#3c3c3c',
+  blue: '#00adef',
+  blue50: '#e6f7fd',
+  blue100: '#b0e6fa',
+  blue200: '#8ad9f8',
+  blue300: '#54c8f4',
+  blue400: '#eebdf2',
+  blue600: '#009dd9',
+  blue700: '#007baa',
+  green: '#80cc28',
+  green50: '#f2faea',
+  green100: '#d8efbc',
+  green200: '#c5e89c',
+  green300: '#aadd6f',
+  green400: '#99d653',
+  green600: '#74ba24',
+  green700: '#5b911c',
+  orange: '#f1511b',
+  orange50: '#feeee8',
+  orange100: '#fbc9b8',
+  orange200: '#f9af96',
+  orange300: '#f68a66',
+  orange400: '#f47449',
+  orange600: '#db4a19',
+  orange700: '#ab3a13',
+  yellow: '#fbbc09',
+  yellow50: '#fff8e6',
+  yellow100: '#feeab3',
+  yellow200: '#fde08e',
+  yellow300: '#fcd25a',
+  yellow400: '#fcc93a',
+  yellow600: '#e4ab08',
+  yellow700: '#b28506',
 };
 
-export type Theme = typeof theme;
+export const theme: DefaultTheme = {
+  colors,
+};
