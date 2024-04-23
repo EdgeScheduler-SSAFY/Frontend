@@ -2,11 +2,11 @@
 import Link from "next/link";
 import styled, { DefaultTheme } from "styled-components";
 
-import { Color } from "@/src/shared/lib/styles/color";
-import { ColorName } from "@/src/shared/lib/type/types";
+import { Color } from "@/shared/lib/styles/color";
+import { ColorName } from "@/shared/lib/type/types";
 import Image from "next/image";
 
-export default function Header() {
+export function Header() {
   return (
     <HeaderNav>
       <MainLogo>
