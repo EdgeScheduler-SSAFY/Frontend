@@ -7,8 +7,8 @@ import { ThemeProvider } from "styled-components";
 
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import GlobalStyle from "@/styles/globalStyle";
-import * as theme from "@/styles/theme";
+import GlobalStyle from "@/src/shared/lib/styles/globalStyle";
+import * as theme from "@/src/shared/lib/styles/theme";
 
 const noto = Noto_Sans_KR({
   subsets: ["latin"], // 또는 preload: false
@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
+    <html lang="en">
       <body className={noto.className}>
         <ThemeProvider theme={theme}>
           <GlobalStyle theme={theme} />

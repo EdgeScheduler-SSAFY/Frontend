@@ -1,6 +1,6 @@
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from "styled-components";
 
-import { Color } from '@/components/color';
+import { Color } from "@/src/shared/lib/styles/color";
 
 const GlobalStyle = createGlobalStyle`
   html {
@@ -13,7 +13,7 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     display: flex;
     flex-direction: column;
-    color: ${Color('black')};
+    color: ${Color("black")};
   }
 `;
 
