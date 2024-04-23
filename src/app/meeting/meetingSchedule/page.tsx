@@ -1,36 +1,98 @@
 "use client";
 import styled from "styled-components";
 import { IoMdArrowDropdown } from "react-icons/io";
+import { useState } from "react";
+import { FaAngleLeft } from "react-icons/fa";
+import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
+import { BsDot } from "react-icons/bs";
+import ScheduleComponent from "./scheduleComponent";
+
+interface OptionButtonProps {
+  selected: boolean;
+}
 
 export default function Meeting() {
+  const [selectedOption, setSelectedOption] = useState(0);
+
+  let currentDate = new Date();
+  let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  let dayOfWeek = currentDate.getDay();
+  let today =
+    currentDate.getFullYear() +
+    "." +
+    (currentDate.getMonth() + 1) +
+    "." +
+    currentDate.getDate() +
+    "(" +
+    days[dayOfWeek] +
+    ")";
+  const handleOptionClick = (index: number) => {
+    setSelectedOption(index);
+  };
   return (
     <MainLayout>
       <HeaderLayout>
         <DateLayout>
           <DateinDateDiv>Date</DateinDateDiv>
           <TimeSelectionLayout>
-            <DateDiv>2024.04.18(Thu)</DateDiv>
-            <TimeDiv>
+            <DateDiv>{today}</DateDiv>
+            <TimeButton as="button">
               <div>PM 03:45</div>
               <IoMdArrowDropdown />
-            </TimeDiv>
-            -<DateDiv>2024.04.18(Thu)</DateDiv>
-            <TimeDiv>PM 03:45</TimeDiv>
+            </TimeButton>
+            <HypoonDiv>-</HypoonDiv>
+            <DateDiv>{today}</DateDiv>
+            <TimeButton as="button">
+              <div>PM 03:45</div>
+              <IoMdArrowDropdown />
+            </TimeButton>
           </TimeSelectionLayout>
         </DateLayout>
         <OptionLayout>
-          <OptionButton>fatest</OptionButton>
-          <OptionButton>
+          <OptionButton
+            selected={selectedOption === 0}
+            onClick={() => handleOptionClick(0)}
+          >
+            fatest
+          </OptionButton>
+          <OptionButton
+            selected={selectedOption === 1}
+            onClick={() => handleOptionClick(1)}
+          >
             minimum
             <br /> absentees
           </OptionButton>
-          <OptionButton>
+          <OptionButton
+            selected={selectedOption === 2}
+            onClick={() => handleOptionClick(2)}
+          >
             excellent
             <br /> satisfaction
           </OptionButton>
         </OptionLayout>
       </HeaderLayout>
-      <div></div>
+      <ScheduleHeaderLayout>
+        <ScheduleHeaderTime>
+          <TimeChangeButton>
+            <LuChevronLeftSquare />
+          </TimeChangeButton>
+          {today}
+          <TimeChangeButton>
+            <LuChevronRightSquare />
+          </TimeChangeButton>
+        </ScheduleHeaderTime>
+        <ScheduleHeaderExp>
+          <WorkingScheduleLayout>
+            <WorkingDiv />
+            Worktime <ScheduleDiv />
+            Scheduled
+          </WorkingScheduleLayout>
+          <DetailDiv>
+            <BsDot /> Hover over the scheduled event area to view details.
+          </DetailDiv>
+        </ScheduleHeaderExp>
+      </ScheduleHeaderLayout>
+      <ScheduleComponent />
     </MainLayout>
   );
 }
@@ -61,7 +123,7 @@ const OptionLayout = styled.div`
   text-align: right;
 `;
 
-const OptionButton = styled.button`
+const OptionButton = styled.button<OptionButtonProps>`
   min-width: 8rem;
   min-height: 3rem;
   border: none;
@@ -72,6 +134,12 @@ const OptionButton = styled.button`
   margin-right: 10px;
   font-size: 14px;
   font-weight: bold;
+  background-color: ${({ selected }) => (selected ? "#00ADEF" : "")};
+  color: ${({ selected }) => (selected ? "white" : "")};
+  &:hover {
+    cursor: pointer;
+    background-color: ${({ selected }) => (selected ? "#028cc3" : "gray")};
+  }
 `;
 
 const DateDiv = styled.div`
@@ -89,9 +157,11 @@ const DateDiv = styled.div`
   align-items: center;
 `;
 
-const TimeDiv = styled(DateDiv)`
+const TimeButton = styled(DateDiv)`
   min-width: 4rem;
   gap: 1rem;
+  padding-right: 8px;
+  background-color: white;
 `;
 const DateinDateDiv = styled.div`
   margin-left: 10px;
@@ -102,4 +172,71 @@ const TimeSelectionLayout = styled.div`
   display: flex;
   flex-direction: row;
   margin-top: 1rem;
+`;
+
+const HypoonDiv = styled.div`
+  height: full;
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+  margin-right: 1rem;
+`;
+
+const ScheduleHeaderLayout = styled.div`
+  width: full;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+`;
+
+const ScheduleHeaderTime = styled.div`
+  display: flex;
+  gap: 2rem;
+  font-weight: bold;
+  font-size: 20px;
+  padding-left: 3rem;
+  align-items: center;
+`;
+
+const ScheduleHeaderExp = styled.div`
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  column-gap: 10px;
+`;
+
+const TimeChangeButton = styled.button`
+  display: flex;
+  align-items: center;
+  border: none;
+  font-size: 25px;
+  background-color: white;
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const DetailDiv = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const WorkingDiv = styled.div`
+  width: 20px;
+  height: 20px;
+  background-color: green;
+`;
+
+const ScheduleDiv = styled(WorkingDiv)`
+  width: 20px;
+  height: 20px;
+  background-color: red;
+`;
+
+const WorkingScheduleLayout = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  gap: 5px;
 `;
