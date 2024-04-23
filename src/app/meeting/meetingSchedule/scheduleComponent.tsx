@@ -63,6 +63,7 @@ const checkedTime: number[][] = [];
 const allDayTime: boolean[] = Array(96).fill(false);
 //checkedTime 이 0이면 그냥 시간, 1이면 불가능한 시간, 2이면 업무 시간
 const startTime: number[] = [0, 4, 6, 8, 8, 12];
+const RecommendTime: boolean[] = Array(96).fill(false);
 
 interface vipDivProps {
   vipPerson: boolean;
@@ -81,7 +82,7 @@ interface timeDivProps {
 }
 
 people.forEach((person: person, index: number) => {
-  let arr = [];
+  let arr: number[] = []; // 사람별 되는 시간 더미데이터
   for (let i = 0; i < 96; i++) {
     if (Math.floor(i / 8) == 1) {
       arr.push(2);
@@ -91,7 +92,7 @@ people.forEach((person: person, index: number) => {
     // 여기에 추천받은 시간이면 true가 뜨도록 할 것.
   }
   checkedTime.push(arr);
-});
+}); // 더미 데이터 생성
 
 checkedTime[0][3] = 1;
 checkedTime[0][4] = 1;
@@ -100,7 +101,10 @@ checkedTime[0][5] = 1;
 checkedTime[3][44] = 1;
 checkedTime[3][45] = 1;
 checkedTime[3][46] = 1;
-//
+//더미 데이터 생성
+RecommendTime[44] = true;
+RecommendTime[45] = true;
+RecommendTime[46] = true;
 
 export default function ScheduleComponent() {
   return (
@@ -131,7 +135,10 @@ export default function ScheduleComponent() {
                   style={{ borderRadius: "50%" }}
                 />
               </PersonImagePart>
-              <PersonNamePart>{person.name}</PersonNamePart>
+              <PersonNamePart>
+                <div> {person.name}</div>
+                <PersonRelateTeamDiv> {person.relatedTeam}</PersonRelateTeamDiv>
+              </PersonNamePart>
               <PersonTimePart>
                 <div>{person.nowTime}</div>
                 <div>{`${person.country}/${person.city}`}</div>
@@ -246,6 +253,7 @@ const TimeDiv = styled.div<timeDivProps>`
 
 const TimeDivGroup = styled.div`
   display: flex;
+  padding-left: 3px;
 `;
 
 const TimeStampGroup = styled.div`
@@ -295,6 +303,7 @@ const PersonImagePart = styled.div`
 const PersonNamePart = styled.div`
   width: 40%;
   text-align: left;
+  padding-left: 3px;
 `;
 
 const PersonTimePart = styled(PersonNamePart)`
@@ -304,4 +313,8 @@ const PersonTimePart = styled(PersonNamePart)`
   font-size: x-small;
   position: relative;
   bottom: -5px;
+`;
+
+const PersonRelateTeamDiv = styled.div`
+  font-size: small;
 `;
