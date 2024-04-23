@@ -147,9 +147,13 @@ const PersonTitleTimeLayout = styled.div`
 const TimeDiv = styled.div<timeDivProps>`
   width: 1rem;
   height: 2rem;
-  border: 0.5px solid gray;
+  border: 0.5px solid ${Color("black100")};
   background-color: ${({ selected }) =>
-    selected === 2 ? Color("green300") : selected === 1 ? "red" : ""};
+    selected === 2
+      ? Color("green300")
+      : selected === 1
+      ? Color("orange50")
+      : ""};
 `;
 
 const TimeDivGroup = styled.div`
