@@ -1,6 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 
-import { Color } from "@/src/shared/lib/styles/color";
+import { Color } from "@/shared/lib/styles/color";
 
 const GlobalStyle = createGlobalStyle`
   html {

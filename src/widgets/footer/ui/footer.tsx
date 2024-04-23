@@ -1,7 +1,7 @@
 "use client";
 import styled from "styled-components";
 
-export default function Footer() {
+export function Footer() {
   return <FooterNav>Copyright © 2024. SSAFY 자율 S201</FooterNav>;
 }
 

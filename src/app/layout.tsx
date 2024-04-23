@@ -2,13 +2,12 @@
 
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
-import StyledComponentsRegistry from "@/lib/registry";
+import StyledComponentsRegistry from "@/../lib/registry";
 import { ThemeProvider } from "styled-components";
-
-import Header from "@/components/header";
-import Footer from "@/components/footer";
-import GlobalStyle from "@/src/shared/lib/styles/globalStyle";
-import * as theme from "@/src/shared/lib/styles/theme";
+import { Header } from "@/widgets/header/index";
+import { Footer } from "@/widgets/footer/index";
+import GlobalStyle from "@/shared/lib/styles/globalStyle";
+import * as theme from "@/shared/lib/styles/theme";
 
 const noto = Noto_Sans_KR({
   subsets: ["latin"], // 또는 preload: false
