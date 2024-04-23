@@ -59,7 +59,7 @@ export default function ScheduleComponent() {
         })}
       </PeopleLayout>
       <TimeTableLayout>
-        <PersonTitleTimeLayout></PersonTitleTimeLayout>
+        <RecommendTimeSchedule></RecommendTimeSchedule>
         {checkedTime.map((checkTimes: number[], index: number) => {
           return (
             <PersonTime key={index}>
@@ -103,9 +103,10 @@ const MainLayout = styled.div`
 const PeopleLayout = styled.div`
   display: flex;
   flex-direction: column;
-  min-width: 10rem;
+  min-width: 12rem;
   text-align: center;
   border: 1px solid black;
+  border-right: none;
 `;
 const TimeTableLayout = styled.div`
   width: full;
@@ -114,6 +115,7 @@ const TimeTableLayout = styled.div`
   flex-direction: column;
   border: 1px solid black;
   overflow-x: auto;
+  border-left: none;
 `;
 
 const PersonTime = styled.div`
@@ -126,7 +128,10 @@ const PersonTime = styled.div`
 
 const PersonTitleLayout = styled.div`
   min-height: 2rem;
+  display: flex;
   font-weight: bold;
+  justify-content: center;
+  align-items: center;
 `;
 
 const PersonLayout = styled.div<vipDivProps>`
@@ -139,10 +144,10 @@ const PersonLayout = styled.div<vipDivProps>`
     vipPerson ? Color("orange200") : Color("blue200")};
 `;
 
-const PersonTitleTimeLayout = styled.div`
+const RecommendTimeSchedule = styled.div`
   min-height: 2rem;
   width: 96rem;
-  background-color: ${Color("blue300")};
+  background-color: ${Color("black50")};
 `;
 const TimeDiv = styled.div<timeDivProps>`
   width: 1rem;
