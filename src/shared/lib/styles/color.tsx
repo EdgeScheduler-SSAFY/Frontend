@@ -1,5 +1,5 @@
 import { DefaultTheme } from "styled-components";
-import { ColorName } from "@/src/shared/lib/type/types";
+import { ColorName } from "@/shared/lib/type/types";
 
 interface Props {
   theme: DefaultTheme;
