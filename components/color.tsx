@@ -1,5 +1,12 @@
 import { DefaultTheme } from 'styled-components';
+import { ColorName } from '@/src/app/type/types';
 
-import { ColorName } from '@/src/app/type/interface';
+interface Props {
+  theme: DefaultTheme;
+}
 
-export const Color = (colorName: ColorName) => (props: { theme: DefaultTheme }) => props.theme.colors[colorName];
+type ColorFunction = (color: ColorName) => (props: Props) => string;
+
+export const Color: ColorFunction = (color) => ({ theme }) => {
+  return theme.colors[color];
+};

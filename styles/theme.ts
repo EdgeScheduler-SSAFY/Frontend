@@ -43,6 +43,10 @@ export const colors = {
   yellow700: '#b28506',
 };
 
-export const theme: DefaultTheme = {
+export type ColorsTypes = typeof colors;
+
+const theme: DefaultTheme = {
   colors,
 };
+
+export default theme;
