@@ -7,11 +7,10 @@ import { Color } from "@/shared/lib/styles/color";
 import { ColorName } from "@/shared/lib/type/types";
 
 export function Header() {
-
   return (
     <HeaderNav>
       <MainLogo>
-        <StyledLink href='/' isActive={isActive("/")}>
+        <StyledLink href='/'>
           <Image src='/images/edgeScheduler.png' alt='edgeSchedulerLogo' height={50} width={50} />
           <LogoName color='blue'>Edge&nbsp;</LogoName>
           <LogoName color='green'>Sch</LogoName>
@@ -20,18 +19,10 @@ export function Header() {
         </StyledLink>
       </MainLogo>
       <LinkDiv>
-        <StyledLink href='/schedule' isActive={isActive("/schedule")}>
-          schedule
-        </StyledLink>
-        <StyledLink href='/meeting' isActive={isActive("/meeting")}>
-          create meeting
-        </StyledLink>
-        <StyledLink href='/myPage/alarmLog' isActive={isActive("/myPage/alarmLog")}>
-          마이페이지
-        </StyledLink>
-        <StyledLink href='/login' isActive={isActive("/login")}>
-          sign in
-        </StyledLink>
+        <StyledLink href='/schedule'>schedule</StyledLink>
+        <StyledLink href='/meeting'>create meeting</StyledLink>
+        <StyledLink href='/myPage/alarmLog'>마이페이지</StyledLink>
+        <StyledLink href='/login'>sign in</StyledLink>
       </LinkDiv>
     </HeaderNav>
   );
