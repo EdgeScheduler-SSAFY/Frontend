@@ -1,31 +1,38 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import styled, { DefaultTheme } from "styled-components";
 
 import { Color } from "@/shared/lib/styles/color";
 import { ColorName } from "@/shared/lib/type/types";
-import Image from "next/image";
 
 export function Header() {
+
   return (
     <HeaderNav>
       <MainLogo>
-        <StyledLink href="/">
-          <Image src="/images/edgeScheduler.png" alt="edgeSchedulerLogo" height={50} width={50} />
-          <LogoName color="blue">Edge&nbsp;</LogoName>
-          <LogoName color="green">Sch</LogoName>
-          <LogoName color="orange">edu</LogoName>
-          <LogoName color="yellow">ler</LogoName>
+        <StyledLink href='/' isActive={isActive("/")}>
+          <Image src='/images/edgeScheduler.png' alt='edgeSchedulerLogo' height={50} width={50} />
+          <LogoName color='blue'>Edge&nbsp;</LogoName>
+          <LogoName color='green'>Sch</LogoName>
+          <LogoName color='orange'>edu</LogoName>
+          <LogoName color='yellow'>ler</LogoName>
         </StyledLink>
       </MainLogo>
-      <NavLink>
-        <StyledLink href="/schedule">schedule</StyledLink>
-        <StyledLink href="/meeting">create meeting</StyledLink>
-        <StyledLink href="/myPage/alarmLog">마이페이지</StyledLink>
-      </NavLink>
-      <LoginLink>
-        <StyledLink href="/login">sign in</StyledLink>
-      </LoginLink>
+      <LinkDiv>
+        <StyledLink href='/schedule' isActive={isActive("/schedule")}>
+          schedule
+        </StyledLink>
+        <StyledLink href='/meeting' isActive={isActive("/meeting")}>
+          create meeting
+        </StyledLink>
+        <StyledLink href='/myPage/alarmLog' isActive={isActive("/myPage/alarmLog")}>
+          마이페이지
+        </StyledLink>
+        <StyledLink href='/login' isActive={isActive("/login")}>
+          sign in
+        </StyledLink>
+      </LinkDiv>
     </HeaderNav>
   );
 }
@@ -40,7 +47,7 @@ const HeaderNav = styled.header`
 `;
 
 const MainLogo = styled.div`
-  flex: 3;
+  width: 40%;
   font-weight: 900;
   font-size: larger;
 `;
@@ -49,19 +56,22 @@ const LogoName = styled.span<{ color: ColorName }>`
   color: ${(props) => Color(props.color)};
 `;
 
-const NavLink = styled.div`
+const LinkDiv = styled.div`
+  width: 60%;
   display: flex;
   justify-content: space-evenly;
-  flex: 5;
-`;
-const LoginLink = styled.div`
-  display: flex;
-  justify-content: space-evenly;
-  flex: 2;
 `;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(Link)<{ isActive: boolean }>`
   display: flex;
   text-decoration: none;
   align-items: center;
+  transition: all 0.2s ease-in-out;
+  &:visited {
+    color: ${Color("black")};
+  }
+  &:hover {
+    cursor: pointer;
+    color: ${Color("blue")};
+  }
 `;
