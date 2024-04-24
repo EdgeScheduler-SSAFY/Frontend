@@ -10,7 +10,6 @@ export default function MeetingScheduleLayout({
 }
 
 const MSLayout = styled.div`
-  margin-left: 10rem;
-  margin-right: 10rem;
-  margin-top: 4rem;
+  width: full;
+  min-height: calc(100% - 50px);
 `;

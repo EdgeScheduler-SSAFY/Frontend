@@ -2,16 +2,22 @@
 import Link from "next/link";
 import styled from "styled-components";
 
-export default function MyPageLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function MyPageLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <MyPageLink>
-      <StyledLink href="/myPage/updateInfo">update information</StyledLink>
-      <StyledLink href="/myPage/alarmLog">alarm log</StyledLink>
-    </MyPageLink>
+    <MainLayout>
+      <MyPageLink>
+        <StyledLink href='/myPage/updateInfo'>update information</StyledLink>
+        <StyledLink href='/myPage/alarmLog'>alarm log</StyledLink>
+      </MyPageLink>
+      {children}
+    </MainLayout>
   );
 }
+
+const MainLayout = styled.div`
+  width: 100%;
+  min-height: calc(100% - 50px);
+`;
 
 const MyPageLink = styled.div`
   display: flex;
