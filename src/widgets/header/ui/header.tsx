@@ -53,7 +53,7 @@ const LinkDiv = styled.div`
   justify-content: space-evenly;
 `;
 
-const StyledLink = styled(Link)<{ isActive: boolean }>`
+const StyledLink = styled(Link)`
   display: flex;
   text-decoration: none;
   align-items: center;
