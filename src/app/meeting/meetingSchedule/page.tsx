@@ -5,7 +5,9 @@ import { useState } from "react";
 import { FaAngleLeft } from "react-icons/fa";
 import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
 import { BsDot } from "react-icons/bs";
+
 import ScheduleComponent from "./scheduleComponent";
+import { Color } from "@/shared/lib/styles/color";
 
 interface OptionButtonProps {
   selected: boolean;
@@ -36,36 +38,27 @@ export default function Meeting() {
           <DateinDateDiv>Date</DateinDateDiv>
           <TimeSelectionLayout>
             <DateDiv>{today}</DateDiv>
-            <TimeButton as="button">
+            <TimeButton as='button'>
               <div>PM 03:45</div>
               <IoMdArrowDropdown />
             </TimeButton>
             <HypoonDiv>-</HypoonDiv>
             <DateDiv>{today}</DateDiv>
-            <TimeButton as="button">
+            <TimeButton as='button'>
               <div>PM 03:45</div>
               <IoMdArrowDropdown />
             </TimeButton>
           </TimeSelectionLayout>
         </DateLayout>
         <OptionLayout>
-          <OptionButton
-            selected={selectedOption === 0}
-            onClick={() => handleOptionClick(0)}
-          >
+          <OptionButton selected={selectedOption === 0} onClick={() => handleOptionClick(0)}>
             fatest
           </OptionButton>
-          <OptionButton
-            selected={selectedOption === 1}
-            onClick={() => handleOptionClick(1)}
-          >
+          <OptionButton selected={selectedOption === 1} onClick={() => handleOptionClick(1)}>
             minimum
             <br /> absentees
           </OptionButton>
-          <OptionButton
-            selected={selectedOption === 2}
-            onClick={() => handleOptionClick(2)}
-          >
+          <OptionButton selected={selectedOption === 2} onClick={() => handleOptionClick(2)}>
             excellent
             <br /> satisfaction
           </OptionButton>
@@ -84,12 +77,11 @@ export default function Meeting() {
         <ScheduleHeaderExp>
           <WorkingScheduleLayout>
             <WorkingDiv />
-            Worktime <ScheduleDiv />
+            Worktime 
+            <ScheduleDiv />
             Scheduled
           </WorkingScheduleLayout>
-          <DetailDiv>
-            <BsDot /> Hover over the scheduled event area to view details.
-          </DetailDiv>
+          <DetailDiv>* Hover over the scheduled event area to view details.</DetailDiv>
         </ScheduleHeaderExp>
       </ScheduleHeaderLayout>
       <ScheduleComponent />
@@ -101,7 +93,7 @@ const MainLayout = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: full;
+  padding: 1rem 10rem;
 `;
 
 const HeaderLayout = styled.div`
@@ -125,7 +117,7 @@ const OptionLayout = styled.div`
 
 const OptionButton = styled.button<OptionButtonProps>`
   min-width: 8rem;
-  min-height: 3rem;
+  min-height: 2.5rem;
   border: none;
   border-radius: 5px;
   padding-top: auto;
@@ -133,12 +125,12 @@ const OptionButton = styled.button<OptionButtonProps>`
   margin-left: 10px;
   margin-right: 10px;
   font-size: 14px;
-  font-weight: bold;
-  background-color: ${({ selected }) => (selected ? "#00ADEF" : "")};
-  color: ${({ selected }) => (selected ? "white" : "")};
+  font-weight: 600;
+  background-color: ${({ selected }) => (selected ? Color("blue") : Color("black50"))};
+  color: ${({ selected }) => (selected ? "white" : `${Color("black")}`)};
   &:hover {
     cursor: pointer;
-    background-color: ${({ selected }) => (selected ? "#028cc3" : "gray")};
+    background-color: ${({ selected }) => (selected ? Color("blue") : Color("black100"))};
   }
 `;
 
@@ -171,7 +163,7 @@ const DateinDateDiv = styled.div`
 const TimeSelectionLayout = styled.div`
   display: flex;
   flex-direction: row;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 `;
 
 const HypoonDiv = styled.div`
@@ -187,13 +179,14 @@ const ScheduleHeaderLayout = styled.div`
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
+  margin-bottom: 1rem;
 `;
 
 const ScheduleHeaderTime = styled.div`
   display: flex;
   gap: 2rem;
   font-weight: bold;
-  font-size: 20px;
+  font-size: 17px;
   padding-left: 3rem;
   align-items: center;
 `;
@@ -220,18 +213,19 @@ const TimeChangeButton = styled.button`
 const DetailDiv = styled.div`
   display: flex;
   align-items: center;
+  font-size: small;
 `;
 
 const WorkingDiv = styled.div`
   width: 20px;
   height: 20px;
-  background-color: green;
+  background-color: ${Color("green100")};
 `;
 
 const ScheduleDiv = styled(WorkingDiv)`
   width: 20px;
   height: 20px;
-  background-color: red;
+  background-color: ${Color("orange100")};
 `;
 
 const WorkingScheduleLayout = styled.div`

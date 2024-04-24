@@ -19,12 +19,12 @@ export function Header() {
         </StyledLink>
       </MainLogo>
       <NavLink>
-        <StyledLink href="/schedule">일정관리</StyledLink>
-        <StyledLink href="/meeting">회의생성</StyledLink>
+        <StyledLink href="/schedule">schedule</StyledLink>
+        <StyledLink href="/meeting">create meeting</StyledLink>
         <StyledLink href="/myPage/alarmLog">마이페이지</StyledLink>
       </NavLink>
       <LoginLink>
-        <StyledLink href="/login">로그인</StyledLink>
+        <StyledLink href="/login">sign in</StyledLink>
       </LoginLink>
     </HeaderNav>
   );
@@ -34,9 +34,9 @@ const HeaderNav = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 2rem;
-  border-bottom: 1px solid;
-  height: 50px;
+  padding: 0 3rem;
+  box-shadow: 0 0px 5px 3px rgba(0, 0, 0, 0.2);
+  height: 60px;
 `;
 
 const MainLogo = styled.div`
