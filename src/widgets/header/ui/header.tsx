@@ -21,7 +21,7 @@ export function Header() {
       <LinkDiv>
         <StyledLink href='/schedule'>schedule</StyledLink>
         <StyledLink href='/meeting'>create meeting</StyledLink>
-        <StyledLink href='/myPage/alarmLog'>마이페이지</StyledLink>
+        <StyledLink href='/myPage/alarmLog'>my page</StyledLink>
         <StyledLink href='/login'>sign in</StyledLink>
       </LinkDiv>
     </HeaderNav>
