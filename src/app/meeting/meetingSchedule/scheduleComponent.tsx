@@ -14,12 +14,12 @@ const RecommendTime: boolean[] = Array(96).fill(false);
 
 interface vipDivProps {
   vipperson: boolean;
-}
+} //필수 사람 선택용
 
 interface timeDivProps {
   selected: number;
   timeindex: number;
-}
+} // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 border 색깔 바꾸기 위함
 
 people.forEach((person: person, index: number) => {
   let arr: number[] = []; // 사람별 되는 시간 더미데이터
@@ -49,12 +49,13 @@ RecommendTime[46] = true;
 export default function ScheduleComponent() {
   const [startIndex, setStartIndex] = useState<null | number>(null);
   const [endIndex, setEndtIndex] = useState<null | number>(null);
+  // 첫지점과 끝지점을 통해 scope 설정에 이용할 예정
   const handleMouseMove = (event: MouseEvent) => {
     console.log(event.clientX);
-  };
+  }; // 마우스 무브 이벤트 추가 테스트용
   const handleMouseUp = (evnet: MouseEvent) => {
     window.removeEventListener("mousemove", handleMouseMove);
-  };
+  }; // 마우스 업 이벤트(클릭 뗄시 발생) 추가 테스트용
 
   const handleMouseDown = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -63,7 +64,7 @@ export default function ScheduleComponent() {
     console.log(`마우스다운 ${index}`);
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
-  };
+  }; // 마우스 클릭 중 시 발생
 
   return (
     <MainLayout>
