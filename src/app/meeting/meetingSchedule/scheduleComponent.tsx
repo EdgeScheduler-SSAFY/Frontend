@@ -56,10 +56,10 @@ export default function ScheduleComponent() {
   const handleMouseMove = (event: MouseEvent) => {
     const targetDiv = event.target as HTMLDivElement;
     let timeIndex = targetDiv.getAttribute("timeIndex");
-    if (timeIndex && Number(timeIndex) > fixedIndex) {
+    if (timeIndex && Number(timeIndex) >= fixedIndex) {
       setEndIndex(Number(timeIndex));
     } // 초기위치보다 오른쪽이면 endIndex변경
-    if (timeIndex && Number(timeIndex) < fixedIndex) {
+    if (timeIndex && Number(timeIndex) <= fixedIndex) {
       setStartIndex(Number(timeIndex));
     } // 초기위치보다 왼쪽이면 startIndex변경
   }; // 마우스 무브 이벤트 추가 테스트용
@@ -85,7 +85,7 @@ export default function ScheduleComponent() {
   }; // 마우스 클릭 중 시 발생
 
   useEffect(() => {
-    console.log("startIndex" + startIndex + "endIndex " + endIndex);
+    console.log("startIndex " + startIndex + "endIndex " + endIndex);
   }, [startIndex, endIndex]);
 
   return (
