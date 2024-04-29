@@ -2,7 +2,7 @@
 import styled from "styled-components";
 import Image from "next/image";
 import { people, person } from "./dummyData";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Color } from "@/shared/lib/styles/color";
 
 const vip: boolean[] = [true, true, true, true, false, false];
@@ -16,8 +16,16 @@ interface vipDivProps {
   vipperson: boolean;
 } //필수 사람 선택용
 
+interface timeStampProps {
+  personIndex: number;
+  timeindex: number;
+  startIndex: number;
+  endIndex: number;
+}
+
 interface timeDivProps {
   selected: number;
+  personIndex: number;
   timeindex: number;
   startIndex: number;
   endIndex: number;
@@ -53,9 +61,13 @@ export default function ScheduleComponent() {
   const [startIndex, setStartIndex] = useState<null | number>(null);
   const [endIndex, setEndIndex] = useState<null | number>(null);
   // 첫지점과 끝지점을 통해 scope 설정에 이용할 예정
+
+  const [timeDivGroupRef, timeDivGroupleftX] = [useRef(null), useRef(0)];
+
   const handleMouseMove = (event: MouseEvent) => {
-    const targetDiv = event.target as HTMLDivElement;
-    let timeIndex = targetDiv.getAttribute("timeIndex");
+    const nowPosition = event.clientX + timeDivGroupRef.current.scrollLeft;
+
+    let timeIndex = Math.floor((nowPosition - timeDivGroupleftX.current) / 16);
     if (timeIndex && Number(timeIndex) >= fixedIndex) {
       setEndIndex(Number(timeIndex));
     } // 초기위치보다 오른쪽이면 endIndex변경
@@ -71,22 +83,26 @@ export default function ScheduleComponent() {
   const handleMouseDown = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
-    console.log(`마우스다운`);
-    const targetDiv = event.target as HTMLDivElement;
-    if (targetDiv.getAttribute("timeIndex")) {
-      fixedIndex = Number(targetDiv.getAttribute("timeIndex"));
-      setStartIndex(fixedIndex);
-      setEndIndex(fixedIndex);
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp, { once: true });
-    }
+    const nowPositionX = event.clientX + timeDivGroupRef.current.scrollLeft;
+    fixedIndex = Math.floor((nowPositionX - timeDivGroupleftX.current) / 16);
+    setStartIndex(fixedIndex);
+    setEndIndex(fixedIndex);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp, { once: true });
 
     // mouseUp은 cleanup 함수 성질이기에 한번만 실행하면 효력을 다하므로 once : true 추가
   }; // 마우스 클릭 중 시 발생
 
+  // useEffect(() => {
+  //   console.log("startIndex " + startIndex + "endIndex " + endIndex);
+  // }, [startIndex, endIndex]);
+
   useEffect(() => {
-    console.log("startIndex " + startIndex + "endIndex " + endIndex);
-  }, [startIndex, endIndex]);
+    if (timeDivGroupRef.current) {
+      timeDivGroupleftX.current =
+        timeDivGroupRef.current.getBoundingClientRect().left;
+    }
+  }, [timeDivGroupRef]);
 
   return (
     <MainLayout>
@@ -128,7 +144,10 @@ export default function ScheduleComponent() {
           );
         })}
       </PeopleLayout>
-      <TimeTableLayout onMouseDown={(event) => handleMouseDown(event)}>
+      <TimeTableLayout
+        onMouseDown={(event) => handleMouseDown(event)}
+        ref={timeDivGroupRef}
+      >
         <RecommendTimeSchedule />
         {checkedTime.map((checkTimes: number[], personIndex: number) => {
           return (
@@ -139,6 +158,7 @@ export default function ScheduleComponent() {
                     <TimeDiv
                       key={timeIndex}
                       selected={checkedTime[personIndex][timeIndex]}
+                      personIndex={personIndex}
                       timeindex={timeIndex}
                       startIndex={startIndex ?? -1}
                       endIndex={endIndex ?? -1}
@@ -150,7 +170,13 @@ export default function ScheduleComponent() {
                 {allDayTime.map((v: boolean, timeIndex: number) => {
                   if (timeIndex % 4 == 0) {
                     return (
-                      <TimeStamp key={timeIndex}>
+                      <TimeStamp
+                        key={timeIndex}
+                        personIndex={personIndex}
+                        timeindex={timeIndex}
+                        startIndex={startIndex ?? -1}
+                        endIndex={endIndex ?? -1}
+                      >
                         {(startTime[personIndex] +
                           Math.floor(timeIndex / 4) +
                           24) %
@@ -158,7 +184,15 @@ export default function ScheduleComponent() {
                       </TimeStamp>
                     );
                   } else {
-                    return <TimeStamp key={timeIndex}></TimeStamp>;
+                    return (
+                      <TimeStamp
+                        key={timeIndex}
+                        personIndex={personIndex}
+                        timeindex={timeIndex}
+                        startIndex={startIndex ?? -1}
+                        endIndex={endIndex ?? -1}
+                      ></TimeStamp>
+                    );
                   }
                 })}
               </TimeStampGroup>
@@ -236,11 +270,14 @@ const TimeDiv = styled.div<timeDivProps>`
       : selected === 1
       ? Color("orange50")
       : ""};
-  border-top: 1px solid ${Color("blue200")};
   border-left: ${({ timeindex, startIndex }) =>
-    timeindex === startIndex ? "5px solid blue" : ""};
+    timeindex == startIndex ? "1px solid blue" : ""};
   border-right: ${({ timeindex, endIndex }) =>
-    timeindex === endIndex ? "5px solid blue" : ""};
+    timeindex == endIndex ? "1px solid blue" : ""};
+  border-top: ${({ timeindex, personIndex, startIndex, endIndex }) =>
+    timeindex <= endIndex && timeindex >= startIndex && personIndex == 0
+      ? "1px solid blue"
+      : ""};
 `;
 
 const TimeDivGroup = styled.div`
@@ -250,23 +287,30 @@ const TimeDivGroup = styled.div`
 
 const TimeStampGroup = styled.div`
   display: flex;
-  width: 96rem;
   height: 1rem;
-  font-size: small;
+  font-size: x-small;
+  padding-left: 3px;
 `;
 
-const TimeStamp = styled.div`
+const TimeStamp = styled.div<timeStampProps>`
   width: 1rem;
-  height: 1rem;
+  height: 1.5rem;
+  border-left: ${({ timeindex, startIndex }) =>
+    timeindex == startIndex ? "1px solid blue" : ""};
+  border-right: ${({ timeindex, endIndex }) =>
+    timeindex == endIndex ? "1px solid blue" : ""};
+  border-bottom: ${({ timeindex, personIndex, startIndex, endIndex }) =>
+    timeindex <= endIndex && timeindex >= startIndex && personIndex == 5
+      ? "1px solid blue"
+      : ""};
 `;
-
 const PersonInfo = styled.div`
   display: flex;
   /* flex-direction: column; */
   position: absolute;
   bottom: 1px;
   right: 5px;
-  font-size: x-small;
+  z-index: 1;
 `;
 const NecessaryDiv = styled.div`
   width: 10px;
