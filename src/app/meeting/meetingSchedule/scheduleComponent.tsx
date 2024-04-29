@@ -216,6 +216,7 @@ const PeopleLayout = styled.div`
   text-align: center;
   border: 1px solid black;
   border-right: none;
+  font-size: small;
 `;
 const TimeTableLayout = styled.div`
   width: full;
