@@ -38,27 +38,36 @@ export default function Meeting() {
           <DateinDateDiv>Date</DateinDateDiv>
           <TimeSelectionLayout>
             <DateDiv>{today}</DateDiv>
-            <TimeButton as='button'>
+            <TimeButton as="button">
               <div>PM 03:45</div>
               <IoMdArrowDropdown />
             </TimeButton>
             <HypoonDiv>-</HypoonDiv>
             <DateDiv>{today}</DateDiv>
-            <TimeButton as='button'>
+            <TimeButton as="button">
               <div>PM 03:45</div>
               <IoMdArrowDropdown />
             </TimeButton>
           </TimeSelectionLayout>
         </DateLayout>
         <OptionLayout>
-          <OptionButton selected={selectedOption === 0} onClick={() => handleOptionClick(0)}>
+          <OptionButton
+            selected={selectedOption === 0}
+            onClick={() => handleOptionClick(0)}
+          >
             fatest
           </OptionButton>
-          <OptionButton selected={selectedOption === 1} onClick={() => handleOptionClick(1)}>
+          <OptionButton
+            selected={selectedOption === 1}
+            onClick={() => handleOptionClick(1)}
+          >
             minimum
             <br /> absentees
           </OptionButton>
-          <OptionButton selected={selectedOption === 2} onClick={() => handleOptionClick(2)}>
+          <OptionButton
+            selected={selectedOption === 2}
+            onClick={() => handleOptionClick(2)}
+          >
             excellent
             <br /> satisfaction
           </OptionButton>
@@ -77,14 +86,17 @@ export default function Meeting() {
         <ScheduleHeaderExp>
           <WorkingScheduleLayout>
             <WorkingDiv />
-            Worktime 
+            Worktime
             <ScheduleDiv />
             Scheduled
           </WorkingScheduleLayout>
-          <DetailDiv>* Hover over the scheduled event area to view details.</DetailDiv>
+          <DetailDiv>
+            * Hover over the scheduled event area to view details.
+          </DetailDiv>
         </ScheduleHeaderExp>
       </ScheduleHeaderLayout>
       <ScheduleComponent />
+      {/* 여기에 스케줄러 들어감 */}
     </MainLayout>
   );
 }
@@ -126,11 +138,13 @@ const OptionButton = styled.button<OptionButtonProps>`
   margin-right: 10px;
   font-size: 14px;
   font-weight: 600;
-  background-color: ${({ selected }) => (selected ? Color("blue") : Color("black50"))};
+  background-color: ${({ selected }) =>
+    selected ? Color("blue") : Color("black50")};
   color: ${({ selected }) => (selected ? "white" : `${Color("black")}`)};
   &:hover {
     cursor: pointer;
-    background-color: ${({ selected }) => (selected ? Color("blue") : Color("black100"))};
+    background-color: ${({ selected }) =>
+      selected ? Color("blue") : Color("black100")};
   }
 `;
 

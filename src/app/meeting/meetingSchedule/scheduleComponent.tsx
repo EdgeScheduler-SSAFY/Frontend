@@ -2,7 +2,7 @@
 import styled from "styled-components";
 import Image from "next/image";
 import { people, person } from "./dummyData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Color } from "@/shared/lib/styles/color";
 
 const vip: boolean[] = [true, true, true, true, false, false];
@@ -19,6 +19,8 @@ interface vipDivProps {
 interface timeDivProps {
   selected: number;
   timeindex: number;
+  startIndex: number;
+  endIndex: number;
 } // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 border 색깔 바꾸기 위함
 
 people.forEach((person: person, index: number) => {
@@ -47,24 +49,44 @@ RecommendTime[45] = true;
 RecommendTime[46] = true;
 
 export default function ScheduleComponent() {
+  let fixedIndex = -1;
   const [startIndex, setStartIndex] = useState<null | number>(null);
-  const [endIndex, setEndtIndex] = useState<null | number>(null);
+  const [endIndex, setEndIndex] = useState<null | number>(null);
   // 첫지점과 끝지점을 통해 scope 설정에 이용할 예정
   const handleMouseMove = (event: MouseEvent) => {
-    console.log(event.clientX);
+    const targetDiv = event.target as HTMLDivElement;
+    let timeIndex = targetDiv.getAttribute("timeIndex");
+    if (timeIndex && Number(timeIndex) > fixedIndex) {
+      setEndIndex(Number(timeIndex));
+    } // 초기위치보다 오른쪽이면 endIndex변경
+    if (timeIndex && Number(timeIndex) < fixedIndex) {
+      setStartIndex(Number(timeIndex));
+    } // 초기위치보다 왼쪽이면 startIndex변경
   }; // 마우스 무브 이벤트 추가 테스트용
   const handleMouseUp = (evnet: MouseEvent) => {
     window.removeEventListener("mousemove", handleMouseMove);
-  }; // 마우스 업 이벤트(클릭 뗄시 발생) 추가 테스트용
+    console.log("마우스업");
+  }; // 마우스 업 이벤트(클릭 뗄시 발생) mousemove이벤트 삭제용
 
   const handleMouseDown = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    index: number
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
-    console.log(`마우스다운 ${index}`);
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
+    console.log(`마우스다운`);
+    const targetDiv = event.target as HTMLDivElement;
+    if (targetDiv.getAttribute("timeIndex")) {
+      fixedIndex = Number(targetDiv.getAttribute("timeIndex"));
+      setStartIndex(fixedIndex);
+      setEndIndex(fixedIndex);
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp, { once: true });
+    }
+
+    // mouseUp은 cleanup 함수 성질이기에 한번만 실행하면 효력을 다하므로 once : true 추가
   }; // 마우스 클릭 중 시 발생
+
+  useEffect(() => {
+    console.log("startIndex" + startIndex + "endIndex " + endIndex);
+  }, [startIndex, endIndex]);
 
   return (
     <MainLayout>
@@ -106,8 +128,8 @@ export default function ScheduleComponent() {
           );
         })}
       </PeopleLayout>
-      <TimeTableLayout>
-        <RecommendTimeSchedule></RecommendTimeSchedule>
+      <TimeTableLayout onMouseDown={(event) => handleMouseDown(event)}>
+        <RecommendTimeSchedule />
         {checkedTime.map((checkTimes: number[], personIndex: number) => {
           return (
             <PersonTime key={personIndex}>
@@ -117,8 +139,9 @@ export default function ScheduleComponent() {
                     <TimeDiv
                       key={timeIndex}
                       selected={checkedTime[personIndex][timeIndex]}
-                      onMouseDown={(event) => handleMouseDown(event, timeIndex)}
                       timeindex={timeIndex}
+                      startIndex={startIndex ?? -1}
+                      endIndex={endIndex ?? -1}
                     ></TimeDiv>
                   );
                 })}
@@ -213,10 +236,11 @@ const TimeDiv = styled.div<timeDivProps>`
       : selected === 1
       ? Color("orange50")
       : ""};
-  border-top: 1.5px solid ${Color("blue200")};
-  border-bottom: 3;
-  border-left: 3;
-  border-right: 3;
+  border-top: 1px solid ${Color("blue200")};
+  border-left: ${({ timeindex, startIndex }) =>
+    timeindex === startIndex ? "5px solid blue" : ""};
+  border-right: ${({ timeindex, endIndex }) =>
+    timeindex === endIndex ? "5px solid blue" : ""};
 `;
 
 const TimeDivGroup = styled.div`
