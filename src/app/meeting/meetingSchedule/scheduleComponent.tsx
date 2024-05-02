@@ -58,32 +58,44 @@ RecommendTime[46] = true;
 
 export default function ScheduleComponent() {
   let fixedIndex = -1;
-  const [startIndex, setStartIndex] = useState<null | number>(null);
-  const [endIndex, setEndIndex] = useState<null | number>(null);
+  const [startIndex, setStartIndex] = useState<number>(-2);
+  const [endIndex, setEndIndex] = useState<number>(-2);
   // 첫지점과 끝지점을 통해 scope 설정에 이용할 예정
 
-  const [timeDivGroupRef, timeDivGroupleftX] = [useRef(null), useRef(0)];
+  const [timeDivGroupRef, timeDivGroupleftX] = [
+    useRef<HTMLDivElement | null>(null),
+    useRef(0),
+  ];
 
   const handleMouseMove = (event: MouseEvent) => {
-    const nowPosition = event.clientX + timeDivGroupRef.current.scrollLeft;
+    const nowPosition = event.clientX + timeDivGroupRef.current!.scrollLeft;
+    let tmpIndex: number = Math.floor(
+      (nowPosition - timeDivGroupleftX.current) / 16
+    );
+    let timeIndex: number;
+    if (tmpIndex < 0) {
+      timeIndex = 0;
+    } else if (tmpIndex > 95) {
+      timeIndex = 95;
+    } else {
+      timeIndex = tmpIndex;
+    } // 범위 밖으로 나가면 초기값 혹은 끝값 바꿔줌
 
-    let timeIndex = Math.floor((nowPosition - timeDivGroupleftX.current) / 16);
-    if (timeIndex && Number(timeIndex) >= fixedIndex) {
-      setEndIndex(Number(timeIndex));
+    if (timeIndex >= fixedIndex) {
+      setEndIndex(timeIndex);
     } // 초기위치보다 오른쪽이면 endIndex변경
-    if (timeIndex && Number(timeIndex) <= fixedIndex) {
-      setStartIndex(Number(timeIndex));
+    if (timeIndex <= fixedIndex) {
+      setStartIndex(timeIndex);
     } // 초기위치보다 왼쪽이면 startIndex변경
   }; // 마우스 무브 이벤트 추가 테스트용
   const handleMouseUp = (evnet: MouseEvent) => {
     window.removeEventListener("mousemove", handleMouseMove);
-    console.log("마우스업");
   }; // 마우스 업 이벤트(클릭 뗄시 발생) mousemove이벤트 삭제용
 
   const handleMouseDown = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
-    const nowPositionX = event.clientX + timeDivGroupRef.current.scrollLeft;
+    const nowPositionX = event.clientX + timeDivGroupRef.current!.scrollLeft;
     fixedIndex = Math.floor((nowPositionX - timeDivGroupleftX.current) / 16);
     setStartIndex(fixedIndex);
     setEndIndex(fixedIndex);
@@ -93,16 +105,12 @@ export default function ScheduleComponent() {
     // mouseUp은 cleanup 함수 성질이기에 한번만 실행하면 효력을 다하므로 once : true 추가
   }; // 마우스 클릭 중 시 발생
 
-  // useEffect(() => {
-  //   console.log("startIndex " + startIndex + "endIndex " + endIndex);
-  // }, [startIndex, endIndex]);
-
   useEffect(() => {
     if (timeDivGroupRef.current) {
       timeDivGroupleftX.current =
         timeDivGroupRef.current.getBoundingClientRect().left;
     }
-  }, [timeDivGroupRef]);
+  }, [timeDivGroupRef, timeDivGroupleftX]);
 
   return (
     <MainLayout>
@@ -160,8 +168,8 @@ export default function ScheduleComponent() {
                       selected={checkedTime[personIndex][timeIndex]}
                       personIndex={personIndex}
                       timeindex={timeIndex}
-                      startIndex={startIndex ?? -1}
-                      endIndex={endIndex ?? -1}
+                      startIndex={startIndex}
+                      endIndex={endIndex}
                     ></TimeDiv>
                   );
                 })}
