@@ -1,6 +1,5 @@
 "use client";
 import type { Metadata } from "next";
-import React from "react";
 import { Noto_Sans_KR } from "next/font/google";
 import StyledComponentsRegistry from "@/../lib/registry";
 import styled, { ThemeProvider } from "styled-components";
