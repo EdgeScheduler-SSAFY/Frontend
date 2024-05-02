@@ -1,5 +1,5 @@
 "use client";
-import styled from "styled-components";
+import { styled, ThemeProvider } from "styled-components";
 import Image from "next/image";
 import { people, person } from "./dummyData";
 import { useEffect, useRef, useState } from "react";
@@ -103,7 +103,8 @@ export default function ScheduleComponent() {
         timeDivGroupRef.current.getBoundingClientRect().left;
     }
   }, [timeDivGroupRef]);
-  
+
+  return (
     <MainLayout>
       <PeopleLayout>
         <PersonTitleLayout>
@@ -237,6 +238,7 @@ const PersonTime = styled.div`
 
 const PersonTitleLayout = styled.div`
   min-height: 3rem;
+  max-height: 3rem;
   display: flex;
   font-weight: bold;
   justify-content: center;
@@ -261,47 +263,65 @@ const RecommendTimeSchedule = styled.div`
   background-color: ${Color("black50")};
 `;
 const TimeDiv = styled.div<timeDivProps>`
+  box-sizing: border-box;
   width: 1rem;
   height: 2rem;
-  border: 0.5px solid ${Color("black100")};
   background-color: ${({ selected }) =>
     selected === 2
       ? Color("green50")
       : selected === 1
       ? Color("orange50")
       : ""};
-  border-left: ${({ timeindex, startIndex }) =>
-    timeindex == startIndex ? "1px solid blue" : ""};
+  border: 2px solid ${Color("black200")};
+  border-left: ${({ timeindex, startIndex, endIndex }) => {
+    if (timeindex == endIndex + 1) {
+      return "0px solid";
+    } else {
+      return timeindex == startIndex ? "2px solid blue" : "";
+    }
+  }};
   border-right: ${({ timeindex, endIndex }) =>
-    timeindex == endIndex ? "1px solid blue" : ""};
+    timeindex == endIndex
+      ? "2px solid blue"
+      : timeindex == 95
+      ? ""
+      : "0px solid"};
+  // Color("black200") 이런 형태로 쓰는 문법이 적용이 안되서 기본값을 주고 바꾸는 식으로 코드작성
   border-top: ${({ timeindex, personIndex, startIndex, endIndex }) =>
     timeindex <= endIndex && timeindex >= startIndex && personIndex == 0
-      ? "1px solid blue"
+      ? "2px solid blue"
       : ""};
 `;
 
 const TimeDivGroup = styled.div`
   display: flex;
-  padding-left: 3px;
+  box-sizing: border-box;
+  margin-left: 3px;
 `;
 
 const TimeStampGroup = styled.div`
   display: flex;
   height: 1rem;
   font-size: x-small;
-  padding-left: 3px;
+  margin-left: 3px;
 `;
 
 const TimeStamp = styled.div<timeStampProps>`
+  box-sizing: border-box;
   width: 1rem;
-  height: 1.5rem;
-  border-left: ${({ timeindex, startIndex }) =>
-    timeindex == startIndex ? "1px solid blue" : ""};
+  height: 26px;
+  border-left: ${({ timeindex, startIndex, endIndex }) => {
+    if (timeindex == endIndex + 1) {
+      return "";
+    } else {
+      return timeindex == startIndex ? "2px solid blue" : ``;
+    }
+  }};
   border-right: ${({ timeindex, endIndex }) =>
-    timeindex == endIndex ? "1px solid blue" : ""};
+    timeindex == endIndex ? "2px solid blue" : ""};
   border-bottom: ${({ timeindex, personIndex, startIndex, endIndex }) =>
     timeindex <= endIndex && timeindex >= startIndex && personIndex == 5
-      ? "1px solid blue"
+      ? "2px solid blue"
       : ""};
 `;
 const PersonInfo = styled.div`
