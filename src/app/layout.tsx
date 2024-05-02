@@ -1,5 +1,6 @@
 "use client";
 import type { Metadata } from "next";
+import React from "react";
 import { Noto_Sans_KR } from "next/font/google";
 import StyledComponentsRegistry from "@/../lib/registry";
 import styled, { ThemeProvider } from "styled-components";
@@ -7,6 +8,7 @@ import { Header } from "@/widgets/header/index";
 import { Footer } from "@/widgets/footer/index";
 import GlobalStyle from "@/shared/lib/styles/globalStyle";
 import * as theme from "@/shared/lib/styles/theme";
+
 const noto = Noto_Sans_KR({
   subsets: ["latin"], // 또는 preload: false
 });
