@@ -1,7 +1,7 @@
 "use client";
 import styled from "styled-components";
 import { IoMdArrowDropdown } from "react-icons/io";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaAngleLeft } from "react-icons/fa";
 import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
 import { BsDot } from "react-icons/bs";
@@ -15,21 +15,40 @@ interface OptionButtonProps {
 
 export default function Meeting() {
   const [selectedOption, setSelectedOption] = useState(0);
-
-  let currentDate = new Date();
+  const [date, setDate] = useState(new Date());
+  const [startIndex, setStartIndex] = useState<number>(-2);
+  const [startTime, setStartTime] = useState<string>("");
+  const [endTime, setEndTime] = useState<string>("");
+  const [endIndex, setEndIndex] = useState<number>(-2);
+  useEffect(() => {
+    console.log(date.getHours());
+  }, [date]);
   let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  let dayOfWeek = currentDate.getDay();
+  let dayOfWeek = date.getDay();
   let today =
-    currentDate.getFullYear() +
+    date.getFullYear() +
     "." +
-    (currentDate.getMonth() + 1) +
+    (date.getMonth() + 1) +
     "." +
-    currentDate.getDate() +
+    date.getDate() +
     "(" +
     days[dayOfWeek] +
     ")";
   const handleOptionClick = (index: number) => {
     setSelectedOption(index);
+  };
+
+  const handleGoToPastDay = () => {
+    let pastDay = new Date(date.getTime() - 24 * 60 * 60 * 1000);
+    let today = new Date();
+    if (pastDay.getTime() > today.getTime()) {
+      setDate(pastDay);
+    }
+  };
+
+  const handleGoToNextDay = () => {
+    let pastDay = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+    setDate(pastDay);
   };
   return (
     <MainLayout>
@@ -39,13 +58,13 @@ export default function Meeting() {
           <TimeSelectionLayout>
             <DateDiv>{today}</DateDiv>
             <TimeButton as="button">
-              <div>PM 03:45</div>
+              <div>PM 03:00</div>
               <IoMdArrowDropdown />
             </TimeButton>
             <HypoonDiv>-</HypoonDiv>
             <DateDiv>{today}</DateDiv>
             <TimeButton as="button">
-              <div>PM 03:45</div>
+              <div>PM 03:00</div>
               <IoMdArrowDropdown />
             </TimeButton>
           </TimeSelectionLayout>
@@ -75,11 +94,11 @@ export default function Meeting() {
       </HeaderLayout>
       <ScheduleHeaderLayout>
         <ScheduleHeaderTime>
-          <TimeChangeButton>
+          <TimeChangeButton onClick={handleGoToPastDay}>
             <LuChevronLeftSquare />
           </TimeChangeButton>
-          {today}
-          <TimeChangeButton>
+          <TimeDiv>{today}</TimeDiv>
+          <TimeChangeButton onClick={handleGoToNextDay}>
             <LuChevronRightSquare />
           </TimeChangeButton>
         </ScheduleHeaderTime>
@@ -246,4 +265,9 @@ const WorkingScheduleLayout = styled.div`
   align-items: center;
   justify-content: right;
   gap: 5px;
+`;
+
+const TimeDiv = styled.div`
+  display: flex;
+  padding-bottom: 4px;
 `;

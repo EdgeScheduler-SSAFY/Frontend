@@ -197,8 +197,8 @@ export default function ScheduleComponent() {
                         key={timeIndex}
                         personIndex={personIndex}
                         timeindex={timeIndex}
-                        startIndex={startIndex ?? -1}
-                        endIndex={endIndex ?? -1}
+                        startIndex={startIndex}
+                        endIndex={endIndex}
                       ></TimeStamp>
                     );
                   }
