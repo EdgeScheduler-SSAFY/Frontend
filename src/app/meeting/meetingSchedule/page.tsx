@@ -13,7 +13,7 @@ interface OptionButtonProps {
   selected: boolean;
 }
 
-export default function Meeting() {
+export default function MeetingSchedule() {
   const [selectedOption, setSelectedOption] = useState(0);
 
   let currentDate = new Date();
@@ -77,7 +77,7 @@ export default function Meeting() {
         <ScheduleHeaderExp>
           <WorkingScheduleLayout>
             <WorkingDiv />
-            Worktime 
+            Worktime
             <ScheduleDiv />
             Scheduled
           </WorkingScheduleLayout>
