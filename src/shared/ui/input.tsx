@@ -10,7 +10,7 @@ const noto = Noto_Sans_KR({
   subsets: ["latin"], // 또는 preload: false
 });
 
-interface InputProrps {
+interface InputProps {
   id: string;
   width?: number;
   height?: number;
@@ -19,9 +19,9 @@ interface InputProrps {
   onClick?: () => void;
 }
 
-export default function Input(props: InputProrps) {
+export default function Input(props: InputProps) {
   // 검색어
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState<string>("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
@@ -34,7 +34,7 @@ export default function Input(props: InputProrps) {
   return <CustomInput {...props} className={noto.className} value={value} onChange={handleChange} id={props.id}></CustomInput>;
 }
 
-const CustomInput = styled.input<InputProrps>`
+const CustomInput = styled.input<InputProps>`
   width: ${(props) => (props.width ? `${props.width}rem` : "10rem")};
   height: ${(props) => (props.height ? `${props.height}rem` : "2rem")};
   padding: 0.1rem 0.7rem;

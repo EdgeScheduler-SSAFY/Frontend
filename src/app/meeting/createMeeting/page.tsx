@@ -12,6 +12,7 @@ import Select from "@/shared/ui/select";
 import { meetingTime } from "@/shared/lib/data";
 import TextArea from "@/shared/ui/textArea";
 import { userLists } from "@/shared/lib/data";
+import UserButton from "./ui/userBtn";
 
 export default function CreateMeeting() {
   // 전체 부서 주소록
@@ -24,7 +25,7 @@ export default function CreateMeeting() {
 
   // 전체 주소록 상태 변경
   const toggleFold = () => {
-    setIsFolded(!isFolded);
+    setIsFolded((prev) => !prev);
   };
 
   // 특정 부서의 상태를 변경
@@ -65,10 +66,11 @@ export default function CreateMeeting() {
                           <li>
                             {userLists[team.name].map((member, index) => (
                               <MenuItem key={index}>
-                                <button className='draggable' draggable='true'>
-                                  <Image src='/images/profile.webp' alt='프로필사진' width={20} height={20} />
-                                  {member.name}
-                                </button>
+                                <UserButton
+                                  profilePath='/images/profile.webp'
+                                  altText='프로필사진'
+                                  userName={member.name}
+                                />
                               </MenuItem>
                             ))}
                           </li>
@@ -104,7 +106,7 @@ export default function CreateMeeting() {
             </div>
             <div>
               <Label htmlFor='participant'>Participant</Label>
-              <ParticipantDiv className='container' id='participant'></ParticipantDiv>
+              <ParticipantDiv id='participant'></ParticipantDiv>
             </div>
           </InformationDiv>
         </CreateForm>
@@ -133,7 +135,7 @@ const CreateForm = styled.div`
 `;
 
 const AddressDiv = styled.div`
-  width: 30%;
+  width: 40%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -141,7 +143,7 @@ const AddressDiv = styled.div`
 `;
 
 const InformationDiv = styled.div`
-  width: 70%;
+  width: 60%;
   display: flex;
   flex-direction: column;
   justify-content: center;
