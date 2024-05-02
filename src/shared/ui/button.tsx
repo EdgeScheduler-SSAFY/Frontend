@@ -10,7 +10,7 @@ interface ButtonProps {
   bgcolor?: ColorName;
   hovercolor?: ColorName;
   fontSize?: number;
-  children?: string;
+  children: string;
   onClick?: () => void;
 }
 

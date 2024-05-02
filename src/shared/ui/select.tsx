@@ -16,7 +16,7 @@ interface SelectListProps {
 }
 
 export default function Select(props: SelectProrps) {
-  const [selectFlag, setSelectFlag] = useState(false);
+  const [selectFlag, setSelectFlag] = useState<boolean>(false);
   // 15 minutes(options[0].option)을 초기값으로 설정
   const [selectedValue, setSelectedValue] = useState(props.options.length > 0 ? props.options[0].option : "");
 
@@ -36,7 +36,7 @@ export default function Select(props: SelectProrps) {
       <SelectedDiv onClick={toggleSelect}>
         <SelectedValue>{selectedValue}</SelectedValue>
       </SelectedDiv>
-      <SelectList show={selectFlag}>
+      <SelectList show={selectFlag ? selectFlag : false}>
         {props.options.map((option) => (
           <SelectOption key={option.value} onClick={() => handleOptionClick(option.option)}>
             {option.option}
