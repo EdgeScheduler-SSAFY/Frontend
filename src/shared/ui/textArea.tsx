@@ -1,11 +1,12 @@
+"use client";
 import styled from "styled-components";
 import { Noto_Sans_KR } from "next/font/google";
 
 import { Color } from "../lib/styles/color";
-import { ColorName } from "../lib/type/types";
 
 const noto = Noto_Sans_KR({
-  subsets: ["latin"], // 또는 preload: false
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
 });
 
 interface TextAreaProrps {
@@ -13,17 +14,18 @@ interface TextAreaProrps {
   height?: number;
   placeholder?: string;
   type?: string;
-  onClick?: () => void;
   resize?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 export default function TextArea(props: TextAreaProrps) {
-  return <CustomTextArea {...props} className={noto.className}></CustomTextArea>;
+  return <CustomTextArea className={noto.className} {...props}></CustomTextArea>;
 }
 
 const CustomTextArea = styled.textarea<TextAreaProrps>`
   resize: ${(props) => (props.resize ? props.resize : "none")};
-  width: ${(props) => (props.width ? `${props.width}rem` : "70%")};
+  width: ${(props) => (props.width ? `${props.width}rem` : "77%")};
   height: ${(props) => (props.height ? `${props.height}rem` : "4rem")};
   padding: 0.5rem 0.7rem;
   font-size: 14px;
