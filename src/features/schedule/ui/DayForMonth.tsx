@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { type dayT } from "@/features/schedule/index";
 import { MoreSchedule } from "@/features/schedule/index";

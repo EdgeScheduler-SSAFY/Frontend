@@ -19,7 +19,7 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
   const lastDayOfMonth = endOfMonth(selected); // 선택된 달의 마지막날
   const startDate = startOfWeek(firstDayOfMonth); // 선택된 달의 첫주의 첫날
   const endDate = endOfWeek(lastDayOfMonth); // 선택된 달의 마지막주의 마지막날
-  const [selectedWeek, setSelectedWeek] = useState(startOfWeek(selected)); // 선택된 주
+  const [selectedWeek] = useState(startOfWeek(selected)); // 선택된 주
   const dates: Date[] = []; // 날짜 배열
 
   let currentDate = startDate; // 현재 날짜
@@ -47,7 +47,7 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [close]);
   //렌더링
   const renderDay = () => {
     return dates.map((date, index) =>
@@ -65,7 +65,10 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
             {/* 선택된 달인지 확인 */}
             {dates.slice(index, index + 7).map((subDate) =>
               selected.getMonth() !== subDate.getMonth() ? (
-                <SubMonthDay onClick={() => handleDayClick(subDate)}>
+                <SubMonthDay
+                  key={format(subDate, "yyyy-MM-dd")}
+                  onClick={() => handleDayClick(subDate)}
+                >
                   {format(subDate, "d")}
                 </SubMonthDay>
               ) : //view가 day인 경우 선택된 날짜인지 확인
@@ -92,7 +95,10 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
             {/* 선택된 달인지 확인 */}
             {dates.slice(index, index + 7).map((subDate) =>
               selected.getMonth() !== subDate.getMonth() ? (
-                <SubMonthDay onClick={() => handleDayClick(subDate)}>
+                <SubMonthDay
+                  key={format(subDate, "yyyy-MM-dd")}
+                  onClick={() => handleDayClick(subDate)}
+                >
                   {format(subDate, "d")}
                 </SubMonthDay>
               ) : (
@@ -184,16 +190,6 @@ const SelectedDay = styled.div`
 const SubMonthDay = styled.div`
   color: #999;
   width: 35px;
-`;
-const ModalBackground = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 const NavLayout = styled.div`
   display: flex;

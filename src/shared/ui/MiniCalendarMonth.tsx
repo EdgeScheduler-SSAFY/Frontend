@@ -31,7 +31,7 @@ export function MiniCalendarMonth({ selectedDate, close, selectDate }: IMonthVie
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [close]);
 
   return (
     <CalendarLayout data-testid="miniCalendar" onClick={(e) => e.stopPropagation()} ref={ref}>

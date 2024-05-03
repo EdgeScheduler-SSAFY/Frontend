@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { type dayT } from "@/features/schedule/index";
 
@@ -49,20 +49,9 @@ const Day = styled.div`
   padding-right: 10px;
   padding-top: 5px;
 `;
-const Box = styled.div`
-  width: 200px;
-  height: 200px;
-  background-color: lightgray;
-`;
 const ChildrenLayout = styled.div`
   display: grid;
   width: 80%;
   height: 75%;
   grid-template-rows: 1fr 1fr 1fr;
-`;
-const MoreLayout = styled.div`
-  width: 90%;
-  height: 25%;
-  font-size: small;
-  text-align: left;
 `;
