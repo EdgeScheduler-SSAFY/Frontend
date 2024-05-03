@@ -1,5 +1,5 @@
 export interface selectList {
-  value: number;
+  value: number | string;
   option: string;
 }
 
@@ -7,8 +7,6 @@ export interface userList {
   id: number;
   name: string;
   profile: string;
-}
-
-export interface UserLists {
-  [key: string]: userList[];
+  timezone: string;
+  department: string;
 }

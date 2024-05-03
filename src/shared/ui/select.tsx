@@ -1,24 +1,22 @@
+"use client";
 import React, { useState } from "react";
 import styled from "styled-components";
 
 import { Color } from "../lib/styles/color";
-import { ColorName } from "../lib/type/types";
 import { selectList } from "../lib/type/interfaces";
 
 interface SelectProrps {
+  width: number;
   id?: string;
-  options: selectList[]; // 옵션 배열 추가
-  onClick?: () => void;
-}
-
-interface SelectListProps {
+  options: selectList[];
   show: boolean;
+  onSelectChange: (value: number | string) => void;
 }
 
 export default function Select(props: SelectProrps) {
-  const [selectFlag, setSelectFlag] = useState<boolean>(false);
+  const [selectFlag, setSelectFlag] = useState<boolean>(props.show);
   // 15 minutes(options[0].option)을 초기값으로 설정
-  const [selectedValue, setSelectedValue] = useState(props.options.length > 0 ? props.options[0].option : "");
+  const [selectedValue, setSelectedValue] = useState<string>(props.options.length > 0 ? props.options[0].option : "");
 
   // 선택여부
   const toggleSelect = () => {
@@ -26,19 +24,24 @@ export default function Select(props: SelectProrps) {
   };
 
   // 선택값
-  const handleOptionClick = (value: string) => {
-    setSelectedValue(value);
-    setSelectFlag(false);
+  const handleOptionClick = (value: number | string) => {
+    // value에 해당하는 option 찾기
+    const selectedOption = props.options.find((option) => option.value === value);
+    if (selectedOption) {
+      setSelectedValue(selectedOption.option); // option으로 설정
+      setSelectFlag(false);
+      props.onSelectChange(value);
+    }
   };
 
   return (
     <SelectDiv id={props.id}>
-      <SelectedDiv onClick={toggleSelect}>
+      <SelectedDiv width={props.width} onClick={toggleSelect}>
         <SelectedValue>{selectedValue}</SelectedValue>
       </SelectedDiv>
-      <SelectList show={selectFlag ? selectFlag : false}>
+      <SelectList width={props.width} $show={selectFlag}>
         {props.options.map((option) => (
-          <SelectOption key={option.value} onClick={() => handleOptionClick(option.option)}>
+          <SelectOption key={option.value} onClick={() => handleOptionClick(option.value)}>
             {option.option}
           </SelectOption>
         ))}
@@ -53,8 +56,8 @@ const SelectDiv = styled.div`
   height: 2rem;
 `;
 
-const SelectedDiv = styled.div`
-  width: 10rem;
+const SelectedDiv = styled.div<{ width: number }>`
+  width: ${(props) => (props.width ? `${props.width}rem` : "10rem")};
   border: solid 1px ${Color("black200")};
   border-radius: 3px;
   box-sizing: border-box;
@@ -71,14 +74,14 @@ const SelectedValue = styled.span`
   align-items: center;
 `;
 
-const SelectList = styled.ul<SelectListProps>`
+const SelectList = styled.ul<{ $show: boolean; width: number }>`
   overflow-y: auto; /* 세로 스크롤 적용 */
-  display: ${(props) => (props.show ? "block" : "none")};
+  display: ${(props) => (props.$show ? "block" : "none")};
   list-style-type: none;
   padding-left: 0;
   position: absolute;
   font-size: 14px;
-  width: 10rem;
+  width: ${(props) => (props.width ? `${props.width}rem` : "10rem")};
   height: 8rem;
   z-index: 15;
   border: solid 1px ${Color("black200")};
@@ -93,7 +96,7 @@ const SelectOption = styled.li`
   height: 1.9rem;
   line-height: 1.9rem;
   margin: 0.05rem 0;
-  padding-left: 1rem;
+  padding-left: 0.7rem;
   cursor: pointer;
   box-sizing: border-box;
   transition: all 0.2s ease-in-out;
