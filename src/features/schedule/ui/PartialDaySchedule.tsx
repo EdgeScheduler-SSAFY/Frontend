@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { format } from "date-fns";
 // 일부시간 일정 컴포넌트의 props
@@ -9,7 +9,7 @@ interface IPartialDayScheduleProps {
 //
 export function PartialDaySchedule({ title, date }: IPartialDayScheduleProps) {
   // 일부시간 일정 상세보기 상태
-  const [showDetails, setShowDetails] = React.useState(false);
+  const [showDetails, setShowDetails] = useState<boolean>(false);
   return (
     // 일부시간 컴포넌트
     <Layout color="lightblue" onClick={() => setShowDetails(!showDetails)}>
