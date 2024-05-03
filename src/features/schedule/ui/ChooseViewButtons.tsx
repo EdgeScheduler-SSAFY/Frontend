@@ -9,7 +9,7 @@ interface IChooseViewButtonsProps {
 // view 선택 버튼
 export function ChooseViewButtons({ view, changeView }: IChooseViewButtonsProps) {
   // view 선택 버튼 확장 여부
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState<boolean>(false);
   // view 선택 버튼 클릭 시
   const handleButtonClick = (selectedView: string) => {
     changeView(selectedView); // view 변경

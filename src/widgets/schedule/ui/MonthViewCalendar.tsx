@@ -1,11 +1,4 @@
-import {
-  DayForMonth,
-  AllDaySchedule,
-  PartialDaySchedule,
-  SeparateSchedule,
-} from "@/features/schedule/index";
 import React, { useState } from "react";
-import styled from "styled-components";
 import {
   startOfMonth,
   endOfMonth,
@@ -15,6 +8,13 @@ import {
   format,
   differenceInCalendarDays,
 } from "date-fns";
+import styled from "styled-components";
+import {
+  DayForMonth,
+  AllDaySchedule,
+  PartialDaySchedule,
+  SeparateSchedule,
+} from "@/features/schedule/index";
 import { Week } from "@/features/schedule/index";
 
 // 월별 캘린더의 props

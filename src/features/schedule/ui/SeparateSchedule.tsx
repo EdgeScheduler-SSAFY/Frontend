@@ -27,13 +27,3 @@ const Layout = styled.div`
   z-index: -1;
   position: relative;
 `;
-const MoreLayout = styled.div`
-  width: 100%;
-  background-color: white;
-  border-radius: 5px;
-  text-align: left;
-  padding: 0 5px;
-  font-size: small;
-  z-index: -1;
-  position: relative;
-`;
