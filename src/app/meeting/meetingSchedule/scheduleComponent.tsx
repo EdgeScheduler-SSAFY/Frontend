@@ -1,5 +1,5 @@
 "use client";
-import styled from "styled-components";
+import { styled, ThemeProvider } from "styled-components";
 import Image from "next/image";
 import { people, person } from "./dummyData";
 import { useEffect, useRef, useState } from "react";
@@ -7,10 +7,15 @@ import { Color } from "@/shared/lib/styles/color";
 
 const vip: boolean[] = [true, true, true, true, false, false];
 const checkedTime: number[][] = [];
-const allDayTime: boolean[] = Array(96).fill(false);
+const allDayTime: boolean[] = Array(112).fill(false);
 //checkedTime 이 0이면 그냥 시간, 1이면 불가능한 시간, 2이면 업무 시간
 const startTime: number[] = [0, 4, 6, 8, 8, 12];
-const RecommendTime: boolean[] = Array(96).fill(false);
+const RecommendTime: boolean[] = Array(112).fill(false);
+
+interface ScheduleComponentProps {
+  setParentStartIndex: (timeIndex: number) => void;
+  setParentEndIndex: (timeIndex: number) => void;
+}
 
 interface vipDivProps {
   vipperson: boolean;
@@ -33,7 +38,7 @@ interface timeDivProps {
 
 people.forEach((person: person, index: number) => {
   let arr: number[] = []; // 사람별 되는 시간 더미데이터
-  for (let i = 0; i < 96; i++) {
+  for (let i = 0; i < 112; i++) {
     if (Math.floor(i / 8) == 1) {
       arr.push(2);
     } else {
@@ -56,54 +61,72 @@ RecommendTime[44] = true;
 RecommendTime[45] = true;
 RecommendTime[46] = true;
 
-export default function ScheduleComponent() {
+export default function ScheduleComponent({
+  setParentStartIndex,
+  setParentEndIndex,
+}: ScheduleComponentProps) {
   let fixedIndex = -1;
-  const [startIndex, setStartIndex] = useState<null | number>(null);
-  const [endIndex, setEndIndex] = useState<null | number>(null);
+  const [startIndex, setStartIndex] = useState<number>(-2);
+  const [endIndex, setEndIndex] = useState<number>(-2);
   // 첫지점과 끝지점을 통해 scope 설정에 이용할 예정
 
-  const [timeDivGroupRef, timeDivGroupleftX] = [useRef(null), useRef(0)];
+  const [timeDivGroupRef, timeDivGroupleftX] = [
+    useRef<HTMLDivElement | null>(null),
+    useRef(0),
+  ];
 
   const handleMouseMove = (event: MouseEvent) => {
-    const nowPosition = event.clientX + timeDivGroupRef.current.scrollLeft;
+    const nowPosition = event.clientX + timeDivGroupRef.current!.scrollLeft;
+    let tmpIndex: number = Math.floor(
+      (nowPosition - timeDivGroupleftX.current) / 16
+    );
+    let timeIndex: number;
+    if (tmpIndex < 0) {
+      timeIndex = 0;
+    } else if (tmpIndex > 111) {
+      timeIndex = 111;
+    } else {
+      timeIndex = tmpIndex;
+    } // 범위 밖으로 나가면 초기값 혹은 끝값 바꿔줌
 
-    let timeIndex = Math.floor((nowPosition - timeDivGroupleftX.current) / 16);
-    if (timeIndex && Number(timeIndex) >= fixedIndex) {
-      setEndIndex(Number(timeIndex));
+    if (timeIndex >= fixedIndex) {
+      updateEndIndex(timeIndex);
     } // 초기위치보다 오른쪽이면 endIndex변경
-    if (timeIndex && Number(timeIndex) <= fixedIndex) {
-      setStartIndex(Number(timeIndex));
+    if (timeIndex <= fixedIndex) {
+      updateStartIndex(timeIndex);
     } // 초기위치보다 왼쪽이면 startIndex변경
   }; // 마우스 무브 이벤트 추가 테스트용
   const handleMouseUp = (evnet: MouseEvent) => {
     window.removeEventListener("mousemove", handleMouseMove);
-    console.log("마우스업");
   }; // 마우스 업 이벤트(클릭 뗄시 발생) mousemove이벤트 삭제용
-
   const handleMouseDown = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
-    const nowPositionX = event.clientX + timeDivGroupRef.current.scrollLeft;
+    const nowPositionX = event.clientX + timeDivGroupRef.current!.scrollLeft;
     fixedIndex = Math.floor((nowPositionX - timeDivGroupleftX.current) / 16);
-    setStartIndex(fixedIndex);
-    setEndIndex(fixedIndex);
+    updateStartIndex(fixedIndex);
+    updateEndIndex(fixedIndex);
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp, { once: true });
 
     // mouseUp은 cleanup 함수 성질이기에 한번만 실행하면 효력을 다하므로 once : true 추가
   }; // 마우스 클릭 중 시 발생
 
-  // useEffect(() => {
-  //   console.log("startIndex " + startIndex + "endIndex " + endIndex);
-  // }, [startIndex, endIndex]);
-
   useEffect(() => {
     if (timeDivGroupRef.current) {
       timeDivGroupleftX.current =
         timeDivGroupRef.current.getBoundingClientRect().left;
     }
-  }, [timeDivGroupRef]);
+  }, [timeDivGroupRef, timeDivGroupleftX]);
 
+  const updateStartIndex = (timeIndex: number) => {
+    setStartIndex(timeIndex);
+    setParentStartIndex(timeIndex);
+  };
+  const updateEndIndex = (timeIndex: number) => {
+    setEndIndex(timeIndex);
+    setParentEndIndex(timeIndex + 1);
+  };
   return (
     <MainLayout>
       <PeopleLayout>
@@ -160,8 +183,8 @@ export default function ScheduleComponent() {
                       selected={checkedTime[personIndex][timeIndex]}
                       personIndex={personIndex}
                       timeindex={timeIndex}
-                      startIndex={startIndex ?? -1}
-                      endIndex={endIndex ?? -1}
+                      startIndex={startIndex}
+                      endIndex={endIndex}
                     ></TimeDiv>
                   );
                 })}
@@ -174,8 +197,8 @@ export default function ScheduleComponent() {
                         key={timeIndex}
                         personIndex={personIndex}
                         timeindex={timeIndex}
-                        startIndex={startIndex ?? -1}
-                        endIndex={endIndex ?? -1}
+                        startIndex={startIndex}
+                        endIndex={endIndex}
                       >
                         {(startTime[personIndex] +
                           Math.floor(timeIndex / 4) +
@@ -189,8 +212,8 @@ export default function ScheduleComponent() {
                         key={timeIndex}
                         personIndex={personIndex}
                         timeindex={timeIndex}
-                        startIndex={startIndex ?? -1}
-                        endIndex={endIndex ?? -1}
+                        startIndex={startIndex}
+                        endIndex={endIndex}
                       ></TimeStamp>
                     );
                   }
@@ -229,7 +252,7 @@ const TimeTableLayout = styled.div`
 `;
 
 const PersonTime = styled.div`
-  width: 96rem;
+  width: 112rem;
   height: 3rem;
   display: flex;
   flex-direction: column;
@@ -238,6 +261,7 @@ const PersonTime = styled.div`
 
 const PersonTitleLayout = styled.div`
   min-height: 3rem;
+  max-height: 3rem;
   display: flex;
   font-weight: bold;
   justify-content: center;
@@ -258,52 +282,54 @@ const PersonLayout = styled.div<vipDivProps>`
 
 const RecommendTimeSchedule = styled.div`
   min-height: 3rem;
-  width: 96rem;
+  width: 112rem;
   background-color: ${Color("black50")};
 `;
 const TimeDiv = styled.div<timeDivProps>`
+  box-sizing: border-box;
   width: 1rem;
   height: 2rem;
-  border: 0.5px solid ${Color("black100")};
   background-color: ${({ selected }) =>
     selected === 2
       ? Color("green50")
       : selected === 1
       ? Color("orange50")
       : ""};
-  border-left: ${({ timeindex, startIndex }) =>
-    timeindex == startIndex ? "1px solid blue" : ""};
-  border-right: ${({ timeindex, endIndex }) =>
-    timeindex == endIndex ? "1px solid blue" : ""};
-  border-top: ${({ timeindex, personIndex, startIndex, endIndex }) =>
-    timeindex <= endIndex && timeindex >= startIndex && personIndex == 0
-      ? "1px solid blue"
-      : ""};
+  border-top: 2px solid ${Color("black200")};
+  border-bottom: 2px solid ${Color("black200")};
+  border-left: 2px solid ${Color("black200")};
+  background-color: ${({ timeindex, startIndex, endIndex, selected }) => {
+    if (timeindex <= endIndex && timeindex >= startIndex) {
+      switch (selected) {
+        case 1:
+          return Color("orange300");
+        case 2:
+          return Color("blue300");
+        default:
+          return Color("blue100");
+      }
+    }
+  }};
 `;
 
 const TimeDivGroup = styled.div`
   display: flex;
-  padding-left: 3px;
+  box-sizing: border-box;
+  border-right: 2px solid ${Color("black200")};
+  margin-left: 3px;
 `;
 
 const TimeStampGroup = styled.div`
   display: flex;
   height: 1rem;
   font-size: x-small;
-  padding-left: 3px;
+  margin-left: 3px;
 `;
 
 const TimeStamp = styled.div<timeStampProps>`
+  box-sizing: border-box;
   width: 1rem;
-  height: 1.5rem;
-  border-left: ${({ timeindex, startIndex }) =>
-    timeindex == startIndex ? "1px solid blue" : ""};
-  border-right: ${({ timeindex, endIndex }) =>
-    timeindex == endIndex ? "1px solid blue" : ""};
-  border-bottom: ${({ timeindex, personIndex, startIndex, endIndex }) =>
-    timeindex <= endIndex && timeindex >= startIndex && personIndex == 5
-      ? "1px solid blue"
-      : ""};
+  height: 26px;
 `;
 const PersonInfo = styled.div`
   display: flex;
