@@ -7,10 +7,15 @@ import { Color } from "@/shared/lib/styles/color";
 
 const vip: boolean[] = [true, true, true, true, false, false];
 const checkedTime: number[][] = [];
-const allDayTime: boolean[] = Array(96).fill(false);
+const allDayTime: boolean[] = Array(112).fill(false);
 //checkedTime 이 0이면 그냥 시간, 1이면 불가능한 시간, 2이면 업무 시간
 const startTime: number[] = [0, 4, 6, 8, 8, 12];
-const RecommendTime: boolean[] = Array(96).fill(false);
+const RecommendTime: boolean[] = Array(112).fill(false);
+
+interface ScheduleComponentProps {
+  setParentStartIndex: (timeIndex: number) => void;
+  setParentEndIndex: (timeIndex: number) => void;
+}
 
 interface vipDivProps {
   vipperson: boolean;
@@ -33,7 +38,7 @@ interface timeDivProps {
 
 people.forEach((person: person, index: number) => {
   let arr: number[] = []; // 사람별 되는 시간 더미데이터
-  for (let i = 0; i < 96; i++) {
+  for (let i = 0; i < 112; i++) {
     if (Math.floor(i / 8) == 1) {
       arr.push(2);
     } else {
@@ -56,7 +61,10 @@ RecommendTime[44] = true;
 RecommendTime[45] = true;
 RecommendTime[46] = true;
 
-export default function ScheduleComponent() {
+export default function ScheduleComponent({
+  setParentStartIndex,
+  setParentEndIndex,
+}: ScheduleComponentProps) {
   let fixedIndex = -1;
   const [startIndex, setStartIndex] = useState<number>(-2);
   const [endIndex, setEndIndex] = useState<number>(-2);
@@ -75,30 +83,29 @@ export default function ScheduleComponent() {
     let timeIndex: number;
     if (tmpIndex < 0) {
       timeIndex = 0;
-    } else if (tmpIndex > 95) {
-      timeIndex = 95;
+    } else if (tmpIndex > 111) {
+      timeIndex = 111;
     } else {
       timeIndex = tmpIndex;
     } // 범위 밖으로 나가면 초기값 혹은 끝값 바꿔줌
 
     if (timeIndex >= fixedIndex) {
-      setEndIndex(timeIndex);
+      updateEndIndex(timeIndex);
     } // 초기위치보다 오른쪽이면 endIndex변경
     if (timeIndex <= fixedIndex) {
-      setStartIndex(timeIndex);
+      updateStartIndex(timeIndex);
     } // 초기위치보다 왼쪽이면 startIndex변경
   }; // 마우스 무브 이벤트 추가 테스트용
   const handleMouseUp = (evnet: MouseEvent) => {
     window.removeEventListener("mousemove", handleMouseMove);
   }; // 마우스 업 이벤트(클릭 뗄시 발생) mousemove이벤트 삭제용
-
   const handleMouseDown = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
     const nowPositionX = event.clientX + timeDivGroupRef.current!.scrollLeft;
     fixedIndex = Math.floor((nowPositionX - timeDivGroupleftX.current) / 16);
-    setStartIndex(fixedIndex);
-    setEndIndex(fixedIndex);
+    updateStartIndex(fixedIndex);
+    updateEndIndex(fixedIndex);
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp, { once: true });
 
@@ -112,6 +119,14 @@ export default function ScheduleComponent() {
     }
   }, [timeDivGroupRef, timeDivGroupleftX]);
 
+  const updateStartIndex = (timeIndex: number) => {
+    setStartIndex(timeIndex);
+    setParentStartIndex(timeIndex);
+  };
+  const updateEndIndex = (timeIndex: number) => {
+    setEndIndex(timeIndex);
+    setParentEndIndex(timeIndex + 1);
+  };
   return (
     <MainLayout>
       <PeopleLayout>
@@ -182,8 +197,8 @@ export default function ScheduleComponent() {
                         key={timeIndex}
                         personIndex={personIndex}
                         timeindex={timeIndex}
-                        startIndex={startIndex ?? -1}
-                        endIndex={endIndex ?? -1}
+                        startIndex={startIndex}
+                        endIndex={endIndex}
                       >
                         {(startTime[personIndex] +
                           Math.floor(timeIndex / 4) +
@@ -237,7 +252,7 @@ const TimeTableLayout = styled.div`
 `;
 
 const PersonTime = styled.div`
-  width: 96rem;
+  width: 112rem;
   height: 3rem;
   display: flex;
   flex-direction: column;
@@ -267,7 +282,7 @@ const PersonLayout = styled.div<vipDivProps>`
 
 const RecommendTimeSchedule = styled.div`
   min-height: 3rem;
-  width: 96rem;
+  width: 112rem;
   background-color: ${Color("black50")};
 `;
 const TimeDiv = styled.div<timeDivProps>`
@@ -280,30 +295,27 @@ const TimeDiv = styled.div<timeDivProps>`
       : selected === 1
       ? Color("orange50")
       : ""};
-  border: 2px solid ${Color("black200")};
-  border-left: ${({ timeindex, startIndex, endIndex }) => {
-    if (timeindex == endIndex + 1) {
-      return "0px solid";
-    } else {
-      return timeindex == startIndex ? "2px solid blue" : "";
+  border-top: 2px solid ${Color("black200")};
+  border-bottom: 2px solid ${Color("black200")};
+  border-left: 2px solid ${Color("black200")};
+  background-color: ${({ timeindex, startIndex, endIndex, selected }) => {
+    if (timeindex <= endIndex && timeindex >= startIndex) {
+      switch (selected) {
+        case 1:
+          return Color("orange300");
+        case 2:
+          return Color("blue300");
+        default:
+          return Color("blue100");
+      }
     }
   }};
-  border-right: ${({ timeindex, endIndex }) =>
-    timeindex == endIndex
-      ? "2px solid blue"
-      : timeindex == 95
-      ? ""
-      : "0px solid"};
-  // Color("black200") 이런 형태로 쓰는 문법이 적용이 안되서 기본값을 주고 바꾸는 식으로 코드작성
-  border-top: ${({ timeindex, personIndex, startIndex, endIndex }) =>
-    timeindex <= endIndex && timeindex >= startIndex && personIndex == 0
-      ? "2px solid blue"
-      : ""};
 `;
 
 const TimeDivGroup = styled.div`
   display: flex;
   box-sizing: border-box;
+  border-right: 2px solid ${Color("black200")};
   margin-left: 3px;
 `;
 
@@ -318,19 +330,6 @@ const TimeStamp = styled.div<timeStampProps>`
   box-sizing: border-box;
   width: 1rem;
   height: 26px;
-  border-left: ${({ timeindex, startIndex, endIndex }) => {
-    if (timeindex == endIndex + 1) {
-      return "";
-    } else {
-      return timeindex == startIndex ? "2px solid blue" : ``;
-    }
-  }};
-  border-right: ${({ timeindex, endIndex }) =>
-    timeindex == endIndex ? "2px solid blue" : ""};
-  border-bottom: ${({ timeindex, personIndex, startIndex, endIndex }) =>
-    timeindex <= endIndex && timeindex >= startIndex && personIndex == 5
-      ? "2px solid blue"
-      : ""};
 `;
 const PersonInfo = styled.div`
   display: flex;
