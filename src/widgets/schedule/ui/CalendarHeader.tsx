@@ -24,7 +24,7 @@ export function CalendarHeader({
   changeDate,
   selectDate,
 }: ICalendarHeaderProps) {
-  const [showMiniCalendar, setShowMiniCalendar] = useState(false); //미니 캘린더 보여주기 여부
+  const [showMiniCalendar, setShowMiniCalendar] = useState<boolean>(false); //미니 캘린더 보여주기 여부
   const [seletedView, setSelectedView] = useState(view); //선택된 뷰
   return (
     <div>

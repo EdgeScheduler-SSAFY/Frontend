@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { type dayT } from "@/features/schedule/index";
 import { MoreSchedule } from "@/features/schedule/index";
-import { ReactNode } from "react";
 // 한달의 날짜별 일정 컴포넌트의 props
 interface IDayForMonthProps {
   day: dayT;
@@ -17,7 +16,7 @@ export function DayForMonth({ day, index }: IDayForMonthProps) {
       return null;
     }
     // 일정이 3개 이하일 경우
-    if (Array.isArray(day.schedules) && day.schedules.length < 4) {
+    if (day.schedules && day.schedules.length < 4) {
       return (
         <ChildrenLayout>
           {day.schedules.map((schedule, index) => (
@@ -27,7 +26,7 @@ export function DayForMonth({ day, index }: IDayForMonthProps) {
       );
     }
     // 일정이 3개 이상일 경우
-    if (Array.isArray(day.schedules) && day.schedules.length > 3) {
+    if (day.schedules && day.schedules.length > 3) {
       return (
         <ChildrenLayout>
           {day.schedules.slice(0, 2).map((schedule, index) => (
