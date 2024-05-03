@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { startOfWeek, endOfWeek, getDate, addDays } from "date-fns";
+import { startOfWeek, getDate, addDays } from "date-fns";
 // 주간 캘린더의 props
 interface IWeekViewCalendarProps {
   selectedDate: Date;

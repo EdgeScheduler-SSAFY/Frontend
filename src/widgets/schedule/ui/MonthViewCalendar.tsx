@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   startOfMonth,
   endOfMonth,
@@ -42,8 +42,7 @@ export function MonthViewCalendar({ selectedDate, scheduleList }: IMonthViewCale
     scheduleList.map((schedule: any) => {
       const start = format(schedule.startDatetime, "yyyy-MM-dd"); // 시작일
       const end = format(schedule.endDatetime, "yyyy-MM-dd"); // 종료일
-      const startDate = new Date(schedule.startDatetime); // 시작일
-      const endDate = new Date(schedule.endDatetime); // 종료일
+      const endDate = schedule.endDatetime; // 종료일
       let currentDate = schedule.startDatetime; // 현재 날짜
       // 시작일과 종료일이 다른 경우
       if (start !== end) {
