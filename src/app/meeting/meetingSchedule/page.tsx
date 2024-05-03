@@ -8,47 +8,137 @@ import { BsDot } from "react-icons/bs";
 
 import ScheduleComponent from "./scheduleComponent";
 import { Color } from "@/shared/lib/styles/color";
+import { start } from "repl";
 
 interface OptionButtonProps {
   selected: boolean;
 }
-
-export default function Meeting() {
-  const [selectedOption, setSelectedOption] = useState(0);
-  const [date, setDate] = useState(new Date());
-  const [startIndex, setStartIndex] = useState<number>(-2);
-  const [startTime, setStartTime] = useState<string>("");
-  const [endTime, setEndTime] = useState<string>("");
-  const [endIndex, setEndIndex] = useState<number>(-2);
-  useEffect(() => {
-    console.log(date.getHours());
-  }, [date]);
-  let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  let dayOfWeek = date.getDay();
-  let today =
+const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+export default function MeetingSchedule() {
+  const todayDate = new Date();
+  const [date, setDate] = useState<Date>(todayDate);
+  const [startDate, setStartDate] = useState<string>(
     date.getFullYear() +
-    "." +
-    (date.getMonth() + 1) +
-    "." +
-    date.getDate() +
-    "(" +
-    days[dayOfWeek] +
-    ")";
+      "." +
+      (date.getMonth() + 1) +
+      "." +
+      date.getDate() +
+      "(" +
+      days[date.getDay()] +
+      ")"
+  );
+  const [endDate, setEndDate] = useState<string>(startDate);
+  const [selectedOption, setSelectedOption] = useState(0);
+  const [startIndex, setStartIndex] = useState<number>(-2);
+  const [startTime, setStartTime] = useState<string>("AM 00:00");
+  const [endTime, setEndTime] = useState<string>("AM 01:00");
+  const [endIndex, setEndIndex] = useState<number>(-2);
+
   const handleOptionClick = (index: number) => {
     setSelectedOption(index);
   };
-
   const handleGoToPastDay = () => {
-    let pastDay = new Date(date.getTime() - 24 * 60 * 60 * 1000);
-    let today = new Date();
-    if (pastDay.getTime() > today.getTime()) {
-      setDate(pastDay);
+    let pastDate = new Date(date.getTime() - 24 * 60 * 60 * 1000);
+    let startOfNowDate = new Date(
+      todayDate.getFullYear(),
+      todayDate.getMonth(),
+      todayDate.getDate()
+    );
+    if (pastDate >= startOfNowDate) {
+      let tmpDate =
+        pastDate.getFullYear() +
+        "." +
+        (pastDate.getMonth() + 1) +
+        "." +
+        pastDate.getDate() +
+        "(" +
+        days[pastDate.getDay()] +
+        ")";
+      setDate(pastDate);
+      setStartDate(tmpDate);
+      setEndDate(tmpDate);
     }
   };
 
   const handleGoToNextDay = () => {
-    let pastDay = new Date(date.getTime() + 24 * 60 * 60 * 1000);
-    setDate(pastDay);
+    let nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+    let tmpDate =
+      nextDate.getFullYear() +
+      "." +
+      (nextDate.getMonth() + 1) +
+      "." +
+      nextDate.getDate() +
+      "(" +
+      days[nextDate.getDay()] +
+      ")";
+    setDate(nextDate);
+    setStartDate(tmpDate);
+    setEndDate(tmpDate);
+  };
+
+  useEffect(() => {
+    if (startIndex >= 0) {
+      changeDate(date, startIndex) &&
+        setStartDate(changeDate(date, startIndex));
+      setStartTime(changeTime(startIndex));
+    }
+  }, [startIndex, date]);
+
+  useEffect(() => {
+    if (endIndex >= 0) {
+      changeDate(date, endIndex) && setEndDate(changeDate(date, endIndex));
+      setEndTime(changeTime(endIndex));
+    }
+  }, [endIndex, date]);
+
+  const changeDate = (date: Date, timeIndex: number) => {
+    if (timeIndex > 95) {
+      const nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+      const tmpDate =
+        nextDate.getFullYear() +
+        "." +
+        (nextDate.getMonth() + 1) +
+        "." +
+        nextDate.getDate() +
+        "(" +
+        days[nextDate.getDay()] +
+        ")";
+      return tmpDate;
+    } else {
+      const tmpDate =
+        date.getFullYear() +
+        "." +
+        (date.getMonth() + 1) +
+        "." +
+        date.getDate() +
+        "(" +
+        days[date.getDay()] +
+        ")";
+      return tmpDate;
+    }
+  };
+  const changeTime = (timeIndex: number) => {
+    let nowTime = "";
+    if (timeIndex < 96 && timeIndex >= 48) {
+      nowTime += "PM ";
+    } else {
+      nowTime += "AM ";
+    }
+    if (
+      (timeIndex >= 0 && timeIndex < 4) ||
+      (timeIndex >= 48 && timeIndex < 52) ||
+      (timeIndex >= 96 && timeIndex < 100)
+    ) {
+      nowTime += "12:";
+    } else {
+      nowTime += Math.floor((timeIndex % 96) / 4) + ":";
+    }
+    if (timeIndex % 4 === 0) {
+      nowTime += "00";
+    } else {
+      nowTime += (timeIndex % 4) * 15;
+    }
+    return nowTime;
   };
   return (
     <MainLayout>
@@ -56,15 +146,15 @@ export default function Meeting() {
         <DateLayout>
           <DateinDateDiv>Date</DateinDateDiv>
           <TimeSelectionLayout>
-            <DateDiv>{today}</DateDiv>
-            <TimeButton as="button">
-              <div>PM 03:00</div>
+            <DateDiv>{startDate}</DateDiv>
+            <TimeButton>
+              <div>{startTime}</div>
               <IoMdArrowDropdown />
             </TimeButton>
             <HypoonDiv>-</HypoonDiv>
-            <DateDiv>{today}</DateDiv>
-            <TimeButton as="button">
-              <div>PM 03:00</div>
+            <DateDiv>{endDate}</DateDiv>
+            <TimeButton>
+              <div>{endTime}</div>
               <IoMdArrowDropdown />
             </TimeButton>
           </TimeSelectionLayout>
@@ -97,7 +187,16 @@ export default function Meeting() {
           <TimeChangeButton onClick={handleGoToPastDay}>
             <LuChevronLeftSquare />
           </TimeChangeButton>
-          <TimeDiv>{today}</TimeDiv>
+          <TimeDiv>
+            {date.getFullYear() +
+              "." +
+              (date.getMonth() + 1) +
+              "." +
+              date.getDate() +
+              "(" +
+              days[date.getDay()] +
+              ")"}
+          </TimeDiv>
           <TimeChangeButton onClick={handleGoToNextDay}>
             <LuChevronRightSquare />
           </TimeChangeButton>
@@ -114,7 +213,10 @@ export default function Meeting() {
           </DetailDiv>
         </ScheduleHeaderExp>
       </ScheduleHeaderLayout>
-      <ScheduleComponent />
+      <ScheduleComponent
+        setParentStartIndex={(timeIndex: number) => setStartIndex(timeIndex)}
+        setParentEndIndex={(timeIndex: number) => setEndIndex(timeIndex)}
+      />
     </MainLayout>
   );
 }
@@ -168,12 +270,12 @@ const OptionButton = styled.button<OptionButtonProps>`
 
 const DateDiv = styled.div`
   display: flex;
-  min-width: 8rem;
+  width: 8rem;
+
   min-height: 2.5rem;
   border: 1px solid gray;
   padding-top: auto;
   padding-bottom: auto;
-  padding-right: 15px;
   padding-left: 5px;
   margin-left: 10px;
   margin-right: 10px;
@@ -181,10 +283,15 @@ const DateDiv = styled.div`
   align-items: center;
 `;
 
-const TimeButton = styled(DateDiv)`
-  min-width: 4rem;
-  gap: 1rem;
+const TimeButton = styled.button`
+  display: flex;
+  min-height: 2.5rem;
+  border: 1px solid gray;
+  width: 7rem;
+  font-size: 1rem;
   padding-right: 8px;
+  align-items: center;
+  justify-content: space-between;
   background-color: white;
 `;
 const DateinDateDiv = styled.div`
@@ -269,5 +376,7 @@ const WorkingScheduleLayout = styled.div`
 
 const TimeDiv = styled.div`
   display: flex;
+  justify-content: center;
+  width: 7rem;
   padding-bottom: 4px;
 `;
