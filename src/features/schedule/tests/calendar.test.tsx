@@ -4,15 +4,13 @@ import { CalendarHeader } from "@/widgets/schedule/index";
 import "@testing-library/jest-dom";
 import { format } from "date-fns";
 import userEvent from "@testing-library/user-event";
-import { ThemeProvider } from "styled-components";
-import * as theme from "@/shared/lib/styles/theme";
 // 캘린더헤더 잘 렌더링 되는지 확인
 describe("calendar Header render well", () => {
   test("render calendar header", () => {
     const mockChangeDate = jest.fn();
     const mockChangeView = jest.fn();
     const mockSelectDate = jest.fn();
-    const selectedDate = new Date("2024-05-03");
+    const selectedDate = new Date();
     render(
       <CalendarHeader
         changeDate={mockChangeDate}
@@ -28,7 +26,7 @@ describe("calendar Header render well", () => {
     expect(month).toBeInTheDocument();
     const meet = screen.getByText("meet");
     expect(meet).toBeInTheDocument();
-    const date = screen.getByText(format(new Date("2024-05-03"), "yyyy. M"));
+    const date = screen.getByText(format(new Date(), "yyyy. M"));
     expect(date).toBeInTheDocument();
   });
 });
@@ -38,7 +36,7 @@ describe("calendar Header calendarNavButton test", () => {
     const mockChangeDate = jest.fn();
     const mockChangeView = jest.fn();
     const mockSelectDate = jest.fn();
-    const selectedDate = new Date("2024-05-03");
+    const selectedDate = new Date();
     render(
       <CalendarHeader
         changeDate={mockChangeDate}
@@ -63,7 +61,7 @@ describe("calendar Header calendarNavButton test", () => {
     const mockChangeDate = jest.fn();
     const mockChangeView = jest.fn();
     const mockSelectDate = jest.fn();
-    const selectedDate = new Date("2024-05-03");
+    const selectedDate = new Date();
     render(
       <CalendarHeader
         changeDate={mockChangeDate}
@@ -92,7 +90,7 @@ describe("calendar Header calendarNavButton test", () => {
     const mockChangeDate = jest.fn();
     const mockChangeView = jest.fn();
     const mockSelectDate = jest.fn();
-    const selectedDate = new Date("2024-05-03");
+    const selectedDate = new Date();
     render(
       <CalendarHeader
         changeDate={mockChangeDate}
@@ -118,7 +116,7 @@ describe("view selecetor test", () => {
     const mockChangeDate = jest.fn();
     const mockChangeView = jest.fn();
     const mockSelectDate = jest.fn();
-    const selectedDate = new Date("2024-05-03");
+    const selectedDate = new Date();
     render(
       <CalendarHeader
         changeDate={mockChangeDate}

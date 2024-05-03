@@ -11,7 +11,7 @@ interface IAllDayScheduleProps {
 
 // 종일 일정 컴포넌트
 export function AllDaySchedule({ title, width }: IAllDayScheduleProps) {
-  const [showDetails, setShowDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState<boolean>(false);
   return (
     <Layout width={width} color="blue" onClick={() => setShowDetails(!showDetails)}>
       {title}

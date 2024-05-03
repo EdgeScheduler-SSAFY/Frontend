@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
 import { format } from "date-fns";
 // 더보기 일정 컴포넌트의 props
@@ -10,7 +10,7 @@ interface IMoreScheduleProps {
 // 하루에 일정이 3개 이상일때 더보기 일정 컴포넌트
 export function MoreSchedule({ schdules, count, date }: IMoreScheduleProps) {
   // 더보기 일정 상태
-  const [showMore, setShowMore] = React.useState(false);
+  const [showMore, setShowMore] = useState<boolean>(false);
   // 외부영역 클릭 확인을위한 ref
   const ref = useRef<HTMLDivElement>(null);
   // 외부영역 클릭시 더보기 일정 닫기
@@ -29,14 +29,14 @@ export function MoreSchedule({ schdules, count, date }: IMoreScheduleProps) {
 
   return (
     // 더보기 일정 레이아웃
-    <MainLayout onClick={() => setShowMore(!showMore)}>
+    <MainLayout onClick={(prev) => setShowMore(!prev)}>
       {/* 몇게 더 있는지 보여줌 */}
       {count} more
       {/* 더보기를 보여주는 부분 */}
       {showMore && (
-        <More ref={ref}>
-          <Text>{format(date, "dd")}</Text>
-          <Text>{format(date, "EEE")}</Text>
+        <MoreDiv ref={ref}>
+          <TextDiv>{format(date, "dd")}</TextDiv>
+          <TextDiv>{format(date, "EEE")}</TextDiv>
           {schdules.map((schedule, index) => (
             <div key={index} onClick={(e) => e.stopPropagation()}>
               {React.isValidElement(schedule) && schedule.props.view
@@ -44,7 +44,7 @@ export function MoreSchedule({ schdules, count, date }: IMoreScheduleProps) {
                 : schedule}
             </div>
           ))}
-        </More>
+        </MoreDiv>
       )}
     </MainLayout>
   );
@@ -57,7 +57,7 @@ const MainLayout = styled.div`
   position: relative;
 `;
 
-const More = styled.div`
+const MoreDiv = styled.div`
   background-color: white;
   padding: 15px;
   position: absolute;
@@ -69,7 +69,7 @@ const More = styled.div`
   border-radius: 8px;
   z-index: 100;
 `;
-const Text = styled.div`
+const TextDiv = styled.div`
   text-align: center;
   margin-bottom: 5px;
 `;
