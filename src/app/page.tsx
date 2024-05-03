@@ -9,3 +9,4 @@ const MainLayout = styled.div`
   width: 100%;
   min-height: calc(100% - 50px);
 `;
+
