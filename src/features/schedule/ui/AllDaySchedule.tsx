@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { Color } from "@/shared/lib/styles/color";
-type color = "blue" | "green" | "red" | "yellow";
+type color = "blue" | "green" | "orange" | "yellow";
 
 // 종일 일정 컴포넌트의 props
 interface IAllDayScheduleProps {
