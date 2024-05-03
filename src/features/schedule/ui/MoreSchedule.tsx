@@ -29,7 +29,7 @@ export function MoreSchedule({ schdules, count, date }: IMoreScheduleProps) {
 
   return (
     // 더보기 일정 레이아웃
-    <MainLayout onClick={(prev) => setShowMore(!prev)}>
+    <MainLayout onClick={() => setShowMore((prev) => !prev)}>
       {/* 몇게 더 있는지 보여줌 */}
       {count} more
       {/* 더보기를 보여주는 부분 */}

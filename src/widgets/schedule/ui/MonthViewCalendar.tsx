@@ -40,10 +40,10 @@ export function MonthViewCalendar({ selectedDate, scheduleList }: IMonthViewCale
   if (selectedDate.getMonth() === 4) {
     // 일정별 날짜별 일정 렌더링
     scheduleList.map((schedule: any) => {
-      const start = format(schedule.startDatetime, "yyyy-MM-dd"); // 시작일
-      const end = format(schedule.endDatetime, "yyyy-MM-dd"); // 종료일
-      const endDate = schedule.endDatetime; // 종료일
-      let currentDate = schedule.startDatetime; // 현재 날짜
+      const start = format(schedule.startDateTime, "yyyy-MM-dd"); // 시작일
+      const end = format(schedule.endDateTime, "yyyy-MM-dd"); // 종료일
+      const endDate = schedule.endDateTime; // 종료일
+      let currentDate = schedule.startDateTime; // 현재 날짜
       // 시작일과 종료일이 다른 경우
       if (start !== end) {
         // 시작일부터 종료일까지 반복
@@ -88,7 +88,7 @@ export function MonthViewCalendar({ selectedDate, scheduleList }: IMonthViewCale
         // 시작일과 종료일이 같은 경우
         // 종일일정인지 확인
         const isAllDay =
-          schedule.startDatetime.getHours() === 0 && schedule.endDatetime.getHours() === 23;
+          schedule.startDateTime.getHours() === 0 && schedule.endDateTime.getHours() === 23;
         dates[format(currentDate, "yyyy-MM-dd")].push(
           isAllDay ? (
             // 종일일정인 경우
