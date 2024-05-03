@@ -2,13 +2,10 @@
 import styled from "styled-components";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { useEffect, useState } from "react";
-import { FaAngleLeft } from "react-icons/fa";
 import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
-import { BsDot } from "react-icons/bs";
 
 import ScheduleComponent from "./scheduleComponent";
 import { Color } from "@/shared/lib/styles/color";
-import { start } from "repl";
 
 interface OptionButtonProps {
   selected: boolean;
