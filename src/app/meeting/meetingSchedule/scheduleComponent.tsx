@@ -4,6 +4,7 @@ import Image from "next/image";
 import { people, person } from "./dummyData";
 import { useEffect, useRef, useState } from "react";
 import { Color } from "@/shared/lib/styles/color";
+import { ScheduleComponentProps, timeDivProps, timeStampProps, vipDivProps } from "@/shared/lib/type";
 
 const vip: boolean[] = [true, true, true, true, false, false];
 const checkedTime: number[][] = [];
@@ -12,29 +13,7 @@ const allDayTime: boolean[] = Array(112).fill(false);
 const startTime: number[] = [0, 4, 6, 8, 8, 12];
 const RecommendTime: boolean[] = Array(112).fill(false);
 
-interface ScheduleComponentProps {
-  setParentStartIndex: (timeIndex: number) => void;
-  setParentEndIndex: (timeIndex: number) => void;
-}
 
-interface vipDivProps {
-  vipperson: boolean;
-} //필수 사람 선택용
-
-interface timeStampProps {
-  personIndex: number;
-  timeindex: number;
-  startIndex: number;
-  endIndex: number;
-}
-
-interface timeDivProps {
-  selected: number;
-  personIndex: number;
-  timeindex: number;
-  startIndex: number;
-  endIndex: number;
-} // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 border 색깔 바꾸기 위함
 
 people.forEach((person: person, index: number) => {
   let arr: number[] = []; // 사람별 되는 시간 더미데이터
