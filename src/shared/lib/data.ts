@@ -1,4 +1,4 @@
-import { userList, selectList } from "./type/interfaces";
+import { userList, selectList } from "./type";
 
 export const userLists: userList[] = [
   {

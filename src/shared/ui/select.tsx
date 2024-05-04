@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 
 import { Color } from "../lib/styles/color";
-import { selectList } from "../lib/type/interfaces";
+import { selectList } from "../lib/type";
 
 interface SelectProrps {
   width: number;
