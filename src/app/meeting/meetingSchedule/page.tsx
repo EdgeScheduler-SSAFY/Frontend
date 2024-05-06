@@ -143,13 +143,13 @@ export default function MeetingSchedule() {
         <DateLayout>
           <DateinDateDiv>Date</DateinDateDiv>
           <TimeSelectionLayout>
-            <DateDiv>{startDate}</DateDiv>
+            <DateDiv data-testid="startDate">{startDate}</DateDiv>
             <TimeButton>
               <div>{startTime}</div>
               <IoMdArrowDropdown />
             </TimeButton>
             <HypoonDiv>-</HypoonDiv>
-            <DateDiv>{endDate}</DateDiv>
+            <DateDiv data-testid="endDate">{endDate}</DateDiv>
             <TimeButton>
               <div>{endTime}</div>
               <IoMdArrowDropdown />
@@ -181,10 +181,10 @@ export default function MeetingSchedule() {
       </HeaderLayout>
       <ScheduleHeaderLayout>
         <ScheduleHeaderTime>
-          <TimeChangeButton onClick={handleGoToPastDay}>
+          <TimeChangeButton onClick={handleGoToPastDay} data-testId="goToPrevDayButton">
             <LuChevronLeftSquare />
           </TimeChangeButton>
-          <TimeDiv>
+          <TimeDiv data-testId="nowDate">
             {date.getFullYear() +
               "." +
               (date.getMonth() + 1) +
@@ -194,7 +194,7 @@ export default function MeetingSchedule() {
               days[date.getDay()] +
               ")"}
           </TimeDiv>
-          <TimeChangeButton onClick={handleGoToNextDay}>
+          <TimeChangeButton onClick={handleGoToNextDay} data-testId="goToNextDayButton">
             <LuChevronRightSquare />
           </TimeChangeButton>
         </ScheduleHeaderTime>
