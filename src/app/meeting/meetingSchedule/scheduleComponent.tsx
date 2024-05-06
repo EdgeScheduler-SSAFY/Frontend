@@ -1,5 +1,5 @@
 "use client";
-import { styled, ThemeProvider } from "styled-components";
+import { styled } from "styled-components";
 import Image from "next/image";
 import { people, person } from "./dummyData";
 import { useEffect, useRef, useState } from "react";
@@ -146,7 +146,7 @@ export default function ScheduleComponent({
           );
         })}
       </PeopleLayout>
-      <TimeTableLayout
+      <TimeTableLayout data-testId="timeTableLayout"
         onMouseDown={(event) => handleMouseDown(event)}
         ref={timeDivGroupRef}
       >
@@ -170,7 +170,7 @@ export default function ScheduleComponent({
               </TimeDivGroup>
               <TimeStampGroup>
                 {allDayTime.map((v: boolean, timeIndex: number) => {
-                  if (timeIndex % 4 == 0) {
+                  if (timeIndex % 4 === 0) {
                     return (
                       <TimeStamp
                         key={timeIndex}
