@@ -1,21 +1,21 @@
-"use client";
-import styled from "styled-components";
-import { Noto_Sans_KR } from "next/font/google";
-import { useState, useEffect } from "react";
-import { MdKeyboardArrowRight, MdKeyboardArrowDown, MdClose } from "react-icons/md";
-import Image from "next/image";
+'use client';
+import styled from 'styled-components';
+import { Noto_Sans_KR } from 'next/font/google';
+import { useState, useEffect } from 'react';
+import { MdKeyboardArrowRight, MdKeyboardArrowDown, MdClose } from 'react-icons/md';
+import Image from 'next/image';
 
-import { runningTime, intervalTime, userLists } from "@/shared/lib/data";
-import { Color } from "@/shared/lib/styles/color";
-import Label from "@/shared/ui/label";
-import Button from "@/shared/ui/button";
-import Input from "@/shared/ui/input";
-import Select from "@/shared/ui/select";
-import TextArea from "@/shared/ui/textArea";
+import { runningTime, intervalTime, userLists } from '@/shared/lib/data';
+import { Color } from '@/shared/lib/styles/color';
+import Label from '@/shared/ui/label';
+import Button from '@/shared/ui/button';
+import Input from '@/shared/ui/input';
+import Select from '@/shared/ui/select';
+import TextArea from '@/shared/ui/textArea';
 
 const noto = Noto_Sans_KR({
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  subsets: ["latin"],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  subsets: ['latin'],
 });
 
 interface MeetingData {
@@ -36,14 +36,14 @@ export default function CreateMeeting() {
   const today = new Date();
   // 회의 정보
   const [meetingData, setMeetingData] = useState<MeetingData>({
-    name: "",
-    description: "",
-    type: "MEETING",
+    name: '',
+    description: '',
+    type: 'MEETING',
     color: 4,
-    startDatetime: "2024-05-03T04:15:00",
-    endDatetime: "2024-05-03T04:15:00",
+    startDatetime: '2024-05-03T04:15:00',
+    endDatetime: '2024-05-03T04:15:00',
     runningTime: 15,
-    period: { start: "2024-05-03T04:15:00", end: "2024-05-03T04:15:00" },
+    period: { start: '2024-05-03T04:15:00', end: '2024-05-03T04:15:00' },
     isPublic: true,
     isRecurrence: false,
     memberList: [],
@@ -54,8 +54,8 @@ export default function CreateMeeting() {
 
   // 각 부서에 대한 상태를 관리할 배열
   const [teamStates, setTeamStates] = useState([
-    { name: "Development Team 1", folded: true },
-    { name: "Development Team 2", folded: true },
+    { name: 'Development Team 1', folded: true },
+    { name: 'Development Team 2', folded: true },
   ]);
 
   // 전체 주소록 상태 변경
@@ -124,7 +124,7 @@ export default function CreateMeeting() {
   };
 
   useEffect(() => {
-    console.log("MeetingData:", meetingData);
+    console.log('MeetingData:', meetingData);
   }, [meetingData]);
 
   return (
@@ -132,15 +132,15 @@ export default function CreateMeeting() {
       <CreateWidget>
         <CreateForm>
           <AddressDiv>
-            <Label htmlFor='addressbook' width={20}>
+            <Label htmlFor="addressbook" width={20}>
               Address Book
             </Label>
             <InlineDiv>
-              <Input id='addressbook' type='text' width={20} placeholder='Please enter a search term.' />
+              <Input id="addressbook" type="text" width={20} placeholder="Please enter a search term." />
             </InlineDiv>
             <AdressBookDiv>
               <ButtonFold onClick={toggleFold} className={noto.className}>
-                {" "}
+                {' '}
                 {isFolded ? <MdKeyboardArrowRight size={16} /> : <MdKeyboardArrowDown size={16} />}부서 주소록
               </ButtonFold>
               {!isFolded && (
@@ -163,10 +163,10 @@ export default function CreateMeeting() {
                                   <UserButton
                                     $isClicked={clickedUsers[member.id]}
                                     onClick={() => userButtonClickHandle(member.id)}
-                                    draggable='true'
+                                    draggable="true"
                                     className={noto.className}
                                   >
-                                    <ProfileImage src={member.profile} alt='프로필사진' width={25} height={25} />
+                                    <ProfileImage src={member.profile} alt="프로필사진" width={25} height={25} />
                                     <UserName>{member.name}</UserName>
                                     <TimeZone>{member.timezone}</TimeZone>
                                   </UserButton>
@@ -183,20 +183,20 @@ export default function CreateMeeting() {
           </AddressDiv>
           <InformationDiv>
             <InlineDiv>
-              <Label htmlFor='name'>Title</Label>
+              <Label htmlFor="name">Title</Label>
               <Input
-                id='name'
-                type='text'
+                id="name"
+                type="text"
                 width={33}
-                placeholder='Please enter a title.'
+                placeholder="Please enter a title."
                 value={meetingData.name}
                 onChange={(e) => setMeetingData((prev) => ({ ...prev, name: e.target.value }))}
               ></Input>
             </InlineDiv>
             <InlineDiv>
-              <Label htmlFor='time'>Time</Label>
+              <Label htmlFor="time">Time</Label>
               <Select
-                id='time'
+                id="time"
                 options={runningTime}
                 show={false}
                 width={10}
@@ -204,25 +204,25 @@ export default function CreateMeeting() {
               ></Select>
             </InlineDiv>
             <div>
-              <Label htmlFor='period'>Period</Label>
-              <PeriodDiv id='period'>
+              <Label htmlFor="period">Period</Label>
+              <PeriodDiv id="period">
                 <Select options={intervalTime} show={false} width={6.5} onSelectChange={startTimeChangeHandle}></Select>
                 <Select options={intervalTime} show={false} width={6.5} onSelectChange={endTimeChangeHandle}></Select>
               </PeriodDiv>
             </div>
             <div>
-              <Label htmlFor='detail'>Detail</Label>
-              <div id='detail'>
+              <Label htmlFor="detail">Detail</Label>
+              <div id="detail">
                 <TextArea
-                  placeholder='Please enter a detail.'
+                  placeholder="Please enter a detail."
                   value={meetingData.description}
                   onChange={(e) => setMeetingData((prev) => ({ ...prev, description: e.target.value }))}
                 />
               </div>
             </div>
             <div>
-              <Label htmlFor='participant'>Participant</Label>
-              <ParticipantDiv id='participant'>
+              <Label htmlFor="participant">Participant</Label>
+              <ParticipantDiv id="participant">
                 {meetingData.memberList.map((member) => {
                   const user = userLists.find((user) => user.id === member.memberid);
                   return (
@@ -230,7 +230,7 @@ export default function CreateMeeting() {
                       {user ? (
                         <ParticipantInfoDiv>
                           <div>
-                            <ProfileImage src={user.profile} alt='프로필사진' width={30} height={30} />
+                            <ProfileImage src={user.profile} alt="프로필사진" width={30} height={30} />
                           </div>
                           <div>
                             <RestDiv>
@@ -240,7 +240,7 @@ export default function CreateMeeting() {
                                 onClick={() => optionalButtonClickHandle(member.memberid)}
                                 $isRequired={member.isRequired}
                               >
-                                {member.isRequired ? "required" : "optional"}
+                                {member.isRequired ? 'required' : 'optional'}
                               </OptionalButton>
                             </RestDiv>
                             <UserDepartment>{user.department}</UserDepartment>
@@ -263,7 +263,7 @@ export default function CreateMeeting() {
         </CreateForm>
         <ButtonDiv>
           <Button>next</Button>
-          <Button color='black' $bgColor='black50' $hoverColor='black100'>
+          <Button color="black" $bgColor="black50" $hoverColor="black100">
             cancel
           </Button>
         </ButtonDiv>
@@ -324,7 +324,7 @@ const AdressBookDiv = styled.div`
   overflow-y: scroll;
   width: 20rem;
   padding: 0.5rem 0.7rem;
-  border: 1px solid ${Color("black200")};
+  border: 1px solid ${Color('black200')};
   border-radius: 3px;
   font-size: 14px;
   height: 24rem;
@@ -337,7 +337,7 @@ const ParticipantDiv = styled.div`
   padding: 0.5rem 0.7rem;
   font-size: 14px;
   height: 8rem;
-  border: 1px solid ${Color("black200")};
+  border: 1px solid ${Color('black200')};
   border-radius: 3px;
   display: flex;
   flex-wrap: wrap;
@@ -351,7 +351,7 @@ const ButtonFold = styled.button`
   border: none;
   cursor: pointer;
   padding: 0;
-  color: Color("black");
+  color: Color('black');
   font-weight: 700;
 `;
 
@@ -385,7 +385,7 @@ const UserButton = styled.button<{ $isClicked: boolean }>`
   justify-content: flex-start;
   position: relative;
   margin-left: 1rem;
-  background-color: ${(props) => (props.$isClicked ? Color("blue100") : Color("black50"))};
+  background-color: ${(props) => (props.$isClicked ? Color('blue100') : Color('black50'))};
 `;
 
 const ProfileImage = styled(Image)`
@@ -411,12 +411,12 @@ const CloseButton = styled.button`
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   &:hover {
-    color: ${Color("orange600")};
+    color: ${Color('orange600')};
   }
 `;
 
 const ParticipantInfoDiv = styled.div`
-  border: 1px solid ${Color("black200")};
+  border: 1px solid ${Color('black200')};
   border-radius: 10px;
   padding: 0.5rem;
   width: 10rem;
@@ -429,8 +429,8 @@ const UserDepartment = styled.div`
 `;
 
 const OptionalButton = styled.button<{ $isRequired: boolean }>`
-  border: 1px solid ${(props) => (props.$isRequired ? Color("black200") : Color("blue600"))};
-  color: ${(props) => (props.$isRequired ? Color("black200") : Color("blue600"))};
+  border: 1px solid ${(props) => (props.$isRequired ? Color('black200') : Color('blue600'))};
+  color: ${(props) => (props.$isRequired ? Color('black200') : Color('blue600'))};
   border-radius: 2px;
   background: none;
   width: 3.5rem;
@@ -445,5 +445,6 @@ const OptionalButton = styled.button<{ $isRequired: boolean }>`
 
 const ProfileDiv = styled.div``;
 const RestDiv = styled.div`
-display: inline-flex;
-align-items: center;`;
+  display: inline-flex;
+  align-items: center;
+`;
