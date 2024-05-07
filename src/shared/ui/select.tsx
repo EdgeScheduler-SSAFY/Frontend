@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 
 import { Color } from "../lib/styles/color";
@@ -9,20 +9,29 @@ interface SelectProrps {
   width: number;
   id?: string;
   options: selectList[];
+  standardIdx?: number;
+  disabledIndex?: number;
   show: boolean;
   onSelectChange: (value: number | string) => void;
 }
 
 export default function Select(props: SelectProrps) {
   const [selectFlag, setSelectFlag] = useState<boolean>(props.show);
-  // 15 minutes(options[0].option)을 초기값으로 설정
-  const [selectedValue, setSelectedValue] = useState<string>(props.options.length > 0 ? props.options[0].option : "");
-
+  // 초기값 설정
+  const [selectedValue, setSelectedValue] = useState<string>(
+    props.options.length > 0 && props.standardIdx !== undefined
+      ? props.options[props.standardIdx].option
+      : props.options[0].option
+  );
   // 선택여부
   const toggleSelect = () => {
     setSelectFlag((prevFlag) => !prevFlag);
   };
 
+  const isDisabled = (index: number) => {
+    if (props.disabledIndex === undefined) return false;
+    return index <= props.disabledIndex;
+  };
   // 선택값
   const handleOptionClick = (value: number | string) => {
     // value에 해당하는 option 찾기
@@ -34,25 +43,46 @@ export default function Select(props: SelectProrps) {
     }
   };
 
+  // 외부 영역 클릭하면 닫히도록 구현
+  const selectRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+        setSelectFlag(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <SelectDiv id={props.id}>
-      <SelectedDiv width={props.width} onClick={toggleSelect}>
-        <SelectedValue>{selectedValue}</SelectedValue>
-      </SelectedDiv>
-      <SelectList width={props.width} $show={selectFlag}>
-        {props.options.map((option) => (
-          <SelectOption key={option.value} onClick={() => handleOptionClick(option.value)}>
-            {option.option}
-          </SelectOption>
-        ))}
-      </SelectList>
-    </SelectDiv>
+    <div ref={selectRef}>
+      <SelectDiv id={props.id} width={props.width}>
+        <SelectedDiv width={props.width} onClick={toggleSelect}>
+          <SelectedValue>{selectedValue}</SelectedValue>
+        </SelectedDiv>
+        <SelectList width={props.width} $show={selectFlag}>
+          {props.options.map((option, index) => (
+            <SelectOption
+              key={option.value}
+              onClick={isDisabled(index) ? undefined : () => handleOptionClick(option.value)}
+              $disabled={isDisabled(index)}
+            >
+              {option.option}
+            </SelectOption>
+          ))}
+        </SelectList>
+      </SelectDiv>
+    </div>
   );
 }
 
-const SelectDiv = styled.div`
+const SelectDiv = styled.div<{ width: number }>`
   position: relative;
-  width: 10rem;
+  width: ${(props) => (props.width ? `${props.width}rem` : "10rem")};
   height: 2rem;
 `;
 
@@ -92,17 +122,18 @@ const SelectList = styled.ul<{ $show: boolean; width: number }>`
   border-radius: 3px;
 `;
 
-const SelectOption = styled.li`
+const SelectOption = styled.li<{ $disabled: boolean }>`
+  background-color: ${({ $disabled }) => ($disabled ? Color("black50") : "none")};
   height: 1.9rem;
   line-height: 1.9rem;
   margin: 0.05rem 0;
   padding-left: 0.7rem;
-  cursor: pointer;
+  cursor: ${({ $disabled }) => ($disabled ? "default" : "pointer")};
   box-sizing: border-box;
   transition: all 0.2s ease-in-out;
   &:hover {
     font-weight: 500;
-    background-color: ${Color("blue50")};
+    background-color: ${({ $disabled }) => ($disabled ? Color("black50") : Color("blue50"))};
     box-sizing: border-box;
   }
 `;

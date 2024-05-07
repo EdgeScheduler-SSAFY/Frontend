@@ -7,8 +7,8 @@ export default function MyPageLayout({ children }: Readonly<{ children: React.Re
     <MainLayout>
       <SubLayout>
         <MyPageLink>
-          <StyledLink href="/myPage/updateInfo">update information</StyledLink>
-          <StyledLink href="/myPage/alarmLog">alarm log</StyledLink>
+          <StyledLink href="/myPage/updateInfo">Update Information</StyledLink>
+          <StyledLink href="/myPage/alarmLog">Alarm Log</StyledLink>
         </MyPageLink>
         <ContentLayout>{children}</ContentLayout>
       </SubLayout>
@@ -23,20 +23,23 @@ const MainLayout = styled.div`
 
 const SubLayout = styled.div`
   display: flex;
+  justify-content: space-evenly;
   margin: 2.5rem;
 `;
 
 const MyPageLink = styled.div`
-  margin-right: 3rem;
-  width: 10%;
+  width: 5%;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
+  text-align: center;
 `;
 
 const ContentLayout = styled.div`
   width: 80%;
+  display: flex;
+  justify-content: center;
 `;
 
 const StyledLink = styled(Link)`
