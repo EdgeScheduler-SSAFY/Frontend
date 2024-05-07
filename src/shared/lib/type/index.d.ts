@@ -1,3 +1,18 @@
+
+export interface MeetingData {
+  name: string;
+  description: string;
+  type: string;
+  color: number;
+  startDatetime: string;
+  endDatetime: string;
+  runningTime: number;
+  period: { start: string; end: string };
+  isPublic: boolean;
+  isRecurrence: boolean;
+  memberList: { memberid: number; isRequired: boolean }[];
+}
+
 export interface selectList {
   value: number | string;
   option: string;

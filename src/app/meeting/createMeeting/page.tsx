@@ -2,48 +2,37 @@
 import styled from "styled-components";
 import { Noto_Sans_KR } from "next/font/google";
 import { useState, useEffect } from "react";
-import { MdKeyboardArrowRight, MdKeyboardArrowDown, MdClose } from "react-icons/md";
+import { MdKeyboardArrowRight, MdKeyboardArrowDown } from "react-icons/md";
 import Image from "next/image";
 
 import { runningTime, intervalTime, userLists } from "@/shared/lib/data";
+import { MeetingData } from "@/shared/lib/type";
 import { Color } from "@/shared/lib/styles/color";
 import Label from "@/shared/ui/label";
-import Button from "@/shared/ui/button";
 import Input from "@/shared/ui/input";
 import Select from "@/shared/ui/select";
 import TextArea from "@/shared/ui/textArea";
+import { MiniCalendar } from "@/shared";
+import ButtonBox from "./ui/buttonBox";
 
 const noto = Noto_Sans_KR({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
 });
 
-interface MeetingData {
-  name: string;
-  description: string;
-  type: string;
-  color: number;
-  startDatetime: string;
-  endDatetime: string;
-  runningTime: number;
-  period: { start: string; end: string };
-  isPublic: boolean;
-  isRecurrence: boolean;
-  memberList: { memberid: number; isRequired: boolean }[];
-}
-
 export default function CreateMeeting() {
   const today = new Date();
   // 회의 정보
+
   const [meetingData, setMeetingData] = useState<MeetingData>({
     name: "",
     description: "",
     type: "MEETING",
     color: 4,
-    startDatetime: "2024-05-03T04:15:00",
-    endDatetime: "2024-05-03T04:15:00",
+    startDatetime: "2024-05-10T04:15:00",
+    endDatetime: "2024-05-10T04:15:00",
     runningTime: 15,
-    period: { start: "2024-05-03T04:15:00", end: "2024-05-03T04:15:00" },
+    period: { start: `2024-05-10T00:00:00`, end: `2024-05-10T00:00:00` },
     isPublic: true,
     isRecurrence: false,
     memberList: [],
@@ -51,12 +40,19 @@ export default function CreateMeeting() {
 
   // 전체 부서 주소록
   const [isFolded, setIsFolded] = useState(true);
-
   // 각 부서에 대한 상태를 관리할 배열
   const [teamStates, setTeamStates] = useState([
     { name: "Development Team 1", folded: true },
     { name: "Development Team 2", folded: true },
   ]);
+  const [sameDate, setSameDate] = useState<boolean>(true);
+  const [disabledIndex, setDisabledIndex] = useState<number>(0);
+  // 클릭 여부 사용자 ID 기준
+  const [clickedUsers, setClickedUsers] = useState<{ [userId: number]: boolean }>({});
+  const [showStartMiniCalendar, setShowStartMiniCalendar] = useState<boolean>(false);
+  const [showEndMiniCalendar, setShowEndMiniCalendar] = useState<boolean>(false);
+  const [selectedStartDate, setSelectedStartDate] = useState(new Date());
+  const [selectedEndDate, setSelectedEndDate] = useState(new Date());
 
   // 전체 주소록 상태 변경
   const toggleFold = () => {
@@ -73,17 +69,48 @@ export default function CreateMeeting() {
     setMeetingData({ ...meetingData, runningTime: value as number });
   };
 
-  // 시작시간 값이 변경될 때 실행될 함수
-  const startTimeChangeHandle = (value: number | string) => {
-    setMeetingData({ ...meetingData, period: { ...meetingData.period, start: value as string } });
-  };
-  // 끝시간 값이 변경될 때 실행될 함수
-  const endTimeChangeHandle = (value: number | string) => {
-    setMeetingData({ ...meetingData, period: { ...meetingData.period, end: value as string } });
+  // 시작날짜 값이 변경될 때 실행될 함수
+  const startDateHandle = (selectedDate: Date) => {
+    setSelectedStartDate(selectedDate);
+    setSelectedEndDate(selectedDate);
+    const year = selectedDate.getFullYear();
+    const month = ("0" + (selectedDate.getMonth() + 1)).slice(-2);
+    const date = ("0" + selectedDate.getDate()).slice(-2);
+    const startTime = meetingData.period.start.split("T")[1]; // 기존 시작 시간
+    setMeetingData({
+      ...meetingData,
+      period: { ...meetingData.period, start: `${year}-${month}-${date}T${startTime}` },
+    });
   };
 
-  // 클릭 여부 사용자 ID 기준
-  const [clickedUsers, setClickedUsers] = useState<{ [userId: number]: boolean }>({});
+  // 시작시간 값이 변경될 때 실행될 함수
+  const startTimeChangeHandle = (value: number | string) => {
+    const startDate = meetingData.period.start.split("T")[0]; // 기존 시작 날짜
+    setMeetingData({ ...meetingData, period: { ...meetingData.period, start: `${startDate}T${value}` } });
+    setDisabledIndex(intervalTime.findIndex((option) => option.value === value));
+  };
+
+  // 끝날짜 값이 변경될 때 실행될 함수
+  const endDateHandle = (selectedDate: Date) => {
+    setSelectedEndDate(selectedDate);
+    const year = selectedDate.getFullYear();
+    const month = ("0" + (selectedDate.getMonth() + 1)).slice(-2);
+    const date = ("0" + selectedDate.getDate()).slice(-2);
+    const endTime = meetingData.period.end.split("T")[1]; // 기존 시작 시간
+    setMeetingData({
+      ...meetingData,
+      period: { ...meetingData.period, end: `${year}-${month}-${date}T${endTime}` },
+    });
+
+    // 두 날짜가 같은지 확인
+    setSameDate(selectedDate.getDate() === selectedStartDate.getDate());
+  };
+
+  // 끝시간 값이 변경될 때 실행될 함수
+  const endTimeChangeHandle = (value: number | string) => {
+    const endDate = meetingData.period.end.split("T")[0]; // 기존 시작 날짜
+    setMeetingData({ ...meetingData, period: { ...meetingData.period, end: `${endDate}T${value}` } });
+  };
 
   // 사용자 버튼 클릭 이벤트
   const userButtonClickHandle = (userId: number) => {
@@ -103,6 +130,19 @@ export default function CreateMeeting() {
         memberList: [...prev.memberList, { memberid: userId, isRequired: false }],
       }));
     }
+
+    setClickedUsers((prev) => ({
+      ...prev,
+      [userId]: !prev[userId],
+    }));
+  };
+
+  // 참가자 div에서 제거
+  const participantRemoveHandle = (userId: number) => {
+    setMeetingData((prev) => ({
+      ...prev,
+      memberList: prev.memberList.filter((member) => member.memberid !== userId),
+    }));
 
     setClickedUsers((prev) => ({
       ...prev,
@@ -140,7 +180,6 @@ export default function CreateMeeting() {
             </InlineDiv>
             <AdressBookDiv>
               <ButtonFold onClick={toggleFold} className={noto.className}>
-                {" "}
                 {isFolded ? <MdKeyboardArrowRight size={16} /> : <MdKeyboardArrowDown size={16} />}부서 주소록
               </ButtonFold>
               {!isFolded && (
@@ -206,8 +245,53 @@ export default function CreateMeeting() {
             <div>
               <Label htmlFor='period'>Period</Label>
               <PeriodDiv id='period'>
-                <Select options={intervalTime} show={false} width={6.5} onSelectChange={startTimeChangeHandle}></Select>
-                <Select options={intervalTime} show={false} width={6.5} onSelectChange={endTimeChangeHandle}></Select>
+                <DateButton onClick={() => setShowStartMiniCalendar((prev) => !prev)}>
+                  {selectedStartDate.getFullYear()}.{("0" + (selectedStartDate.getMonth() + 1)).slice(-2)}.
+                  {("0" + selectedStartDate.getDate()).slice(-2)}
+                </DateButton>
+                {showStartMiniCalendar && (
+                  <StartCalendarDiv>
+                    <MiniCalendar
+                      selectDate={startDateHandle}
+                      selectedDate={selectedStartDate}
+                      close={() => setShowStartMiniCalendar(false)}
+                      view='day'
+                      $standardDate={new Date(new Date().setHours(0, 0, 0, 0))}
+                    />
+                  </StartCalendarDiv>
+                )}
+                <Select
+                  options={intervalTime}
+                  show={false}
+                  width={6.5}
+                  onSelectChange={startTimeChangeHandle}
+                  standardIdx={0}
+                  disabledIndex={-1}
+                ></Select>
+                <LineDiv>-</LineDiv>
+                <DateButton onClick={() => setShowEndMiniCalendar((prev) => !prev)}>
+                  {selectedEndDate.getFullYear()}.{("0" + (selectedEndDate.getMonth() + 1)).slice(-2)}.
+                  {("0" + selectedEndDate.getDate()).slice(-2)}
+                </DateButton>
+                {showEndMiniCalendar && (
+                  <EndCalendarDiv>
+                    <MiniCalendar
+                      selectDate={endDateHandle}
+                      selectedDate={selectedEndDate}
+                      close={() => setShowEndMiniCalendar(false)}
+                      view='day'
+                      $standardDate={selectedStartDate}
+                    />
+                  </EndCalendarDiv>
+                )}
+                <Select
+                  options={intervalTime}
+                  show={false}
+                  width={6.5}
+                  onSelectChange={endTimeChangeHandle}
+                  standardIdx={sameDate ? 1 : 0}
+                  disabledIndex={sameDate ? disabledIndex : -1}
+                ></Select>
               </PeriodDiv>
             </div>
             <div>
@@ -228,28 +312,26 @@ export default function CreateMeeting() {
                   return (
                     <div key={member.memberid}>
                       {user ? (
-                        <ParticipantInfoDiv>
+                        <ParticipantInfoDiv onClick={() => participantRemoveHandle(member.memberid)}>
                           <div>
-                            <ProfileImage src={user.profile} alt='프로필사진' width={30} height={30} />
+                            <ProfileImage src={user.profile} alt='프로필사진' width={25} height={25} />
                           </div>
-                          <div>
-                            <RestDiv>
-                              <UserName>{user.name}</UserName>
-                              <OptionalButton
-                                className={noto.className}
-                                onClick={() => optionalButtonClickHandle(member.memberid)}
-                                $isRequired={member.isRequired}
-                              >
-                                {member.isRequired ? "required" : "optional"}
-                              </OptionalButton>
-                            </RestDiv>
+                          <RestDiv>
+                            <UserName>{user.name}</UserName>
                             <UserDepartment>{user.department}</UserDepartment>
-                          </div>
+                          </RestDiv>
                           <div>
-                            <CloseButton onClick={() => {}}>
-                              <MdClose />
-                            </CloseButton>
+                            <OptionalButton
+                              className={noto.className}
+                              onClick={() => optionalButtonClickHandle(member.memberid)}
+                              $isRequired={member.isRequired}
+                            >
+                              {member.isRequired ? "required" : "optional"}
+                            </OptionalButton>
                           </div>
+                          {/* <CloseButton onClick={() => {}}>
+                            <MdClose />
+                          </CloseButton> */}
                         </ParticipantInfoDiv>
                       ) : (
                         <div>Unknown</div>
@@ -261,12 +343,7 @@ export default function CreateMeeting() {
             </div>
           </InformationDiv>
         </CreateForm>
-        <ButtonDiv>
-          <Button>next</Button>
-          <Button color='black' $bgColor='black50' $hoverColor='black100'>
-            cancel
-          </Button>
-        </ButtonDiv>
+        <ButtonBox />
       </CreateWidget>
     </MainLayout>
   );
@@ -312,12 +389,6 @@ const PeriodDiv = styled.div`
   width: 80%;
   display: flex;
   justify-content: start;
-`;
-
-const ButtonDiv = styled.div`
-  display: flex;
-  justify-content: end;
-  padding: 1rem 10rem;
 `;
 
 const AdressBookDiv = styled.div`
@@ -385,12 +456,12 @@ const UserButton = styled.button<{ $isClicked: boolean }>`
   justify-content: flex-start;
   position: relative;
   margin-left: 1rem;
+  transition: all 0.2s ease-in;
   background-color: ${(props) => (props.$isClicked ? Color("blue100") : Color("black50"))};
 `;
 
 const ProfileImage = styled(Image)`
   border-radius: 50%;
-  margin-right: 0.6rem;
 `;
 
 const UserName = styled.div`
@@ -419,9 +490,17 @@ const ParticipantInfoDiv = styled.div`
   border: 1px solid ${Color("black200")};
   border-radius: 10px;
   padding: 0.5rem;
-  width: 10rem;
-  margin: 0.3rem;
+  width: 10.3rem;
+  height: 3rem;
   display: flex;
+  align-items: start;
+  justify-content: space-between;
+  margin: 0.2rem;
+  transition: all 0.2s ease-in;
+  &:hover {
+    background-color: ${Color("orange50")};
+    cursor: pointer;
+  }
 `;
 
 const UserDepartment = styled.div`
@@ -433,17 +512,54 @@ const OptionalButton = styled.button<{ $isRequired: boolean }>`
   color: ${(props) => (props.$isRequired ? Color("black200") : Color("blue600"))};
   border-radius: 2px;
   background: none;
-  width: 3.5rem;
+  width: 2.7rem;
   height: 1.5rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 10px;
+  font-size: 9px;
   transition: all 0.2s ease-in-out;
   cursor: pointer;
 `;
 
-const ProfileDiv = styled.div``;
 const RestDiv = styled.div`
-display: inline-flex;
-align-items: center;`;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  flex-wrap: wrap;
+  width: 5rem;
+`;
+
+const StartCalendarDiv = styled.div`
+  position: relative;
+  top: -4rem;
+  left: -15rem;
+`;
+
+const EndCalendarDiv = styled.div`
+  position: relative;
+  top: -4rem;
+  left: -15rem;
+`;
+
+const DateButton = styled.div`
+  width: 5rem;
+  height: 2rem;
+  background: none;
+  border: 1px solid ${Color("black200")};
+  border-radius: 3px;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  padding: 0.1rem 0.7rem;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+`;
+
+const LineDiv = styled.div`
+  width: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${Color("black")};
+`;
