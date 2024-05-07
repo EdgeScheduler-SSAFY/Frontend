@@ -1,5 +1,3 @@
-
-
 export interface selectList {
   value: number | string;
   option: string;
