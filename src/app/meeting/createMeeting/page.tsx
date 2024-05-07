@@ -2,36 +2,23 @@
 import styled from "styled-components";
 import { Noto_Sans_KR } from "next/font/google";
 import { useState, useEffect } from "react";
-import { MdKeyboardArrowRight, MdKeyboardArrowDown, MdClose } from "react-icons/md";
+import { MdKeyboardArrowRight, MdKeyboardArrowDown } from "react-icons/md";
 import Image from "next/image";
 
 import { runningTime, intervalTime, userLists } from "@/shared/lib/data";
+import { MeetingData } from "@/shared/lib/type";
 import { Color } from "@/shared/lib/styles/color";
 import Label from "@/shared/ui/label";
-import Button from "@/shared/ui/button";
 import Input from "@/shared/ui/input";
 import Select from "@/shared/ui/select";
 import TextArea from "@/shared/ui/textArea";
 import { MiniCalendar } from "@/shared";
-import { text } from "stream/consumers";
+import ButtonBox from "./ui/buttonBox";
+
 const noto = Noto_Sans_KR({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
 });
-
-interface MeetingData {
-  name: string;
-  description: string;
-  type: string;
-  color: number;
-  startDatetime: string;
-  endDatetime: string;
-  runningTime: number;
-  period: { start: string; end: string };
-  isPublic: boolean;
-  isRecurrence: boolean;
-  memberList: { memberid: number; isRequired: boolean }[];
-}
 
 export default function CreateMeeting() {
   const today = new Date();
@@ -42,10 +29,10 @@ export default function CreateMeeting() {
     description: "",
     type: "MEETING",
     color: 4,
-    startDatetime: "2024-05-03T04:15:00",
-    endDatetime: "2024-05-03T04:15:00",
+    startDatetime: "2024-05-10T04:15:00",
+    endDatetime: "2024-05-10T04:15:00",
     runningTime: 15,
-    period: { start: `2024-05-03T00:00:00`, end: `2024-05-03T$00:00:00` },
+    period: { start: `2024-05-10T00:00:00`, end: `2024-05-10T00:00:00` },
     isPublic: true,
     isRecurrence: false,
     memberList: [],
@@ -53,12 +40,19 @@ export default function CreateMeeting() {
 
   // 전체 부서 주소록
   const [isFolded, setIsFolded] = useState(true);
-
   // 각 부서에 대한 상태를 관리할 배열
   const [teamStates, setTeamStates] = useState([
     { name: "Development Team 1", folded: true },
     { name: "Development Team 2", folded: true },
   ]);
+  const [sameDate, setSameDate] = useState<boolean>(true);
+  const [disabledIndex, setDisabledIndex] = useState<number>(0);
+  // 클릭 여부 사용자 ID 기준
+  const [clickedUsers, setClickedUsers] = useState<{ [userId: number]: boolean }>({});
+  const [showStartMiniCalendar, setShowStartMiniCalendar] = useState<boolean>(false);
+  const [showEndMiniCalendar, setShowEndMiniCalendar] = useState<boolean>(false);
+  const [selectedStartDate, setSelectedStartDate] = useState(new Date());
+  const [selectedEndDate, setSelectedEndDate] = useState(new Date());
 
   // 전체 주소록 상태 변경
   const toggleFold = () => {
@@ -74,9 +68,6 @@ export default function CreateMeeting() {
   const runningTimeChangeHandle = (value: number | string) => {
     setMeetingData({ ...meetingData, runningTime: value as number });
   };
-
-  const [sameDate, setSameDate] = useState<boolean>(true);
-  const [disabledIndex, setDisabledIndex] = useState<number>(0);
 
   // 시작날짜 값이 변경될 때 실행될 함수
   const startDateHandle = (selectedDate: Date) => {
@@ -120,9 +111,6 @@ export default function CreateMeeting() {
     const endDate = meetingData.period.end.split("T")[0]; // 기존 시작 날짜
     setMeetingData({ ...meetingData, period: { ...meetingData.period, end: `${endDate}T${value}` } });
   };
-
-  // 클릭 여부 사용자 ID 기준
-  const [clickedUsers, setClickedUsers] = useState<{ [userId: number]: boolean }>({});
 
   // 사용자 버튼 클릭 이벤트
   const userButtonClickHandle = (userId: number) => {
@@ -175,11 +163,6 @@ export default function CreateMeeting() {
     });
   };
 
-  const [showStartMiniCalendar, setShowStartMiniCalendar] = useState<boolean>(false);
-  const [showEndMiniCalendar, setShowEndMiniCalendar] = useState<boolean>(false);
-  const [selectedStartDate, setSelectedStartDate] = useState(new Date());
-  const [selectedEndDate, setSelectedEndDate] = useState(new Date());
-
   useEffect(() => {
     console.log("MeetingData:", meetingData);
   }, [meetingData]);
@@ -197,7 +180,6 @@ export default function CreateMeeting() {
             </InlineDiv>
             <AdressBookDiv>
               <ButtonFold onClick={toggleFold} className={noto.className}>
-                {" "}
                 {isFolded ? <MdKeyboardArrowRight size={16} /> : <MdKeyboardArrowDown size={16} />}부서 주소록
               </ButtonFold>
               {!isFolded && (
@@ -267,7 +249,6 @@ export default function CreateMeeting() {
                   {selectedStartDate.getFullYear()}.{("0" + (selectedStartDate.getMonth() + 1)).slice(-2)}.
                   {("0" + selectedStartDate.getDate()).slice(-2)}
                 </DateButton>
-                {/* 미니 캘린더 day*/}
                 {showStartMiniCalendar && (
                   <StartCalendarDiv>
                     <MiniCalendar
@@ -292,7 +273,6 @@ export default function CreateMeeting() {
                   {selectedEndDate.getFullYear()}.{("0" + (selectedEndDate.getMonth() + 1)).slice(-2)}.
                   {("0" + selectedEndDate.getDate()).slice(-2)}
                 </DateButton>
-                {/* 미니 캘린더 day*/}
                 {showEndMiniCalendar && (
                   <EndCalendarDiv>
                     <MiniCalendar
@@ -363,12 +343,7 @@ export default function CreateMeeting() {
             </div>
           </InformationDiv>
         </CreateForm>
-        <ButtonDiv>
-          <Button>next</Button>
-          <Button color='black' $bgColor='black50' $hoverColor='black100'>
-            cancel
-          </Button>
-        </ButtonDiv>
+        <ButtonBox />
       </CreateWidget>
     </MainLayout>
   );
@@ -414,12 +389,6 @@ const PeriodDiv = styled.div`
   width: 80%;
   display: flex;
   justify-content: start;
-`;
-
-const ButtonDiv = styled.div`
-  display: flex;
-  justify-content: end;
-  padding: 1rem 10rem;
 `;
 
 const AdressBookDiv = styled.div`
