@@ -7,6 +7,8 @@ import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
 import ScheduleComponent from "./scheduleComponent";
 import { Color } from "@/shared/lib/styles/color";
 import RecommendTypeSetButton from "@/features/meetingSchedule/ui/RecommendTypeSetButton";
+import CancelButton from "@/features/meetingSchedule/ui/CancelButton";
+import SubmitButton from "@/features/meetingSchedule/ui/SubmitButton";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export default function MeetingSchedule() {
@@ -218,6 +220,11 @@ export default function MeetingSchedule() {
         setParentStartIndex={(timeIndex: number) => setStartIndex(timeIndex)}
         setParentEndIndex={(timeIndex: number) => setEndIndex(timeIndex)}
       />
+
+      <ButtonsLayout>
+        <CancelButton>Cancel</CancelButton>
+        <SubmitButton>Submit</SubmitButton>
+      </ButtonsLayout>
     </MainLayout>
   );
 }
@@ -359,4 +366,11 @@ const TimeDiv = styled.div`
   justify-content: center;
   width: 7rem;
   padding-bottom: 4px;
+`;
+
+const ButtonsLayout = styled.div`
+  display: flex;
+  justify-content: right;
+  margin-top: 1rem;
+  gap: 2rem;
 `;

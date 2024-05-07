@@ -1,4 +1,3 @@
-// ui/recommendTypeSetButton.tsx
 import { Color } from "@/shared/lib/styles/color";
 import React from "react";
 import styled from "styled-components";
@@ -6,7 +5,7 @@ import styled from "styled-components";
 interface recommendTypeSetButtonProps {
   selected: boolean;
   onClick: () => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const StyledButton = styled.button<recommendTypeSetButtonProps>`

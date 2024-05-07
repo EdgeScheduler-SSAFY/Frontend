@@ -6,10 +6,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { Color } from "@/shared/lib/styles/color";
 import {
   ScheduleComponentProps,
-  timeDivProps,
   timeStampProps,
   vipDivProps,
 } from "@/shared/lib/type";
+import TimeDiv from "@/features/meetingSchedule/ui/TimeDiv";
+import TimeStampDiv from "@/features/meetingSchedule/ui/TimeStampDiv";
 
 const vip: boolean[] = [true, true, true, true, false, false];
 const checkedTime: number[][] = [];
@@ -168,7 +169,7 @@ export default function ScheduleComponent({
                       timeindex={timeIndex}
                       startindex={startIndex}
                       endindex={endIndex}
-                    ></TimeDiv>
+                    />
                   );
                 })}
               </TimeDivGroup>
@@ -176,28 +177,24 @@ export default function ScheduleComponent({
                 {allDayTime.map((v: boolean, timeIndex: number) => {
                   if (timeIndex % 4 === 0) {
                     return (
-                      <TimeStamp
+                      <TimeStampDiv
                         key={timeIndex}
                         personindex={personindex}
                         timeindex={timeIndex}
-                        startindex={startIndex}
-                        endindex={endIndex}
                       >
                         {(startTime[personindex] +
                           Math.floor(timeIndex / 4) +
                           24) %
                           24}
-                      </TimeStamp>
+                      </TimeStampDiv>
                     );
                   } else {
                     return (
-                      <TimeStamp
+                      <TimeStampDiv
                         key={timeIndex}
                         personindex={personindex}
                         timeindex={timeIndex}
-                        startindex={startIndex}
-                        endindex={endIndex}
-                      ></TimeStamp>
+                      ></TimeStampDiv>
                     );
                   }
                 })}
@@ -268,32 +265,6 @@ const RecommendTimeSchedule = styled.div`
   width: 112rem;
   background-color: ${Color("black50")};
 `;
-const TimeDiv = styled.div<timeDivProps>`
-  box-sizing: border-box;
-  width: 1rem;
-  height: 2rem;
-  background-color: ${({ selected }) =>
-    selected === 2
-      ? Color("green50")
-      : selected === 1
-      ? Color("orange50")
-      : ""};
-  border-top: 2px solid ${Color("black200")};
-  border-bottom: 2px solid ${Color("black200")};
-  border-left: 2px solid ${Color("black200")};
-  background-color: ${({ timeindex, startindex, endindex, selected }) => {
-    if (timeindex <= endindex && timeindex >= startindex) {
-      switch (selected) {
-        case 1:
-          return Color("orange300");
-        case 2:
-          return Color("blue300");
-        default:
-          return Color("blue100");
-      }
-    }
-  }};
-`;
 
 const TimeDivGroup = styled.div`
   display: flex;
@@ -309,11 +280,6 @@ const TimeStampGroup = styled.div`
   margin-left: 3px;
 `;
 
-const TimeStamp = styled.div<timeStampProps>`
-  box-sizing: border-box;
-  width: 1rem;
-  height: 26px;
-`;
 const PersonInfo = styled.div`
   display: flex;
   /* flex-direction: column; */
