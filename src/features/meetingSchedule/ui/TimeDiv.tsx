@@ -1,5 +1,6 @@
 import { Color } from "@/shared/lib/styles/color";
 import { timeDivProps } from "@/shared/lib/type";
+import React from "react";
 import styled from "styled-components";
 
 const StyledDiv = styled.div<timeDivProps>`

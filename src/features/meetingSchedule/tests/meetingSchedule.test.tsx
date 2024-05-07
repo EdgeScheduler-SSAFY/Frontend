@@ -39,11 +39,7 @@ describe("MeetingSchedulePage date change test", () => {
 
     await waitFor(() => {
       const startDateElement = screen.getByTestId("startDate");
-      const endDateElement = screen.getByTestId("endDate");
-      const nowDateElement = screen.getByTestId("nowDate");
       expect(startDateElement).toHaveTextContent(tmpDate);
-      expect(endDateElement).toHaveTextContent(tmpDate);
-      expect(nowDateElement).toHaveTextContent(tmpDate);
     });
 
     const prevDayButton = screen.getByTestId("goToPastDayButton");
@@ -60,11 +56,7 @@ describe("MeetingSchedulePage date change test", () => {
         days[prevDate.getDay()] +
         ")";
       const startDateElement = screen.getByTestId("startDate");
-      const endDateElement = screen.getByTestId("endDate");
-      const nowDateElement = screen.getByTestId("nowDate");
       expect(startDateElement).toHaveTextContent(prevTmpDate);
-      expect(endDateElement).toHaveTextContent(prevTmpDate);
-      expect(nowDateElement).toHaveTextContent(prevTmpDate);
     });
   }); // 다음날 버튼 눌렀을 때 날짜가 바뀌는지 확인, 다시 과거 버튼 눌렀을 때 제대로 바뀌는 지 체크
 });

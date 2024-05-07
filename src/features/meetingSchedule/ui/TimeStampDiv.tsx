@@ -1,5 +1,6 @@
 import { timeStampProps } from "@/shared/lib/type";
 import styled from "styled-components";
+import React from "react";
 
 const StyledDiv = styled.div<timeStampProps>`
   box-sizing: border-box;
