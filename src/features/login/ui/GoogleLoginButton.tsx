@@ -4,10 +4,10 @@ import Image from "next/image";
 
 import { Color } from "@/shared/lib/styles/color";
 
-export function LoginButton() {
+export function GoogleLoginButton() {
   const googleLogin = () => {
     window.location.href =
-      "https://edgescheduler.co.kr/oauth2/authorization/google";
+      "https://user-service.edgescheduler.co.kr/oauth2/authorization/google";
   };
   return (
     <LoginButtonLayout onClick={googleLogin}>

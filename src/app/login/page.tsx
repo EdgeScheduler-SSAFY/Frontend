@@ -1,7 +1,7 @@
 "use client";
 import styled from "styled-components";
 
-import { LoginButton } from "@/features/login/index";
+import { GoogleLoginButton } from "@/features/login/index";
 import { Color } from "@/shared/lib/styles/color";
 import { ColorName } from "@/shared/lib/type/types";
 
@@ -14,7 +14,7 @@ export default function Login() {
         <LogoName color="orange">edu</LogoName>
         <LogoName color="yellow">ler</LogoName>
       </MainLogo>
-      <LoginButton />
+      <GoogleLoginButton />
     </MainLayout>
   );
 }
