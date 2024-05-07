@@ -6,8 +6,8 @@ export default function Meeting() {
   return (
     <MainLayout>
       <Linkdiv>
-        <StyledLink href='/meeting/createMeeting'>createMeeting</StyledLink>
-        <StyledLink href='/meeting/meetingSchedule'>meetingSchedule</StyledLink>
+        <StyledLink href="/meeting/createMeeting">createMeeting</StyledLink>
+        <StyledLink href="/meeting/meetingSchedule">meetingSchedule</StyledLink>
       </Linkdiv>
     </MainLayout>
   );

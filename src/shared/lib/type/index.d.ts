@@ -23,8 +23,7 @@ export interface vipDivProps {
 export interface timeStampProps {
   personindex: number;
   timeindex: number;
-  startindex: number;
-  endindex: number;
+  children?: React.ReactNode;
 }
 
 export interface timeDivProps {
