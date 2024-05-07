@@ -5,12 +5,21 @@ import Image from "next/image";
 import { Color } from "@/shared/lib/styles/color";
 
 export function LoginButton() {
+  const googleLogin = () => {
+    window.location.href =
+      "https://edgescheduler.co.kr/oauth2/authorization/google";
+  };
   return (
-    <LoginButtonLayout>
-      <MSLogo>
-        <Image src='/images/microsoftLogo.png' alt='microsoftLogo' height={40} width={40} />
-      </MSLogo>
-      <LoginText>Sign in with Microsoft</LoginText>
+    <LoginButtonLayout onClick={googleLogin}>
+      <GoogleLogo>
+        <Image
+          src="/images/googleLogo.png"
+          alt="goolgeLogo"
+          height={40}
+          width={40}
+        />
+      </GoogleLogo>
+      <LoginText>Sign in with Google</LoginText>
     </LoginButtonLayout>
   );
 }
@@ -30,7 +39,7 @@ const LoginButtonLayout = styled.div`
   }
 `;
 
-const MSLogo = styled.div`
+const GoogleLogo = styled.div`
   width: 20%;
   display: flex;
   justify-content: center;
