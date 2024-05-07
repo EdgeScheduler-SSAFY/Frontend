@@ -2,9 +2,14 @@
 import { styled } from "styled-components";
 import Image from "next/image";
 import { people, person } from "./dummyData";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Color } from "@/shared/lib/styles/color";
-import { ScheduleComponentProps, timeDivProps, timeStampProps, vipDivProps } from "@/shared/lib/type";
+import {
+  ScheduleComponentProps,
+  timeDivProps,
+  timeStampProps,
+  vipDivProps,
+} from "@/shared/lib/type";
 
 const vip: boolean[] = [true, true, true, true, false, false];
 const checkedTime: number[][] = [];
@@ -12,8 +17,6 @@ const allDayTime: boolean[] = Array(112).fill(false);
 //checkedTime 이 0이면 그냥 시간, 1이면 불가능한 시간, 2이면 업무 시간
 const startTime: number[] = [0, 4, 6, 8, 8, 12];
 const RecommendTime: boolean[] = Array(112).fill(false);
-
-
 
 people.forEach((person: person, index: number) => {
   let arr: number[] = []; // 사람별 되는 시간 더미데이터
@@ -146,24 +149,25 @@ export default function ScheduleComponent({
           );
         })}
       </PeopleLayout>
-      <TimeTableLayout data-testId="timeTableLayout"
+      <TimeTableLayout
+        data-testId="timeTableLayout"
         onMouseDown={(event) => handleMouseDown(event)}
         ref={timeDivGroupRef}
       >
         <RecommendTimeSchedule />
-        {checkedTime.map((checkTimes: number[], personIndex: number) => {
+        {checkedTime.map((checkTimes: number[], personindex: number) => {
           return (
-            <PersonTime key={personIndex}>
+            <PersonTime key={personindex}>
               <TimeDivGroup>
                 {checkTimes.map((checkTime: number, timeIndex: number) => {
                   return (
                     <TimeDiv
                       key={timeIndex}
-                      selected={checkedTime[personIndex][timeIndex]}
-                      personIndex={personIndex}
+                      selected={checkedTime[personindex][timeIndex]}
+                      personindex={personindex}
                       timeindex={timeIndex}
-                      startIndex={startIndex}
-                      endIndex={endIndex}
+                      startindex={startIndex}
+                      endindex={endIndex}
                     ></TimeDiv>
                   );
                 })}
@@ -174,12 +178,12 @@ export default function ScheduleComponent({
                     return (
                       <TimeStamp
                         key={timeIndex}
-                        personIndex={personIndex}
+                        personindex={personindex}
                         timeindex={timeIndex}
-                        startIndex={startIndex}
-                        endIndex={endIndex}
+                        startindex={startIndex}
+                        endindex={endIndex}
                       >
-                        {(startTime[personIndex] +
+                        {(startTime[personindex] +
                           Math.floor(timeIndex / 4) +
                           24) %
                           24}
@@ -189,10 +193,10 @@ export default function ScheduleComponent({
                     return (
                       <TimeStamp
                         key={timeIndex}
-                        personIndex={personIndex}
+                        personindex={personindex}
                         timeindex={timeIndex}
-                        startIndex={startIndex}
-                        endIndex={endIndex}
+                        startindex={startIndex}
+                        endindex={endIndex}
                       ></TimeStamp>
                     );
                   }
@@ -277,8 +281,8 @@ const TimeDiv = styled.div<timeDivProps>`
   border-top: 2px solid ${Color("black200")};
   border-bottom: 2px solid ${Color("black200")};
   border-left: 2px solid ${Color("black200")};
-  background-color: ${({ timeindex, startIndex, endIndex, selected }) => {
-    if (timeindex <= endIndex && timeindex >= startIndex) {
+  background-color: ${({ timeindex, startindex, endindex, selected }) => {
+    if (timeindex <= endindex && timeindex >= startindex) {
       switch (selected) {
         case 1:
           return Color("orange300");

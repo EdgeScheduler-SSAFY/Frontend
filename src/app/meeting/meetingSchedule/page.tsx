@@ -1,15 +1,13 @@
 "use client";
 import styled from "styled-components";
 import { IoMdArrowDropdown } from "react-icons/io";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
 
 import ScheduleComponent from "./scheduleComponent";
 import { Color } from "@/shared/lib/styles/color";
+import RecommendTypeSetButton from "@/features/meetingSchedule/ui/RecommendTypeSetButton";
 
-interface OptionButtonProps {
-  selected: boolean;
-}
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export default function MeetingSchedule() {
   const todayDate = new Date();
@@ -157,34 +155,37 @@ export default function MeetingSchedule() {
           </TimeSelectionLayout>
         </DateLayout>
         <OptionLayout>
-          <OptionButton
+          <RecommendTypeSetButton
             selected={selectedOption === 0}
             onClick={() => handleOptionClick(0)}
           >
             fatest
-          </OptionButton>
-          <OptionButton
+          </RecommendTypeSetButton>
+          <RecommendTypeSetButton
             selected={selectedOption === 1}
             onClick={() => handleOptionClick(1)}
           >
             minimum
             <br /> absentees
-          </OptionButton>
-          <OptionButton
+          </RecommendTypeSetButton>
+          <RecommendTypeSetButton
             selected={selectedOption === 2}
             onClick={() => handleOptionClick(2)}
           >
             excellent
             <br /> satisfaction
-          </OptionButton>
+          </RecommendTypeSetButton>
         </OptionLayout>
       </HeaderLayout>
       <ScheduleHeaderLayout>
         <ScheduleHeaderTime>
-          <TimeChangeButton onClick={handleGoToPastDay} data-testId="goToPrevDayButton">
+          <TimeChangeButton
+            onClick={handleGoToPastDay}
+            data-testid="goToPastDayButton"
+          >
             <LuChevronLeftSquare />
           </TimeChangeButton>
-          <TimeDiv data-testId="nowDate">
+          <TimeDiv data-testid="nowDate">
             {date.getFullYear() +
               "." +
               (date.getMonth() + 1) +
@@ -194,7 +195,10 @@ export default function MeetingSchedule() {
               days[date.getDay()] +
               ")"}
           </TimeDiv>
-          <TimeChangeButton onClick={handleGoToNextDay} data-testId="goToNextDayButton">
+          <TimeChangeButton
+            onClick={handleGoToNextDay}
+            data-testid="goToNextDayButton"
+          >
             <LuChevronRightSquare />
           </TimeChangeButton>
         </ScheduleHeaderTime>
@@ -242,27 +246,6 @@ const OptionLayout = styled.div`
   align-items: center;
   justify-content: center;
   text-align: right;
-`;
-
-const OptionButton = styled.button<OptionButtonProps>`
-  min-width: 8rem;
-  min-height: 2.5rem;
-  border: none;
-  border-radius: 5px;
-  padding-top: auto;
-  padding-bottom: auto;
-  margin-left: 10px;
-  margin-right: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  background-color: ${({ selected }) =>
-    selected ? Color("blue") : Color("black50")};
-  color: ${({ selected }) => (selected ? "white" : `${Color("black")}`)};
-  &:hover {
-    cursor: pointer;
-    background-color: ${({ selected }) =>
-      selected ? Color("blue") : Color("black100")};
-  }
 `;
 
 const DateDiv = styled.div`
