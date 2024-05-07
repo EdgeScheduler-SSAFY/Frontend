@@ -9,10 +9,10 @@ export default function Login() {
   return (
     <MainLayout>
       <MainLogo>
-        <LogoName color='blue'>Edge&nbsp;</LogoName>
-        <LogoName color='green'>Sch</LogoName>
-        <LogoName color='orange'>edu</LogoName>
-        <LogoName color='yellow'>ler</LogoName>
+        <LogoName color="blue">Edge&nbsp;</LogoName>
+        <LogoName color="green">Sch</LogoName>
+        <LogoName color="orange">edu</LogoName>
+        <LogoName color="yellow">ler</LogoName>
       </MainLogo>
       <LoginButton />
     </MainLayout>
@@ -26,7 +26,6 @@ const MainLayout = styled.div`
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  
 `;
 
 const MainLogo = styled.div`
