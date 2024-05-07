@@ -6,7 +6,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Color } from "@/shared/lib/styles/color";
 import {
   ScheduleComponentProps,
-  timeStampProps,
   vipDivProps,
 } from "@/shared/lib/type";
 import TimeDiv from "@/features/meetingSchedule/ui/TimeDiv";
@@ -22,7 +21,7 @@ const RecommendTime: boolean[] = Array(112).fill(false);
 people.forEach((person: person, index: number) => {
   let arr: number[] = []; // 사람별 되는 시간 더미데이터
   for (let i = 0; i < 112; i++) {
-    if (Math.floor(i / 8) == 1) {
+    if (Math.floor(i / 8) === 1) {
       arr.push(2);
     } else {
       arr.push(0);
