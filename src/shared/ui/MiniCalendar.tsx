@@ -11,9 +11,10 @@ interface IMiniCalendarProps {
   close: () => void; // 모달 닫기 함수
   selectDate: (date: Date) => void; // 날짜 선택시 실행되는 함수
   view: CalendarView; // 현재 뷰(day, week,none)
+  $standardDate?: Date; // 기준 날짜
 }
 // 미니 캘린더 컴포넌트
-export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCalendarProps) {
+export function MiniCalendar({ selectedDate, close, selectDate, view, $standardDate }: IMiniCalendarProps) {
   const [selected, setSelected] = useState(selectedDate); // 선택된 날짜
   const firstDayOfMonth = startOfMonth(selected); // 선택된 달의 첫날
   const lastDayOfMonth = endOfMonth(selected); // 선택된 달의 마지막날
@@ -22,12 +23,20 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
   const [selectedWeek] = useState(startOfWeek(selected)); // 선택된 주
   const dates: Date[] = []; // 날짜 배열
 
+  const isDisabled = (date: Date) => {
+    // 기준 날짜가 없으면 모든 날짜가 활성화
+    if (!$standardDate) return false;
+
+    // 비활성여부 확인
+    return date < $standardDate;
+  };
   let currentDate = startDate; // 현재 날짜
   // 날짜 배열 채우기
   while (currentDate <= endDate) {
     dates.push(currentDate);
     currentDate = addDays(currentDate, 1);
   }
+
   // 날짜 선택시 실행되는 함수
   const handleDayClick = (date: Date) => {
     selectDate(date);
@@ -48,6 +57,7 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [close]);
+
   //렌더링
   const renderDay = () => {
     return dates.map((date, index) =>
@@ -67,7 +77,8 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
               selected.getMonth() !== subDate.getMonth() ? (
                 <SubMonthDay
                   key={format(subDate, "yyyy-MM-dd")}
-                  onClick={() => handleDayClick(subDate)}
+                  onClick={isDisabled(subDate) ? undefined : () => handleDayClick(subDate)}
+                  $disabled={isDisabled(subDate)}
                 >
                   {format(subDate, "d")}
                 </SubMonthDay>
@@ -76,14 +87,15 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
                 subDate.getDate() === selectedDate.getDate() &&
                 subDate.getFullYear() === selectedDate.getFullYear() &&
                 subDate.getMonth() === selectedDate.getMonth() ? (
-                <SelectedDay
-                  onClick={() => handleDayClick(subDate)}
-                  key={format(subDate, "yyyy-MM-dd")}
-                >
+                <SelectedDay onClick={() => handleDayClick(subDate)} key={format(subDate, "yyyy-MM-dd")}>
                   {format(subDate, "d")}
                 </SelectedDay>
               ) : (
-                <Day onClick={() => handleDayClick(subDate)} key={format(subDate, "yyyy-MM-dd")}>
+                <Day
+                  onClick={isDisabled(subDate) ? undefined : () => handleDayClick(subDate)}
+                  key={format(subDate, "yyyy-MM-dd")}
+                  $disabled={isDisabled(subDate)}
+                >
                   {format(subDate, "d")}
                 </Day>
               )
@@ -97,12 +109,17 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
               selected.getMonth() !== subDate.getMonth() ? (
                 <SubMonthDay
                   key={format(subDate, "yyyy-MM-dd")}
-                  onClick={() => handleDayClick(subDate)}
+                  onClick={isDisabled(subDate) ? undefined : () => handleDayClick(subDate)}
+                  $disabled={isDisabled(subDate)}
                 >
                   {format(subDate, "d")}
                 </SubMonthDay>
               ) : (
-                <Day onClick={() => handleDayClick(subDate)} key={format(subDate, "yyyy-MM-dd")}>
+                <Day
+                  onClick={isDisabled(subDate) ? undefined : () => handleDayClick(subDate)}
+                  key={format(subDate, "yyyy-MM-dd")}
+                  $disabled={isDisabled(subDate)}
+                >
                   {format(subDate, "d")}
                 </Day>
               )
@@ -113,8 +130,8 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
     );
   };
   return (
-    <CalendarLayout onClick={(e) => e.stopPropagation()} ref={ref} data-testid="miniCalendar">
-      \{/* 미니캘린더 네브 */}
+    <CalendarLayout onClick={(e) => e.stopPropagation()} ref={ref} data-testid='miniCalendar'>
+      {/* 미니캘린더 네브 */}
       <NavLayout>
         <ArrowLayout>
           <LuChevronLeftSquare
@@ -130,13 +147,13 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
       </NavLayout>
       {/* 미니켈린더 요일 */}
       <CalendarGridX>
-        <WeekDay>sun</WeekDay>
-        <WeekDay>mon</WeekDay>
-        <WeekDay>tue</WeekDay>
-        <WeekDay>wed</WeekDay>
-        <WeekDay>thu</WeekDay>
-        <WeekDay>fri</WeekDay>
-        <WeekDay>sat</WeekDay>
+        <WeekDay>Sun</WeekDay>
+        <WeekDay>Mon</WeekDay>
+        <WeekDay>Tue</WeekDay>
+        <WeekDay>Wed</WeekDay>
+        <WeekDay>Thu</WeekDay>
+        <WeekDay>Fri</WeekDay>
+        <WeekDay>Sat</WeekDay>
       </CalendarGridX>
       <CalendarGridY>{renderDay()}</CalendarGridY>
     </CalendarLayout>
@@ -166,6 +183,7 @@ const CalendarGridX = styled.div`
   gap: 5px;
   padding: 5px;
   text-align: center;
+  align-items: center;
 `;
 const SelectedCalendarGridX = styled.div`
   display: grid;
@@ -176,19 +194,26 @@ const SelectedCalendarGridX = styled.div`
   padding: 5px;
   text-align: center;
 `;
-const Day = styled.div`
+const Day = styled.div<{ $disabled: boolean }>`
   width: 35px;
   margin: 3px;
-  cursor: pointer;
+  cursor: ${({ $disabled }) => ($disabled ? "default" : "pointer")};
+  color: ${({ $disabled }) => ($disabled ? Color("black100") : Color("black"))};
+  &:hover {
+    background-color: ${({ $disabled }) => ($disabled ? "none" : Color("blue50"))};
+    border-radius: 5px;
+  }
 `;
 const SelectedDay = styled.div`
   width: 35px;
-  color: ${Color("blue300")};
-  border: 3px solid ${Color("blue300")};
+  margin: 3px;
+  color: ${Color("blue")};
+  font-weight: 600;
   cursor: pointer;
 `;
-const SubMonthDay = styled.div`
-  color: #999;
+const SubMonthDay = styled.div<{ $disabled: boolean }>`
+  cursor: ${({ $disabled }) => ($disabled ? "default" : "pointer")};
+  color: ${Color("black100")};
   width: 35px;
 `;
 const NavLayout = styled.div`
@@ -204,4 +229,5 @@ const ArrowLayout = styled.div`
 const WeekDay = styled.div`
   width: 35px;
   margin: 3px;
+  font-weight: 600;
 `;
