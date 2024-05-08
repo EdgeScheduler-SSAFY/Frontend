@@ -9,9 +9,16 @@ import { Color } from "@/shared/lib/styles/color";
 import RecommendTypeSetButton from "@/features/meetingSchedule/ui/RecommendTypeSetButton";
 import CancelButton from "@/features/meetingSchedule/ui/CancelButton";
 import SubmitButton from "@/features/meetingSchedule/ui/SubmitButton";
+import useMeetStore, { MeetState } from "@/store/meetStore";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export default function MeetingSchedule() {
+  const { startDatetime, endDatetime, runningtime, memberList } = useMeetStore(
+    (state: MeetState) => state
+  );
+
+  // console.log(startDatetime, endDatetime, runningtime, memberList);
+
   const todayDate = new Date();
   const [date, setDate] = useState<Date>(todayDate);
   const [startDate, setStartDate] = useState<string>(

@@ -2,15 +2,20 @@ import styled from "styled-components";
 
 import Button from "@/shared/ui/button";
 
-export default function ButtonBox() {
+export default function ButtonBox({ handleNext, handleCancel }) {
   return (
     <ButtonDiv>
-    <Button>next</Button>
-    <Button color='black' $bgColor='black50' $hoverColor='black100'>
-      cancel
-    </Button>
-  </ButtonDiv>
-  )
+      <Button onClick={handleNext}>next</Button>
+      <Button
+        color="black"
+        $bgColor="black50"
+        $hoverColor="black100"
+        onClick={handleCancel}
+      >
+        cancel
+      </Button>
+    </ButtonDiv>
+  );
 }
 
 const ButtonDiv = styled.div`
