@@ -35,7 +35,9 @@ export default function Select(props: SelectProrps) {
   // 선택값
   const handleOptionClick = (value: number | string) => {
     // value에 해당하는 option 찾기
-    const selectedOption = props.options.find((option) => option.value === value);
+    const selectedOption = props.options.find(
+      (option) => option.value === value
+    );
     if (selectedOption) {
       setSelectedValue(selectedOption.option); // option으로 설정
       setSelectFlag(false);
@@ -47,7 +49,10 @@ export default function Select(props: SelectProrps) {
   const selectRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+      if (
+        selectRef.current &&
+        !selectRef.current.contains(event.target as Node)
+      ) {
         setSelectFlag(false);
       }
     }
@@ -68,7 +73,11 @@ export default function Select(props: SelectProrps) {
           {props.options.map((option, index) => (
             <SelectOption
               key={option.value}
-              onClick={isDisabled(index) ? undefined : () => handleOptionClick(option.value)}
+              onClick={
+                isDisabled(index)
+                  ? undefined
+                  : () => handleOptionClick(option.value)
+              }
               $disabled={isDisabled(index)}
             >
               {option.option}
@@ -123,7 +132,8 @@ const SelectList = styled.ul<{ $show: boolean; width: number }>`
 `;
 
 const SelectOption = styled.li<{ $disabled: boolean }>`
-  background-color: ${({ $disabled }) => ($disabled ? Color("black50") : "none")};
+  background-color: ${({ $disabled }) =>
+    $disabled ? Color("black50") : "none"};
   height: 1.9rem;
   line-height: 1.9rem;
   margin: 0.05rem 0;
@@ -133,7 +143,8 @@ const SelectOption = styled.li<{ $disabled: boolean }>`
   transition: all 0.2s ease-in-out;
   &:hover {
     font-weight: 500;
-    background-color: ${({ $disabled }) => ($disabled ? Color("black50") : Color("blue50"))};
+    background-color: ${({ $disabled }) =>
+      $disabled ? Color("black50") : Color("blue50")};
     box-sizing: border-box;
   }
 `;
