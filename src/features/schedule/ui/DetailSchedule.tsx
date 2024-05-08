@@ -89,7 +89,7 @@ export function DetailSchedule({ close }: IDetailScheduleProps) {
     };
   }, []);
   return (
-    <MainLayout onClick={(e) => e.stopPropagation()} ref={ref}>
+    <MainLayout onClick={(e) => e.stopPropagation()} ref={ref} data-testid="detail schedule">
       <NameLayout>
         <div>{data.name}</div>
         <div></div>

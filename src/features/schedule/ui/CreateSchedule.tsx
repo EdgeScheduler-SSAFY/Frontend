@@ -84,7 +84,6 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
         setIsCount(true);
         break;
       default:
-      // Handle unexpected case
     }
   };
   const [recurrenceDay, setRecurrenceDay] = useState<string[]>([]);
@@ -101,7 +100,7 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
   };
 
   return (
-    <MainLayout ref={ref}>
+    <MainLayout ref={ref} data-testid={"create schedule"}>
       <div>Create Schedule</div>
       <input
         placeholder="Add a title"
