@@ -46,8 +46,8 @@ export default function Select(props: SelectProrps) {
   // 외부 영역 클릭하면 닫히도록 구현
   const selectRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+    function handleClickOutside(e: MouseEvent) {
+      if (selectRef.current && !selectRef.current.contains(e.target as Node)) {
         setSelectFlag(false);
       }
     }
