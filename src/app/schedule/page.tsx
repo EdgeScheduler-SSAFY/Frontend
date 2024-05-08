@@ -1,21 +1,91 @@
 "use client";
 import styled from "styled-components";
-import { type dayT } from "@/features/schedule/model/types";
-import { DayForMonth } from "@/features/schedule/index";
 import { CalendarHeader, MonthViewCalendar, WeekViewCalendar } from "@/widgets/schedule/index";
 import { useState } from "react";
+import { DayViewCalendar } from "@/widgets/schedule/index";
 
-const dummy: any = {
-  date: new Date(),
-  scheduleList: [
+export default function Schedule() {
+  const [view, setView] = useState("month");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const scheduleList = [
     {
       scheduleId: 1,
       organizerId: 1,
       name: "allday",
       type: "WORKING",
       color: 1,
-      startDatetime: new Date("2024-05-03T00:00:00"),
-      endDatetime: new Date("2024-05-03T23:00:00"),
+      startDateTime: new Date("2024-05-05T02:00:00"),
+      endDateTime: new Date("2024-05-05T12:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-05T05:25:00"),
+      endDateTime: new Date("2024-05-05T12:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-05T05:25:00"),
+      endDateTime: new Date("2024-05-05T07:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-05T01:25:00"),
+      endDateTime: new Date("2024-05-05T07:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-05T16:25:00"),
+      endDateTime: new Date("2024-05-05T23:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-05T19:25:00"),
+      endDateTime: new Date("2024-05-05T20:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-05T20:25:00"),
+      endDateTime: new Date("2024-05-05T23:30:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-05T08:25:00"),
+      endDateTime: new Date("2024-05-05T23:30:00"),
       isPublic: true,
     },
     {
@@ -24,18 +94,59 @@ const dummy: any = {
       name: "partially",
       type: "WORKING",
       color: 1,
-      startDatetime: new Date("2024-05-04T09:00:00"),
-      endDatetime: new Date("2024-05-04T12:00:00"),
+      startDateTime: new Date("2024-05-06T09:00:00"),
+      endDateTime: new Date("2024-05-06T12:00:00"),
+      isPublic: true,
+    },
+
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "3day7",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-05T09:00:00"),
+      endDateTime: new Date("2024-05-07T14:00:00"),
       isPublic: true,
     },
     {
       scheduleId: 1,
       organizerId: 1,
-      name: "3day",
+      name: "3day8",
       type: "WORKING",
       color: 1,
-      startDatetime: new Date("2024-05-05T09:00:00"),
-      endDatetime: new Date("2024-05-15T14:00:00"),
+      startDateTime: new Date("2024-05-05T09:00:00"),
+      endDateTime: new Date("2024-05-08T14:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "3day1",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-20T09:00:00"),
+      endDateTime: new Date("2024-05-21T14:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "3day10",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-05T09:00:00"),
+      endDateTime: new Date("2024-05-10T14:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "more check all dayyyyyyyyyyyyyyyyy",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-10T00:00:00"),
+      endDateTime: new Date("2024-05-10T23:59:59"),
       isPublic: true,
     },
     {
@@ -44,8 +155,8 @@ const dummy: any = {
       name: "more checkkkkkkkkkkkkkkkkkkk",
       type: "WORKING",
       color: 1,
-      startDatetime: new Date("2024-05-10T09:00:00"),
-      endDatetime: new Date("2024-05-10T12:00:00"),
+      startDateTime: new Date("2024-05-10T00:00:00"),
+      endDateTime: new Date("2024-05-10T23:59:59"),
       isPublic: true,
     },
     {
@@ -54,18 +165,8 @@ const dummy: any = {
       name: "more check",
       type: "WORKING",
       color: 1,
-      startDatetime: new Date("2024-05-10T09:00:00"),
-      endDatetime: new Date("2024-05-10T12:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "more check all day",
-      type: "WORKING",
-      color: 1,
-      startDatetime: new Date("2024-05-10T00:00:00"),
-      endDatetime: new Date("2024-05-10T23:59:59"),
+      startDateTime: new Date("2024-05-10T00:00:00"),
+      endDateTime: new Date("2024-05-10T23:59:59"),
       isPublic: true,
     },
     {
@@ -74,15 +175,83 @@ const dummy: any = {
       name: "more check",
       type: "WORKING",
       color: 1,
-      startDatetime: new Date("2024-05-10T09:00:00"),
-      endDatetime: new Date("2024-05-10T12:00:00"),
+      startDateTime: new Date("2024-05-10T00:00:00"),
+      endDateTime: new Date("2024-05-10T23:59:59"),
       isPublic: true,
     },
-  ],
-};
-export default function Schedule({ scheduleList = dummy.scheduleList }) {
-  const [view, setView] = useState("month");
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  ];
+  const scheduleList2 = [
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-06T02:00:00"),
+      endDateTime: new Date("2024-05-06T12:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-06T02:00:00"),
+      endDateTime: new Date("2024-05-06T12:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-06T02:00:00"),
+      endDateTime: new Date("2024-05-06T12:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-06T00:00:00"),
+      endDateTime: new Date("2024-05-06T23:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-06T00:00:00"),
+      endDateTime: new Date("2024-05-06T23:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-06T00:00:00"),
+      endDateTime: new Date("2024-05-06T23:00:00"),
+      isPublic: true,
+    },
+    {
+      scheduleId: 1,
+      organizerId: 1,
+      name: "allday",
+      type: "WORKING",
+      color: 1,
+      startDateTime: new Date("2024-05-06T00:00:00"),
+      endDateTime: new Date("2024-05-06T23:00:00"),
+      isPublic: true,
+    },
+  ];
   return (
     <MainLayout>
       <CalendarHeader
@@ -98,7 +267,15 @@ export default function Schedule({ scheduleList = dummy.scheduleList }) {
           selectedDate={selectedDate}
         ></MonthViewCalendar>
       )}
-      {view === "week" && <WeekViewCalendar selectedDate={selectedDate}></WeekViewCalendar>}
+      {view === "week" && (
+        <WeekViewCalendar
+          scheduleList={scheduleList}
+          selectedDate={selectedDate}
+        ></WeekViewCalendar>
+      )}
+      {view === "day" && (
+        <DayViewCalendar schedules={scheduleList2} selectedDate={selectedDate}></DayViewCalendar>
+      )}
     </MainLayout>
   );
 }
@@ -106,5 +283,4 @@ export default function Schedule({ scheduleList = dummy.scheduleList }) {
 const MainLayout = styled.div`
   width: 100;
   height: calc(100% - 50px);
-  min-height: calc(100% - 50px);
 `;
