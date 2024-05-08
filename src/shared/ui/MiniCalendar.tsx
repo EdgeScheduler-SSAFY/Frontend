@@ -46,8 +46,8 @@ export function MiniCalendar({ selectedDate, close, selectDate, view, $standardD
   const ref = useRef<HTMLDivElement>(null);
   // 외부 영역 클릭시 미니 캘린더 닫기
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
         close();
       }
     };

@@ -1,12 +1,12 @@
 "use client";
 import styled from "styled-components";
 import { Noto_Sans_KR } from "next/font/google";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MdKeyboardArrowRight, MdKeyboardArrowDown } from "react-icons/md";
 import Image from "next/image";
 
 import { runningTime, intervalTime, userLists } from "@/shared/lib/data";
-import { MeetingData } from "@/shared/lib/type";
+import { MeetingData, userList } from "@/shared/lib/type";
 import { Color } from "@/shared/lib/styles/color";
 import Label from "@/shared/ui/label";
 import Input from "@/shared/ui/input";
@@ -14,6 +14,7 @@ import Select from "@/shared/ui/select";
 import TextArea from "@/shared/ui/textArea";
 import { MiniCalendar } from "@/shared";
 import ButtonBox from "./ui/buttonBox";
+import { filterUserList, highlightSearchTerm } from "./model/searchUtils";
 
 const noto = Noto_Sans_KR({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -21,9 +22,7 @@ const noto = Noto_Sans_KR({
 });
 
 export default function CreateMeeting() {
-  const today = new Date();
   // 회의 정보
-
   const [meetingData, setMeetingData] = useState<MeetingData>({
     name: "",
     description: "",
@@ -38,21 +37,41 @@ export default function CreateMeeting() {
     memberList: [],
   });
 
-  // 전체 부서 주소록
-  const [isFolded, setIsFolded] = useState(true);
-  // 각 부서에 대한 상태를 관리할 배열
+  const [searchTerm, setSearchTerm] = useState<string>(""); // 검색어
+  const [showSearchList, setShowSearchList] = useState(false); // 검색 리스트 표시 여부
+  const searchRef = useRef<HTMLDivElement>(null);
+  const [isFolded, setIsFolded] = useState(true); // 전체 부서 주소록
   const [teamStates, setTeamStates] = useState([
     { name: "Development Team 1", folded: true },
     { name: "Development Team 2", folded: true },
-  ]);
+  ]); // 각 부서에 대한 상태를 관리할 배열
   const [sameDate, setSameDate] = useState<boolean>(true);
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
-  // 클릭 여부 사용자 ID 기준
-  const [clickedUsers, setClickedUsers] = useState<{ [userId: number]: boolean }>({});
+  const [clickedUsers, setClickedUsers] = useState<{ [userId: number]: boolean }>({}); // 클릭 여부 사용자 ID 기준
   const [showStartMiniCalendar, setShowStartMiniCalendar] = useState<boolean>(false);
   const [showEndMiniCalendar, setShowEndMiniCalendar] = useState<boolean>(false);
   const [selectedStartDate, setSelectedStartDate] = useState(new Date());
   const [selectedEndDate, setSelectedEndDate] = useState(new Date());
+
+  // 검색어 입력 시 호출되는 함수
+  const searchInputChangehandle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    // 검색어가 비어있으면 검색 리스트를 닫음
+    setShowSearchList(e.target.value !== "");
+  };
+
+  // 외부를 클릭하면 검색 리스트를 닫음
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSearchList(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // 전체 주소록 상태 변경
   const toggleFold = () => {
@@ -114,6 +133,7 @@ export default function CreateMeeting() {
 
   // 사용자 버튼 클릭 이벤트
   const userButtonClickHandle = (userId: number) => {
+    console.log("userButtonClickHandle called with userId:", userId);
     const clickedUser = userLists.find((user) => user.id === userId);
     // 이미 참가자 목록에 있는 사용자인지 확인
     const isParticipant = meetingData.memberList.some((user) => user.memberid === userId);
@@ -135,6 +155,9 @@ export default function CreateMeeting() {
       ...prev,
       [userId]: !prev[userId],
     }));
+
+    setSearchTerm("");
+    setShowSearchList(false);
   };
 
   // 참가자 div에서 제거
@@ -151,7 +174,8 @@ export default function CreateMeeting() {
   };
 
   // 필수 / 선택 여부 전환 이벤트
-  const optionalButtonClickHandle = (userId: number) => {
+  const optionalButtonClickHandle = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, userId: number) => {
+    e.stopPropagation(); // 이벤트 버블링 중단
     setMeetingData((prev) => {
       const updatedMemberList = prev.memberList.map((member) => {
         if (member.memberid === userId) {
@@ -164,8 +188,9 @@ export default function CreateMeeting() {
   };
 
   useEffect(() => {
-    console.log("MeetingData:", meetingData);
-  }, [meetingData]);
+    console.log("searchTerm:", searchTerm);
+    // console.log("MeetingData:", meetingData);
+  }, [meetingData, searchTerm]);
 
   return (
     <MainLayout>
@@ -176,8 +201,37 @@ export default function CreateMeeting() {
               Address Book
             </Label>
             <InlineDiv>
-              <Input id='addressbook' type='text' width={20} placeholder='Please enter a search term.' />
+              <SearchBox>
+                <Input
+                  id='addressbook'
+                  type='text'
+                  width={20}
+                  placeholder='Please enter a search term.'
+                  value={searchTerm}
+                  onChange={searchInputChangehandle}
+                  onFocus={() => {
+                    if (searchTerm !== "") setShowSearchList(true);
+                  }}
+                />
+              </SearchBox>
             </InlineDiv>
+            {showSearchList && (
+              <SearchDiv ref={searchRef}>
+                <SearchList>
+                  {filterUserList(userLists, searchTerm).length > 0 ? (
+                    filterUserList(userLists, searchTerm).map((member) => (
+                      <SearchListOption key={member.id} onClick={() => userButtonClickHandle(member.id)}>
+                        <ProfileImage src={member.profile} alt='프로필사진' width={20} height={20} />
+                        <UserName>{highlightSearchTerm(member.name, searchTerm)}</UserName>
+                        <Department>{member.department}</Department>
+                      </SearchListOption>
+                    ))
+                  ) : (
+                    <SearchListOption onClick={undefined}>No one matches your search term😥</SearchListOption>
+                  )}
+                </SearchList>
+              </SearchDiv>
+            )}
             <AdressBookDiv>
               <ButtonFold onClick={toggleFold} className={noto.className}>
                 {isFolded ? <MdKeyboardArrowRight size={16} /> : <MdKeyboardArrowDown size={16} />}부서 주소록
@@ -202,7 +256,6 @@ export default function CreateMeeting() {
                                   <UserButton
                                     $isClicked={clickedUsers[member.id]}
                                     onClick={() => userButtonClickHandle(member.id)}
-                                    draggable='true'
                                     className={noto.className}
                                   >
                                     <ProfileImage src={member.profile} alt='프로필사진' width={25} height={25} />
@@ -323,7 +376,7 @@ export default function CreateMeeting() {
                           <div>
                             <OptionalButton
                               className={noto.className}
-                              onClick={() => optionalButtonClickHandle(member.memberid)}
+                              onClick={(e) => optionalButtonClickHandle(e, member.memberid)}
                               $isRequired={member.isRequired}
                             >
                               {member.isRequired ? "required" : "optional"}
@@ -383,6 +436,38 @@ const InlineDiv = styled.div`
   display: flex;
   align-items: center;
   height: 3rem;
+`;
+
+const SearchBox = styled.div`
+  position: relative;
+`;
+const SearchDiv = styled.div`
+  position: absolute;
+  top: 11rem;
+  width: 20rem;
+  padding: 0 0.7rem;
+  background-color: white;
+  border: 1px solid ${Color("black200")};
+  border-radius: 3px;
+  z-index: 1;
+`;
+
+const SearchList = styled.ul`
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+  font-size: 12px;
+`;
+
+const SearchListOption = styled.li`
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  height: 2rem;
+  line-height: 2rem;
+  margin: 0.2rem 0;
+  border-radius: 3px;
+  cursor: pointer;
 `;
 
 const PeriodDiv = styled.div`
@@ -445,7 +530,7 @@ const LnbSubTree = styled.ul`
 `;
 
 const UserButton = styled.button<{ $isClicked: boolean }>`
-  width: 11rem;
+  width: 13rem;
   height: 2.5rem;
   padding: 0.2rem 0.5rem;
   border: none;
@@ -457,11 +542,12 @@ const UserButton = styled.button<{ $isClicked: boolean }>`
   position: relative;
   margin-left: 1rem;
   transition: all 0.2s ease-in;
-  background-color: ${(props) => (props.$isClicked ? Color("blue100") : Color("black50"))};
+  background-color: ${(props) => (props.$isClicked ? Color("yellow100") : Color("black50"))};
 `;
 
 const ProfileImage = styled(Image)`
   border-radius: 50%;
+  margin-right: 0.5rem;
 `;
 
 const UserName = styled.div`
@@ -476,16 +562,9 @@ const TimeZone = styled.div`
   right: 0.8rem;
 `;
 
-const CloseButton = styled.button`
-  border: none;
-  background: none;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  &:hover {
-    color: ${Color("orange600")};
-  }
+const Department = styled.div`
+  color: ${Color("black300")};
 `;
-
 const ParticipantInfoDiv = styled.div`
   border: 1px solid ${Color("black200")};
   border-radius: 10px;
