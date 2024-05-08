@@ -43,16 +43,15 @@ export function CalendarNavButton({
 }
 
 const NavContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr max-content;
   padding: 0 1rem;
   font-size: 1rem;
   color: #333;
 `;
 const DateLayout = styled.div`
   margin: 0 1rem;
-  width: 170px;
+  cursor: pointer;
 `;
 const Button = styled.div`
   display: flex;
