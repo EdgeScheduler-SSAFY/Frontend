@@ -91,7 +91,10 @@ export default function CreateMeeting() {
   // 시작날짜 값이 변경될 때 실행될 함수
   const startDateHandle = (selectedDate: Date) => {
     setSelectedStartDate(selectedDate);
-    setSelectedEndDate(selectedDate);
+    // 끝 날짜가 더 빠를 때만 변경
+    if (selectedDate > selectedEndDate) {
+      setSelectedEndDate(selectedDate);
+    }
     const year = selectedDate.getFullYear();
     const month = ("0" + (selectedDate.getMonth() + 1)).slice(-2);
     const date = ("0" + selectedDate.getDate()).slice(-2);
@@ -319,7 +322,7 @@ export default function CreateMeeting() {
                   width={6.5}
                   onSelectChange={startTimeChangeHandle}
                   standardIdx={0}
-                  disabledIndex={-1}
+                  disabledLastIndex={sameDate? true : false}
                 ></Select>
                 <LineDiv>-</LineDiv>
                 <DateButton onClick={() => setShowEndMiniCalendar((prev) => !prev)}>
@@ -342,7 +345,7 @@ export default function CreateMeeting() {
                   show={false}
                   width={6.5}
                   onSelectChange={endTimeChangeHandle}
-                  standardIdx={sameDate ? 1 : 0}
+                  standardIdx={disabledIndex + 1}
                   disabledIndex={sameDate ? disabledIndex : -1}
                 ></Select>
               </PeriodDiv>
