@@ -41,6 +41,7 @@ const ButtonsLayout = styled.div`
   border: 1px solid lightgray;
   border-radius: 5px;
   padding-left: 5px;
+  z-index: 100;
 `;
 const ToggleLayout = styled.div`
   display: grid;
