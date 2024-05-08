@@ -1,29 +1,45 @@
-"use client";
-import Link from "next/link";
-import Image from "next/image";
-import styled, { DefaultTheme } from "styled-components";
+'use client';
+import { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import styled from 'styled-components';
+import { MdOutlineNotifications } from 'react-icons/md';
+import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
 
-import { Color } from "@/shared/lib/styles/color";
-import { ColorName } from "@/shared/lib/type/types";
+import { Color } from '@/shared/lib/styles/color';
+import { ColorName } from '@/shared/lib/type/types';
+import { useEffect } from 'react';
 
 export function Header() {
+  const EventSource = NativeEventSource || EventSourcePolyfill;
+  useEffect(() => {
+    const eventSource = new EventSource('https://gateway.edgescheduler.co.kr/notification-service/notify/3');
+    eventSource.addEventListener('connected', (event) => {
+      const { data: receivedConnectData } = event;
+      if (receivedConnectData === `Connected Successfully`) {
+        console.log('SSE CONNECTED');
+      }
+    });
+  });
+
   return (
     <HeaderNav>
       <MainLogo>
-        <StyledLink href='/'>
-          <Image src='/images/edgeScheduler.png' alt='edgeSchedulerLogo' height={50} width={50} />
-          <LogoName color='blue'>Edge&nbsp;</LogoName>
-          <LogoName color='green'>Sch</LogoName>
-          <LogoName color='orange'>edu</LogoName>
-          <LogoName color='yellow'>ler</LogoName>
+        <StyledLink href="/">
+          <Image src="/images/edgeScheduler.png" alt="edgeSchedulerLogo" height={50} width={50} />
+          <LogoName color="blue">Edge&nbsp;</LogoName>
+          <LogoName color="green">Sch</LogoName>
+          <LogoName color="orange">edu</LogoName>
+          <LogoName color="yellow">ler</LogoName>
         </StyledLink>
       </MainLogo>
       <LinkDiv>
-        <StyledLink href='/schedule'>schedule</StyledLink>
-        <StyledLink href='/meeting'>create meeting</StyledLink>
-        <StyledLink href='/myPage/alarmLog'>my page</StyledLink>
-        <StyledLink href='/login'>sign in</StyledLink>
+        <StyledLink href="/schedule">schedule</StyledLink>
+        <StyledLink href="/meeting">create meeting</StyledLink>
+        <StyledLink href="/myPage/alarmLog">my page</StyledLink>
+        <StyledLink href="/login">sign in</StyledLink>
       </LinkDiv>
+      <MdOutlineNotifications size={23} />
     </HeaderNav>
   );
 }
@@ -59,10 +75,10 @@ const StyledLink = styled(Link)`
   align-items: center;
   transition: all 0.2s ease-in-out;
   &:visited {
-    color: ${Color("black")};
+    color: ${Color('black')};
   }
   &:hover {
     cursor: pointer;
-    color: ${Color("blue")};
+    color: ${Color('blue')};
   }
 `;
