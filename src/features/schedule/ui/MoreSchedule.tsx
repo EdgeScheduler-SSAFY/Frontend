@@ -29,7 +29,12 @@ export function MoreSchedule({ schdules, count, date }: IMoreScheduleProps) {
 
   return (
     // 더보기 일정 레이아웃
-    <MainLayout onClick={(prev) => setShowMore(!prev)}>
+    <MainLayout
+      onClick={(e) => {
+        setShowMore((prev) => !prev);
+        e.stopPropagation();
+      }}
+    >
       {/* 몇게 더 있는지 보여줌 */}
       {count} more
       {/* 더보기를 보여주는 부분 */}
@@ -39,8 +44,8 @@ export function MoreSchedule({ schdules, count, date }: IMoreScheduleProps) {
           <TextDiv>{format(date, "EEE")}</TextDiv>
           {schdules.map((schedule, index) => (
             <div key={index} onClick={(e) => e.stopPropagation()}>
-              {React.isValidElement(schedule) && schedule.props.view
-                ? React.cloneElement(schedule, { ...schedule.props, view: "more" })
+              {React.isValidElement(schedule) && schedule.props
+                ? React.cloneElement(schedule, { ...schedule.props, view: "more", width: 90 })
                 : schedule}
             </div>
           ))}
