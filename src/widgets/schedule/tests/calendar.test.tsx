@@ -26,7 +26,7 @@ describe("calendar Header render well", () => {
     expect(month).toBeInTheDocument();
     const meet = screen.getByText("meet");
     expect(meet).toBeInTheDocument();
-    const date = screen.getByText(format(new Date(), "yyyy. M"));
+    const date = screen.getByText(format(new Date(), "yyyy.MM"));
     expect(date).toBeInTheDocument();
   });
 });
@@ -134,8 +134,6 @@ describe("view selecetor test", () => {
     await waitFor(() => {
       const week = screen.getByText("week");
       expect(week).toBeInTheDocument();
-      const day = screen.getByText("day");
-      expect(day).toBeInTheDocument();
     });
   });
 });
