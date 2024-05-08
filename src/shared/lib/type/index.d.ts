@@ -1,4 +1,3 @@
-
 export interface MeetingData {
   name: string;
   description: string;
@@ -10,7 +9,7 @@ export interface MeetingData {
   period: { start: string; end: string };
   isPublic: boolean;
   isRecurrence: boolean;
-  memberList: { memberid: number; isRequired: boolean }[];
+  memberList: { memberId: number; isRequired: boolean }[];
 }
 
 export interface selectList {
