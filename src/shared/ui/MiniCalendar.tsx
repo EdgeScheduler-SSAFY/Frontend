@@ -65,7 +65,10 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
             {/* 선택된 달인지 확인 */}
             {dates.slice(index, index + 7).map((subDate) =>
               selected.getMonth() !== subDate.getMonth() ? (
-                <SubMonthDay onClick={() => handleDayClick(subDate)}>
+                <SubMonthDay
+                  key={format(subDate, "yyyy-MM-dd")}
+                  onClick={() => handleDayClick(subDate)}
+                >
                   {format(subDate, "d")}
                 </SubMonthDay>
               ) : //view가 day인 경우 선택된 날짜인지 확인
@@ -92,11 +95,14 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
             {/* 선택된 달인지 확인 */}
             {dates.slice(index, index + 7).map((subDate) =>
               selected.getMonth() !== subDate.getMonth() ? (
-                <SubMonthDay onClick={() => handleDayClick(subDate)}>
+                <SubMonthDay
+                  key={format(subDate, "yyyy-MM-dd")}
+                  onClick={() => handleDayClick(subDate)}
+                >
                   {format(subDate, "d")}
                 </SubMonthDay>
               ) : (
-                <Day onClick={() => handleDayClick(subDate)} key={format(subDate, "yyyy-MM-dd")}>
+                <Day key={format(subDate, "yyyy-MM-dd")} onClick={() => handleDayClick(subDate)}>
                   {format(subDate, "d")}
                 </Day>
               )
@@ -108,7 +114,7 @@ export function MiniCalendar({ selectedDate, close, selectDate, view }: IMiniCal
   };
   return (
     <CalendarLayout onClick={(e) => e.stopPropagation()} ref={ref} data-testid="miniCalendar">
-      \{/* 미니캘린더 네브 */}
+      {/* 미니캘린더 네브 */}
       <NavLayout>
         <ArrowLayout>
           <LuChevronLeftSquare
@@ -149,6 +155,7 @@ const CalendarLayout = styled.div`
   border-top: none;
   border-radius: 0 0 5px 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 100;
 `;
 const CalendarGridY = styled.div`
   display: grid;
@@ -184,16 +191,6 @@ const SelectedDay = styled.div`
 const SubMonthDay = styled.div`
   color: #999;
   width: 35px;
-`;
-const ModalBackground = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 const NavLayout = styled.div`
   display: flex;
