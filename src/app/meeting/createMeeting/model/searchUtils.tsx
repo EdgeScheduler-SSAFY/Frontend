@@ -70,7 +70,7 @@ export function filterUserList(list: userList[], searchTerm: string) {
 export const highlightSearchTerm = (target: string, searchTerm: string) => {
   const regex = new RegExp(`(${searchTerm})`, "gi");
   const parts = target.split(regex);
-  return parts.map((part, index) => (regex.test(part) ? <HighlightedText>{part}</HighlightedText> : part));
+  return parts.map((part, index) => (regex.test(part) ? <HighlightedText key={index}>{part}</HighlightedText> : part));
 };
 
 const HighlightedText = styled.span`
