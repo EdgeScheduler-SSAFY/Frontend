@@ -237,7 +237,7 @@ export default function CreateMeeting() {
             )}
             <AdressBookDiv>
               <ButtonFold onClick={toggleFold} className={noto.className}>
-                {isFolded ? <MdKeyboardArrowRight size={16} /> : <MdKeyboardArrowDown size={16} />}부서 주소록
+                {isFolded ? <MdKeyboardArrowRight size={16} /> : <MdKeyboardArrowDown size={16} />}Full List
               </ButtonFold>
               {!isFolded && (
                 <LnbTree>
