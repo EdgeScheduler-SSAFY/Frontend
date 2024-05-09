@@ -5,7 +5,7 @@ import "@testing-library/jest-dom";
 import { format, startOfWeek } from "date-fns";
 import userEvent from "@testing-library/user-event";
 
-// 캘린더헤더 잘 렌더링 되는지 확인
+// 캘린더 잘 렌더링 되는지 확인
 describe("week view calendar render well", () => {
   const today = new Date();
   const startDate = startOfWeek(today);
