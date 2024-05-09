@@ -65,7 +65,7 @@ export function DayForWeek({ schedules }: IDayForWeekProps) {
               e.stopPropagation();
             }}
           >
-            {columns[index]}
+            {schedule.name}
           </ScheduleDiv>
         );
       })}

@@ -7,7 +7,7 @@ import userEvent from "@testing-library/user-event";
 // 캘린더헤더 잘 렌더링 되는지 확인
 describe("month view calendar render well", () => {
   const today = new Date();
-  test("render calendar header", async () => {
+  test("render calendar", async () => {
     render(
       <MonthViewCalendar
         selectedDate={new Date()}

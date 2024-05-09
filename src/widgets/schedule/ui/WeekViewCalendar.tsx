@@ -15,7 +15,6 @@ const WeekDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 export function WeekViewCalendar({ selectedDate, scheduleList }: IWeekViewCalendarProps) {
   const [showCreate, setShowCreate] = useState<boolean>(false); //일정 생성 모달 보여주기 여부
-
   // 주간 캘린더 컴포넌트
   const startDate = startOfWeek(selectedDate); // 선택된 주의 첫날
   const [createDate, setCreateDate] = useState<Date>(); // 일정 생성 날짜
@@ -35,8 +34,6 @@ export function WeekViewCalendar({ selectedDate, scheduleList }: IWeekViewCalend
   if (selectedDate.getMonth() === 4) {
     // 일정별 날짜별 일정 렌더링
     scheduleList.map((schedule: any) => {
-      console.log(schedule.name);
-      console.log(schedule.startDateTime);
       const start = format(schedule.startDateTime, "yyyy-MM-dd"); // 시작일
       const end = format(schedule.endDateTime, "yyyy-MM-dd"); // 종료일
       const endDate = schedule.endDateTime; // 종료일
@@ -61,7 +58,6 @@ export function WeekViewCalendar({ selectedDate, scheduleList }: IWeekViewCalend
           currentDate = addDays(currentDate, 1);
           // 첫날이후로 빈공간을 체우기 위한 SeparateSchedule 추가
           while (currentDate <= endDate && currentDate < endOfWeek(selectedDate)) {
-            console.log(differenceInCalendarDays(currentDate, startDate));
             allDaySchedules[differenceInCalendarDays(currentDate, startDate)].push(
               <SeparateSchedule view="hide" title={schedule.name} width={100}></SeparateSchedule>
             );
@@ -110,7 +106,7 @@ export function WeekViewCalendar({ selectedDate, scheduleList }: IWeekViewCalend
       <WeekAllday
         more={more}
         changeMore={() => setMore((prev: boolean) => !prev)}
-        date={selectedDate}
+        date={startDate}
         schedules={allDaySchedules}
       ></WeekAllday>
       {/* 시간 캘린더 */}
@@ -123,14 +119,24 @@ export function WeekViewCalendar({ selectedDate, scheduleList }: IWeekViewCalend
           </IndexsLayout>
           {partialSchedules.map((schedules, index) => (
             <DayLayout
+              data-testid={"day" + index}
               key={index} // 각 DayLayout에 고유한 key 제공
               first={index === 0} // 첫 번째 DayLayout에만 특별한 스타일 적용
               onClick={(event) => {
                 const rect = event.currentTarget.getBoundingClientRect();
                 const y = event.clientY - rect.top;
-                const { hours, minutes } = getTimeFromPosition(y, rect.height);
+                const { hours, minutes } = getTimeFromPosition(y, 984);
                 console.log(`Clicked Time: ${hours}:${minutes < 10 ? "0" + minutes : minutes}`);
-                setCreateDate(set(startDate, { hours, minutes }));
+                setCreateDate(
+                  new Date(
+                    startDate.getFullYear(),
+                    startDate.getMonth(),
+                    startDate.getDate() + index,
+                    Number(hours),
+                    Number(minutes),
+                    0
+                  )
+                );
                 setShowCreate((prev) => !prev);
               }}
             >
