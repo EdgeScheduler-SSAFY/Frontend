@@ -1,29 +1,38 @@
 "use client";
-import React, { useEffect } from "react";
-import { useRouter } from "next/router";
-export default function Page() {
+import React, { useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+function PageContent() {
+  const searchParams = useSearchParams();
   const router = useRouter();
+
   useEffect(() => {
-    const refreshToken = Array.isArray(router.query["refresh-token"])
-      ? router.query["refresh-token"][0]
-      : router.query["refresh-token"] || "";
-    const accessToken = Array.isArray(router.query["access-token"])
-      ? router.query["access-token"][0]
-      : router.query["access-token"] || "";
-    const expiresIn = Array.isArray(router.query["expires_in"])
-      ? router.query["expires_in"][0]
-      : router.query["expires_in"] || "";
-    sessionStorage.setItem("refreshToken", refreshToken || "");
-    sessionStorage.setItem("accessToken", accessToken || "");
-    sessionStorage.setItem("expiresIn", expiresIn || "");
-    if (expiresIn) {
-      const currentTime = new Date();
-      const expiresAt = new Date(
-        currentTime.getTime() + parseInt(expiresIn, 10) * 1000 - 10 * 60 * 1000
-      );
-      sessionStorage.setItem("expiresAt", expiresAt.toISOString());
+    if (typeof window !== "undefined" && searchParams) {
+      const refreshToken = searchParams.get("refresh-token") || "";
+      const accessToken = searchParams.get("access-token") || "";
+      const expiresIn = searchParams.get("expires_in") || "";
+
+      sessionStorage.setItem("refreshToken", refreshToken);
+      sessionStorage.setItem("accessToken", accessToken);
+      sessionStorage.setItem("expiresIn", expiresIn);
+
+      if (expiresIn) {
+        const currentTime = new Date();
+        const expiresAt = new Date(
+          currentTime.getTime() + parseInt(expiresIn, 10) * 1000 - 10 * 60 * 1000
+        );
+        sessionStorage.setItem("expiresAt", expiresAt.toISOString());
+      }
+
+      router.push("/");
     }
-    router.push("/");
-  }, [router.query]);
+  }, [searchParams, router]);
+
   return <div></div>;
+}
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PageContent />
+    </Suspense>
+  );
 }
