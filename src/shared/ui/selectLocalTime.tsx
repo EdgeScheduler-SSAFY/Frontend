@@ -10,6 +10,7 @@ interface SelectLocalTimeProps {
   width: number;
   id?: string;
   options: selectList[];
+  margin: number;
   onSelectChange: (value: string | number) => void;
 }
 
@@ -34,7 +35,7 @@ export default function SelectLocalTime(props: SelectLocalTimeProps) {
     if (selectedOption) {
       setLocal(selectedOption.option);
     }
-  }, []);
+  }, [props.options, value]);
 
   const toggleSelect = () => {
     setSelectFlag((prevFlag) => !prevFlag);
@@ -43,8 +44,6 @@ export default function SelectLocalTime(props: SelectLocalTimeProps) {
 
   const handleOptionClick = (option: selectList) => {
     // value에 해당하는 option 찾기
-    console.log(option);
-    setLocal(option.option);
     setValue(option.value);
     setSelectFlag(false);
     props.onSelectChange(option.value);
@@ -70,7 +69,7 @@ export default function SelectLocalTime(props: SelectLocalTimeProps) {
   }, []);
 
   return (
-    <div ref={selectRef}>
+    <SelectLayout margin={props.margin} ref={selectRef}>
       <SelectDiv id={props.id} width={props.width}>
         <SelectedDiv width={props.width} onClick={toggleSelect}>
           <SelectedValue>{local}</SelectedValue>
@@ -83,10 +82,13 @@ export default function SelectLocalTime(props: SelectLocalTimeProps) {
           ))}
         </SelectList>
       </SelectDiv>
-    </div>
+    </SelectLayout>
   );
 }
 
+const SelectLayout = styled.div<{ margin: number }>`
+  margin-top: ${(props) => `${props.margin}rem`};
+`;
 const SelectDiv = styled.div<{ width: number }>`
   position: relative;
   width: ${(props) => (props.width ? `${props.width}rem` : "10rem")};
