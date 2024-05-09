@@ -3,10 +3,36 @@ import styled from "styled-components";
 import { CalendarHeader, MonthViewCalendar, WeekViewCalendar } from "@/widgets/schedule/index";
 import { useState } from "react";
 import { DayViewCalendar } from "@/widgets/schedule/index";
+import { fetchWithInterceptor } from "@/shared/index";
 
 export default function Schedule() {
   const [view, setView] = useState("month");
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const test = async () => {
+    console.log("test");
+    await fetchWithInterceptor(
+      "/schedule-service/schedules/period?startDatetime=2024-05-01T00:00:00&endDatetime=2024-05-31T23:59:59",
+      {
+        method: "GET",
+        // headers: {
+        //   "Content-Type": "application/json",
+        //   Authrization: "Bearer AccessToken",
+        // },
+      }
+    )
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+      });
+  };
+  const currentTime = new Date();
+  const expiresAt: Date = new Date(
+    currentTime.getTime() + parseInt(sessionStorage.getItem("expiresIn") || "10") - 10 * 60 * 1000
+  );
+  sessionStorage.setItem("expiresAt", expiresAt.toISOString());
+  sessionStorage.setItem("now", currentTime.toISOString());
   const scheduleList = [
     {
       scheduleId: 1,
@@ -254,6 +280,7 @@ export default function Schedule() {
   ];
   return (
     <MainLayout>
+      <button onClick={() => test()}>test</button>
       <CalendarHeader
         selectDate={setSelectedDate}
         changeDate={setSelectedDate}
