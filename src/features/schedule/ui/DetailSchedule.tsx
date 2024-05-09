@@ -212,7 +212,7 @@ const MainLayout = styled.div`
   top: 10px;
   background-color: white;
   width: 350px;
-  z-index: 1000;
+  z-index: 300;
   color: black;
   border-radius: 5px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
