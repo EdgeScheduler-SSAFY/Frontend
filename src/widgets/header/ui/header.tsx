@@ -1,49 +1,68 @@
-'use client';
-import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import styled from 'styled-components';
-import { MdOutlineNotifications } from 'react-icons/md';
-import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
+"use client";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import styled from "styled-components";
+import { MdOutlineNotifications } from "react-icons/md";
 
-import { Color } from '@/shared/lib/styles/color';
-import { ColorName } from '@/shared/lib/type/types';
-import { useEffect } from 'react';
+import { Color } from "@/shared/lib/styles/color";
+import { ColorName } from "@/shared/lib/type/types";
+import { NoticeList } from "@/widgets/notice/ui/noticeList";
+import NewNotice from "@/widgets/notice/ui/newNotice";
 
 export function Header() {
-  const EventSource = NativeEventSource || EventSourcePolyfill;
+  const [showNoticeList, setShowNoticeList] = useState<boolean>(false);
+
+  const noticeListHandle = () => {
+    setShowNoticeList((prev) => !prev);
+  };
+
+  const ref = useRef<HTMLDivElement>(null);
+  // 외부영역 클릭시 알림리스트 닫기
   useEffect(() => {
-    const eventSource = new EventSource('https://gateway.edgescheduler.co.kr/notification-service/notify/3');
-    eventSource.addEventListener('connected', (event) => {
-      const { data: receivedConnectData } = event;
-      if (receivedConnectData === `Connected Successfully`) {
-        console.log('SSE CONNECTED');
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setShowNoticeList(false);
       }
-    });
-  });
+    };
+
+    if (showNoticeList) document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showNoticeList]);
 
   return (
     <HeaderNav>
+      <NewNotice />
       <MainLogo>
-        <StyledLink href="/">
-          <Image src="/images/edgeScheduler.png" alt="edgeSchedulerLogo" height={50} width={50} />
-          <LogoName color="blue">Edge&nbsp;</LogoName>
-          <LogoName color="green">Sch</LogoName>
-          <LogoName color="orange">edu</LogoName>
-          <LogoName color="yellow">ler</LogoName>
+        <StyledLink href='/'>
+          <Image src='/images/edgeScheduler.png' alt='edgeSchedulerLogo' height={50} width={50} />
+          <LogoName color='blue'>Edge&nbsp;</LogoName>
+          <LogoName color='green'>Sch</LogoName>
+          <LogoName color='orange'>edu</LogoName>
+          <LogoName color='yellow'>ler</LogoName>
         </StyledLink>
       </MainLogo>
       <LinkDiv>
-        <StyledLink href="/schedule">schedule</StyledLink>
-        <StyledLink href="/meeting">create meeting</StyledLink>
-        <StyledLink href="/myPage/alarmLog">my page</StyledLink>
-        <StyledLink href="/login">sign in</StyledLink>
+        <StyledLink href='/schedule'>schedule</StyledLink>
+        <StyledLink href='/meeting'>create meeting</StyledLink>
+        <StyledLink href='/myPage/notificationBox'>my page</StyledLink>
+        <StyledLink href='/login'>sign in</StyledLink>
       </LinkDiv>
-      <MdOutlineNotifications size={23} />
+      <div ref={ref}>
+        <MdOutlineNotifications size={25} onClick={noticeListHandle} style={{ cursor: "pointer" }} />
+      </div>
+      {showNoticeList && (
+        <NoticeLayout>
+          <NoticeList />
+        </NoticeLayout>
+      )}
     </HeaderNav>
   );
 }
-
 const HeaderNav = styled.header`
   display: flex;
   justify-content: space-between;
@@ -70,15 +89,20 @@ const LinkDiv = styled.div`
 `;
 
 const StyledLink = styled(Link)`
+  color: ${Color("black")};
   display: flex;
   text-decoration: none;
   align-items: center;
   transition: all 0.2s ease-in-out;
   &:visited {
-    color: ${Color('black')};
+    color: ${Color("black")};
   }
   &:hover {
     cursor: pointer;
-    color: ${Color('blue')};
+    color: ${Color("blue")};
   }
+`;
+
+const NoticeLayout = styled.div`
+  position: relative;
 `;
