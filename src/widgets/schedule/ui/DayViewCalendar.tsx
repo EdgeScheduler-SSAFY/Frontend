@@ -1,7 +1,7 @@
 import React, { useState, ReactNode } from "react";
 import styled from "styled-components";
 import { format, differenceInCalendarDays } from "date-fns";
-import { DayForWeek, AllDaySchedule } from "@/features/schedule/index";
+import { DayForWeek, AllDaySchedule, CreateSchedule } from "@/features/schedule/index";
 import { schedule } from "@/widgets/schedule/model/type";
 
 interface IDayViewCalendarProps {
@@ -44,6 +44,16 @@ export function DayViewCalendar({ selectedDate, schedules }: IDayViewCalendarPro
       return null;
     });
   }
+  const [showCreate, setShowCreate] = useState<boolean>(false); //일정 생성 모달 보여주기 여부
+  const [createDate, setCreateDate] = useState<Date>(); // 일정 생성 날짜
+  const getTimeFromPosition = (y: number, height: number) => {
+    const totalMinutes = (y / height) * 1440; // 1440은 하루의 총 분 수
+    const roundedMinutes = Math.round(totalMinutes / 15) * 15; // 15분 단위로 반올림
+    const hours = Math.floor(roundedMinutes / 60);
+    const minutes = roundedMinutes % 60;
+    console.log(hours, minutes);
+    return { hours, minutes }; // 시간 포맷팅
+  };
   return (
     <MainLayout more={more}>
       <DayDiv>
@@ -72,11 +82,37 @@ export function DayViewCalendar({ selectedDate, schedules }: IDayViewCalendarPro
           ))}
         </IndexsLayout>
         <CalanderLayout>
-          <DayLayout first={true}>
+          <DayLayout
+            first={true}
+            data-testid="day"
+            onClick={(event) => {
+              const rect = event.currentTarget.getBoundingClientRect();
+              const y = event.clientY - rect.top;
+              const { hours, minutes } = getTimeFromPosition(y, 984);
+              console.log(`Clicked Time: ${hours}:${minutes < 10 ? "0" + minutes : minutes}`);
+              setCreateDate(
+                new Date(
+                  selectedDate.getFullYear(),
+                  selectedDate.getMonth(),
+                  selectedDate.getDate(),
+                  Number(hours),
+                  Number(minutes),
+                  0
+                )
+              );
+              setShowCreate((prev) => !prev);
+            }}
+          >
             <DayForWeek schedules={partialSchedules}></DayForWeek>
           </DayLayout>
         </CalanderLayout>
       </WeekLayout>
+      {showCreate && (
+        <CreateSchedule
+          startDate={createDate || new Date()}
+          close={() => setShowCreate(false)}
+        ></CreateSchedule>
+      )}
     </MainLayout>
   );
 }
