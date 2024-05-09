@@ -12,7 +12,7 @@ export function fetchWithInterceptor(url: string, options: RequestOptions = {}) 
   const refreshToken = sessionStorage.getItem("refreshToken");
   const expiresAt = sessionStorage.getItem("expiresAt");
   if (expiresAt && new Date(expiresAt) < new Date()) {
-    fetch("https://gateway.edgescheduler.co.kr/user-service/auth/token/refresh", {
+    fetch("https:/user-service.edgescheduler.co.kr/auth/token/refresh", {
       method: "POST",
       headers: {
         Authorization: "Bearer " + accessToken,
