@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { worldTime } from "@/shared/lib/data";
 import SelectLocalTime from "@/shared/ui/selectLocalTime";
 import Link from "next/link";

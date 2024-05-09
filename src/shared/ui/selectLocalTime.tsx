@@ -71,7 +71,11 @@ export default function SelectLocalTime(props: SelectLocalTimeProps) {
   return (
     <SelectLayout margin={props.margin} ref={selectRef}>
       <SelectDiv id={props.id} width={props.width}>
-        <SelectedDiv width={props.width} onClick={toggleSelect}>
+        <SelectedDiv
+          width={props.width}
+          onClick={toggleSelect}
+          data-testid="selectdiv"
+        >
           <SelectedValue>{local}</SelectedValue>
         </SelectedDiv>
         <SelectList width={props.width} $show={selectFlag}>
