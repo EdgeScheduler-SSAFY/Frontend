@@ -4,49 +4,55 @@ import styled from "styled-components";
 
 import { Color } from "../lib/styles/color";
 import { selectList } from "../lib/type";
+import useUserStore, { userState } from "@/store/userStore";
 
-interface SelectProrps {
+interface SelectLocalTimeProps {
   width: number;
   id?: string;
   options: selectList[];
-  standardIdx?: number;
-  disabledIndex?: number;
-  show: boolean;
-  onSelectChange: (value: number | string) => void;
+  onSelectChange: (value: string | number) => void;
 }
 
-export default function Select(props: SelectProrps) {
-  const [selectFlag, setSelectFlag] = useState<boolean>(props.show);
+export default function SelectLocalTime(props: SelectLocalTimeProps) {
   // 초기값 설정
-  const [selectedValue, setSelectedValue] = useState<string>(
-    props.options.length > 0 && props.standardIdx !== undefined
-      ? props.options[props.standardIdx].option
-      : props.options[0].option
-  );
-  // 선택여부
-  const toggleSelect = () => {
-    setSelectFlag((prevFlag) => !prevFlag);
-  };
 
-  const isDisabled = (index: number) => {
-    if (props.disabledIndex === undefined) return false;
-    return index <= props.disabledIndex;
-  };
-  // 선택값
-  const handleOptionClick = (value: number | string) => {
-    // value에 해당하는 option 찾기
+  const { localValue, setLocalValue } = useUserStore((state: userState) => ({
+    localValue: state.localValue,
+    setLocalValue: state.setLocalValue,
+  }));
+  const [selectFlag, setSelectFlag] = useState<boolean>(false);
+  const [local, setLocal] = useState<string>("Albania");
+  // 보여지는 이름
+  const [value, setValue] = useState<string | number>(localValue);
+  //실제 값
+
+  // value에 해당하는 option 찾기
+  useEffect(() => {
     const selectedOption = props.options.find(
       (option) => option.value === value
     );
     if (selectedOption) {
-      setSelectedValue(selectedOption.option); // option으로 설정
-      setSelectFlag(false);
-      props.onSelectChange(value);
+      setLocal(selectedOption.option);
     }
+  }, []);
+
+  const toggleSelect = () => {
+    setSelectFlag((prevFlag) => !prevFlag);
   };
+  // dropdown 열고닫기
+
+  const handleOptionClick = (option: selectList) => {
+    // value에 해당하는 option 찾기
+    console.log(option);
+    setLocal(option.option);
+    setValue(option.value);
+    setSelectFlag(false);
+    props.onSelectChange(option.value);
+  }; // 핸들 옵션 클릭
 
   // 외부 영역 클릭하면 닫히도록 구현
   const selectRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -67,19 +73,11 @@ export default function Select(props: SelectProrps) {
     <div ref={selectRef}>
       <SelectDiv id={props.id} width={props.width}>
         <SelectedDiv width={props.width} onClick={toggleSelect}>
-          <SelectedValue>{selectedValue}</SelectedValue>
+          <SelectedValue>{local}</SelectedValue>
         </SelectedDiv>
         <SelectList width={props.width} $show={selectFlag}>
           {props.options.map((option, index) => (
-            <SelectOption
-              key={option.value}
-              onClick={
-                isDisabled(index)
-                  ? undefined
-                  : () => handleOptionClick(option.value)
-              }
-              $disabled={isDisabled(index)}
-            >
+            <SelectOption key={index} onClick={() => handleOptionClick(option)}>
               {option.option}
             </SelectOption>
           ))}
@@ -129,22 +127,18 @@ const SelectList = styled.ul<{ $show: boolean; width: number }>`
   box-sizing: border-box;
   background-color: white;
   border-radius: 3px;
+  cursor: pointer;
 `;
 
-const SelectOption = styled.li<{ $disabled: boolean }>`
-  background-color: ${({ $disabled }) =>
-    $disabled ? Color("black50") : "none"};
+const SelectOption = styled.li`
   height: 1.9rem;
   line-height: 1.9rem;
   margin: 0.05rem 0;
   padding-left: 0.7rem;
-  cursor: ${({ $disabled }) => ($disabled ? "default" : "pointer")};
   box-sizing: border-box;
   transition: all 0.2s ease-in-out;
   &:hover {
     font-weight: 500;
-    background-color: ${({ $disabled }) =>
-      $disabled ? Color("black50") : Color("blue50")};
     box-sizing: border-box;
   }
 `;

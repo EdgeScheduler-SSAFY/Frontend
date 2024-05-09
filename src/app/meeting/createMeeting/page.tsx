@@ -10,12 +10,13 @@ import { MeetingData } from "@/shared/lib/type";
 import { Color } from "@/shared/lib/styles/color";
 import Label from "@/shared/ui/label";
 import Input from "@/shared/ui/input";
-import Select from "@/shared/ui/select";
+import SelectTime from "@/shared/ui/selectTime";
 import TextArea from "@/shared/ui/textArea";
 import useMeetStore, { MeetState } from "@/store/meetStore";
 import { MiniCalendar } from "@/shared";
 import ButtonBox from "./ui/buttonBox";
 import { useRouter } from "next/navigation";
+import SelectLocalTime from "@/shared/ui/selectLocalTime";
 
 const noto = Noto_Sans_KR({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -311,13 +312,13 @@ export default function CreateMeeting() {
             </InlineDiv>
             <InlineDiv>
               <Label htmlFor="time">Time</Label>
-              <Select
+              <SelectTime
                 id="time"
                 options={runningTime}
                 show={false}
                 width={10}
                 onSelectChange={runningTimeChangeHandle}
-              ></Select>
+              ></SelectTime>
             </InlineDiv>
             <div>
               <Label htmlFor="period">Period</Label>
@@ -340,14 +341,14 @@ export default function CreateMeeting() {
                     />
                   </StartCalendarDiv>
                 )}
-                <Select
+                <SelectTime
                   options={intervalTime}
                   show={false}
                   width={6.5}
                   onSelectChange={startTimeChangeHandle}
                   standardIdx={0}
                   disabledIndex={-1}
-                ></Select>
+                ></SelectTime>
                 <LineDiv>-</LineDiv>
                 <DateButton
                   onClick={() => setShowEndMiniCalendar((prev) => !prev)}
@@ -367,14 +368,14 @@ export default function CreateMeeting() {
                     />
                   </EndCalendarDiv>
                 )}
-                <Select
+                <SelectLocalTime
                   options={intervalTime}
                   show={false}
                   width={6.5}
                   onSelectChange={endTimeChangeHandle}
                   standardIdx={sameDate ? 1 : 0}
                   disabledIndex={sameDate ? disabledIndex : -1}
-                ></Select>
+                ></SelectLocalTime>
               </PeriodDiv>
             </div>
             <div>
