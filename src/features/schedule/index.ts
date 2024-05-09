@@ -1,4 +1,4 @@
-export { DayForMonth } from "./ui/DayForMonth";
+export { DayForMonth, renderSchedules } from "./ui/DayForMonth";
 export { TodayButton } from "./ui/TodayButton";
 export { CalendarNavButton } from "./ui/CalendarNavButton";
 export { type dayT } from "./model/types";
@@ -11,3 +11,6 @@ export { WeekViewSchedule } from "./ui/WeekViewSchedule";
 export { DayForWeek } from "./ui/DayForWeek";
 export { PartialDaySchedule } from "./ui/PartialDaySchedule";
 export { SeparateSchedule } from "./ui/SeparateSchedule";
+export { WeekAllday } from "./ui/WeekAllday";
+export { CreateSchedule } from "./ui/CreateSchedule";
+export { DetailSchedule } from "./ui/DetailSchedule";
