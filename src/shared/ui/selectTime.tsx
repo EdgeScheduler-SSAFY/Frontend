@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { Color } from "../lib/styles/color";
 import { selectList } from "../lib/type";
 
-interface SelectProrps {
+interface SelectProps {
   width: number;
   id?: string;
   options: selectList[];
@@ -16,7 +16,7 @@ interface SelectProrps {
   onSelectChange: (value: number | string) => void;
 }
 
-export default function Select(props: SelectProrps) {
+export default function SelectTime(props: SelectProps) {
   const [selectFlag, setSelectFlag] = useState<boolean>(props.show);
   const [selectedValue, setSelectedValue] = useState<string>("");
 
@@ -26,7 +26,8 @@ export default function Select(props: SelectProrps) {
       // 시작시간 선택하면 끝 시간은 idx + 1 되는데
       // 시작시간에서 마지막 idx 선택하면  idx로 되도록 설정
       const lastIdx = props.options.length - 1;
-      const finalIdx = props.standardIdx > lastIdx ? lastIdx : props.standardIdx;
+      const finalIdx =
+        props.standardIdx > lastIdx ? lastIdx : props.standardIdx;
       setSelectedValue(props.options[finalIdx].option);
     } else if (props.options.length > 0) {
       setSelectedValue(props.options[0].option);
@@ -49,7 +50,9 @@ export default function Select(props: SelectProrps) {
   // 선택값
   const handleOptionClick = (value: number | string) => {
     // value에 해당하는 option 찾기
-    const selectedOption = props.options.find((option) => option.value === value);
+    const selectedOption = props.options.find(
+      (option) => option.value === value
+    );
     if (selectedOption) {
       setSelectedValue(selectedOption.option); // option으로 설정
       setSelectFlag(false);
@@ -60,8 +63,11 @@ export default function Select(props: SelectProrps) {
   // 외부 영역 클릭하면 닫히도록 구현
   const selectRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (selectRef.current && !selectRef.current.contains(e.target as Node)) {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        selectRef.current &&
+        !selectRef.current.contains(event.target as Node)
+      ) {
         setSelectFlag(false);
       }
     }
@@ -82,7 +88,11 @@ export default function Select(props: SelectProrps) {
           {props.options.map((option, index) => (
             <SelectOption
               key={option.value}
-              onClick={isDisabled(index) ? undefined : () => handleOptionClick(option.value)}
+              onClick={
+                isDisabled(index)
+                  ? undefined
+                  : () => handleOptionClick(option.value)
+              }
               $disabled={isDisabled(index) || isLastDisabled(index) || false}
             >
               {option.option}
@@ -137,7 +147,8 @@ const SelectList = styled.ul<{ $show: boolean; width: number }>`
 `;
 
 const SelectOption = styled.li<{ $disabled: boolean }>`
-  background-color: ${({ $disabled }) => ($disabled ? Color("black50") : "none")};
+  background-color: ${({ $disabled }) =>
+    $disabled ? Color("black50") : "none"};
   height: 1.9rem;
   line-height: 1.9rem;
   margin: 0.05rem 0;
@@ -147,7 +158,8 @@ const SelectOption = styled.li<{ $disabled: boolean }>`
   transition: all 0.2s ease-in-out;
   &:hover {
     font-weight: 500;
-    background-color: ${({ $disabled }) => ($disabled ? Color("black50") : Color("blue50"))};
+    background-color: ${({ $disabled }) =>
+      $disabled ? Color("black50") : Color("blue50")};
     box-sizing: border-box;
   }
 `;
