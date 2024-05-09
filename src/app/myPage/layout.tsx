@@ -1,14 +1,14 @@
 "use client";
 import { worldTime } from "@/shared/lib/data";
-import Select from "@/shared/ui/select";
+import SelectLocalTime from "@/shared/ui/selectLocalTime";
 import Link from "next/link";
-import { useRef } from "react";
 import styled from "styled-components";
 
 export default function MyPageLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const worldTimeChangeHandle = (value: string | number) => {
+    console.log(value);
     // 여기서 바로 api 요청 보내서 처리할 예정.
   };
   return (
@@ -19,13 +19,12 @@ export default function MyPageLayout({
           <StyledLink href="/myPage/alarmLog">Alarm Log</StyledLink>
           <div>
             내 시간 바꾸기
-            <Select
+            <SelectLocalTime
               id="worldTime"
               options={worldTime}
-              show={false}
-              width={10}
+              width={16}
               onSelectChange={worldTimeChangeHandle}
-            ></Select>
+            ></SelectLocalTime>
           </div>
         </MyPageLink>
         <ContentLayout>{children}</ContentLayout>
