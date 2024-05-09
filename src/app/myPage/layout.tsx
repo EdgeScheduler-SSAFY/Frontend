@@ -8,7 +8,7 @@ export default function MyPageLayout({ children }: Readonly<{ children: React.Re
       <SubLayout>
         <MyPageLink>
           <StyledLink href="/myPage/updateInfo">Update Information</StyledLink>
-          <StyledLink href="/myPage/alarmLog">Alarm Log</StyledLink>
+          <StyledLink href="/myPage/notificationBox">Notification Box</StyledLink>
         </MyPageLink>
         <ContentLayout>{children}</ContentLayout>
       </SubLayout>
