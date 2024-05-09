@@ -36,13 +36,19 @@ export function MonthViewCalendar({ selectedDate, scheduleList }: IMonthViewCale
     dates[format(currentDate, "yyyy-MM-dd")] = [];
     currentDate = addDays(currentDate, 1);
   }
+  scheduleList.sort(
+    (a: any, b: any) =>
+      differenceInCalendarDays(b.endDateTime, b.startDateTime) -
+      differenceInCalendarDays(a.endDateTime, a.startDateTime)
+  );
   // api 연결전 임시 조건 삭제 예정
   if (selectedDate.getMonth() === 4) {
     // 일정별 날짜별 일정 렌더링
     scheduleList.map((schedule: any) => {
       const start = format(schedule.startDateTime, "yyyy-MM-dd"); // 시작일
       const end = format(schedule.endDateTime, "yyyy-MM-dd"); // 종료일
-      const endDate = schedule.endDateTime; // 종료일
+      const startDate = new Date(schedule.startDateTime); // 시작일
+      const endDate = new Date(schedule.endDateTime); // 종료일
       let currentDate = schedule.startDateTime; // 현재 날짜
       // 시작일과 종료일이 다른 경우
       if (start !== end) {
@@ -56,7 +62,7 @@ export function MonthViewCalendar({ selectedDate, scheduleList }: IMonthViewCale
           }
           // 시작일의 포맷
           const startFormat = format(currentDate, "yyyy-MM-dd");
-          // 종료일의 포맷
+          // 차이
           const dayDiff = differenceInCalendarDays(currentEnd, currentDate);
           // 2번째 시작부터 시작일이 배열에 없으면 추가
           if (!dates[startFormat]) {
@@ -99,6 +105,7 @@ export function MonthViewCalendar({ selectedDate, scheduleList }: IMonthViewCale
           )
         );
       }
+      return null;
     });
   }
   return (
