@@ -4,6 +4,7 @@ import { Color } from "../lib/styles/color";
 import { ColorName } from "../lib/type/types";
 
 interface ButtonProps {
+  id?: string;
   width?: number;
   height?: number;
   color?: ColorName;
@@ -33,5 +34,8 @@ const CustomButton = styled.button<ButtonProps>`
   &:hover {
     /* box-shadow: 0 0.5em 0.5em -0.4em ${(props) => (props.color ? props.color : Color("blue600"))}; */
     background-color: ${(props) => (props.$hoverColor ? Color(props.$hoverColor) : Color("blue600"))};
+  }
+  &:focus {
+    background-color: ${(props) => (props.$bgColor ? Color(props.$bgColor) : Color("blue"))};
   }
 `;

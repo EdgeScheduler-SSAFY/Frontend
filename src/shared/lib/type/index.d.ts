@@ -1,4 +1,3 @@
-
 export interface MeetingData {
   name: string;
   description: string;
@@ -48,3 +47,10 @@ export interface timeDivProps {
   startindex: number;
   endindex: number;
 } // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 border 색깔 바꾸기 위함
+
+export interface NoticeState {
+  [key: string]: {
+    state: any;
+    eventType: string;
+  };
+}
