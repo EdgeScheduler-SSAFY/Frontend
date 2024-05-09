@@ -14,7 +14,7 @@ export interface MeetState {
   memberList: member[];
   setStartDatetime: (startdatetime: string) => void;
   setEndDatetime: (endDatetime: string) => void;
-  setRunningtime: (runningtime: number) => void;
+  setRunningTime: (runningtime: number) => void;
   setMemberList: (memberList: member[]) => void;
 }
 
@@ -25,7 +25,7 @@ const useMeetStore = create<MeetState>((set) => ({
   memberList: [],
   setStartDatetime: (startDatetime) => set({ startDatetime }),
   setEndDatetime: (endDatetime) => set({ endDatetime }),
-  setRunningtime: (runningtime) => set({ runningtime }),
+  setRunningTime: (runningtime) => set({ runningtime }),
   setMemberList: (memberList) => set({ memberList }),
 }));
 

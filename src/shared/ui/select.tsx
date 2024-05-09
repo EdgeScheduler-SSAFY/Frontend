@@ -11,18 +11,28 @@ interface SelectProrps {
   options: selectList[];
   standardIdx?: number;
   disabledIndex?: number;
+  disabledLastIndex?: boolean;
   show: boolean;
   onSelectChange: (value: number | string) => void;
 }
 
 export default function Select(props: SelectProrps) {
   const [selectFlag, setSelectFlag] = useState<boolean>(props.show);
-  // 초기값 설정
-  const [selectedValue, setSelectedValue] = useState<string>(
-    props.options.length > 0 && props.standardIdx !== undefined
-      ? props.options[props.standardIdx].option
-      : props.options[0].option
-  );
+  const [selectedValue, setSelectedValue] = useState<string>("");
+
+  // 외부에서 options이 변경될 때 selectedValue를 초기화
+  useEffect(() => {
+    if (props.options.length > 0 && props.standardIdx !== undefined) {
+      // 시작시간 선택하면 끝 시간은 idx + 1 되는데
+      // 시작시간에서 마지막 idx 선택하면  idx로 되도록 설정
+      const lastIdx = props.options.length - 1;
+      const finalIdx = props.standardIdx > lastIdx ? lastIdx : props.standardIdx;
+      setSelectedValue(props.options[finalIdx].option);
+    } else if (props.options.length > 0) {
+      setSelectedValue(props.options[0].option);
+    }
+  }, [props.options, props.standardIdx]);
+
   // 선택여부
   const toggleSelect = () => {
     setSelectFlag((prevFlag) => !prevFlag);
@@ -31,6 +41,10 @@ export default function Select(props: SelectProrps) {
   const isDisabled = (index: number) => {
     if (props.disabledIndex === undefined) return false;
     return index <= props.disabledIndex;
+  };
+
+  const isLastDisabled = (index: number) => {
+    if (props.disabledLastIndex) return index === props.options.length - 1;
   };
   // 선택값
   const handleOptionClick = (value: number | string) => {
@@ -46,8 +60,8 @@ export default function Select(props: SelectProrps) {
   // 외부 영역 클릭하면 닫히도록 구현
   const selectRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+    function handleClickOutside(e: MouseEvent) {
+      if (selectRef.current && !selectRef.current.contains(e.target as Node)) {
         setSelectFlag(false);
       }
     }
@@ -69,7 +83,7 @@ export default function Select(props: SelectProrps) {
             <SelectOption
               key={option.value}
               onClick={isDisabled(index) ? undefined : () => handleOptionClick(option.value)}
-              $disabled={isDisabled(index)}
+              $disabled={isDisabled(index) || isLastDisabled(index) || false}
             >
               {option.option}
             </SelectOption>

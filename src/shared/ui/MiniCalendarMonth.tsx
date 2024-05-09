@@ -21,8 +21,8 @@ export function MiniCalendarMonth({ selectedDate, close, selectDate }: IMonthVie
   const ref = useRef<HTMLDivElement>(null);
   // 외부영역 클릭시 미니 캘린더 닫기
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
         close();
       }
     };

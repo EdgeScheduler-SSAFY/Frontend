@@ -14,7 +14,13 @@ interface IMiniCalendarProps {
   $standardDate?: Date; // 기준 날짜
 }
 // 미니 캘린더 컴포넌트
-export function MiniCalendar({ selectedDate, close, selectDate, view, $standardDate }: IMiniCalendarProps) {
+export function MiniCalendar({
+  selectedDate,
+  close,
+  selectDate,
+  view,
+  $standardDate,
+}: IMiniCalendarProps) {
   const [selected, setSelected] = useState(selectedDate); // 선택된 날짜
   const firstDayOfMonth = startOfMonth(selected); // 선택된 달의 첫날
   const lastDayOfMonth = endOfMonth(selected); // 선택된 달의 마지막날
@@ -46,8 +52,8 @@ export function MiniCalendar({ selectedDate, close, selectDate, view, $standardD
   const ref = useRef<HTMLDivElement>(null);
   // 외부 영역 클릭시 미니 캘린더 닫기
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
         close();
       }
     };
@@ -87,7 +93,10 @@ export function MiniCalendar({ selectedDate, close, selectDate, view, $standardD
                 subDate.getDate() === selectedDate.getDate() &&
                 subDate.getFullYear() === selectedDate.getFullYear() &&
                 subDate.getMonth() === selectedDate.getMonth() ? (
-                <SelectedDay onClick={() => handleDayClick(subDate)} key={format(subDate, "yyyy-MM-dd")}>
+                <SelectedDay
+                  onClick={() => handleDayClick(subDate)}
+                  key={format(subDate, "yyyy-MM-dd")}
+                >
                   {format(subDate, "d")}
                 </SelectedDay>
               ) : (
@@ -130,7 +139,7 @@ export function MiniCalendar({ selectedDate, close, selectDate, view, $standardD
     );
   };
   return (
-    <CalendarLayout onClick={(e) => e.stopPropagation()} ref={ref} data-testid='miniCalendar'>
+    <CalendarLayout onClick={(e) => e.stopPropagation()} ref={ref} data-testid="miniCalendar">
       {/* 미니캘린더 네브 */}
       <NavLayout>
         <ArrowLayout>
@@ -172,6 +181,7 @@ const CalendarLayout = styled.div`
   border-top: none;
   border-radius: 0 0 5px 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 100;
 `;
 const CalendarGridY = styled.div`
   display: grid;

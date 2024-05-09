@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { format } from "date-fns";
+
+import { DetailSchedule } from "@/features/schedule/index";
 // 일부시간 일정 컴포넌트의 props
 interface IPartialDayScheduleProps {
   title: string;
@@ -18,6 +20,7 @@ export function PartialDaySchedule({ title, date }: IPartialDayScheduleProps) {
         {format(date, "HH:mm  ")}
         {title}
       </Text>
+      {showDetails && <DetailSchedule close={() => setShowDetails(false)}></DetailSchedule>}
     </Layout>
   );
 }

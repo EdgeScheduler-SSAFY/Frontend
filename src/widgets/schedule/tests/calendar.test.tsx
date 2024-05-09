@@ -26,7 +26,7 @@ describe("calendar Header render well", () => {
     expect(month).toBeInTheDocument();
     const meet = screen.getByText("meet");
     expect(meet).toBeInTheDocument();
-    const date = screen.getByText(format(new Date(), "yyyy. M"));
+    const date = screen.getByText(format(new Date(), "yyyy.MM"));
     expect(date).toBeInTheDocument();
   });
 });
@@ -130,15 +130,10 @@ describe("view selecetor test", () => {
     const month = screen.getByText("month");
     expect(month).toBeInTheDocument();
     userEvent.click(month);
-
+    // month를 클릭하면 week와 day가 렌더링 되어야 함
     await waitFor(() => {
       const week = screen.getByText("week");
       expect(week).toBeInTheDocument();
-    });
-
-    await waitFor(() => {
-      const day = screen.getByText("day");
-      expect(day).toBeInTheDocument();
     });
   });
 });

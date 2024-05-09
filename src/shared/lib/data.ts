@@ -3,7 +3,7 @@ import { userList, selectList } from "./type";
 export const userLists: userList[] = [
   {
     id: 1,
-    name: "조현수",
+    name: "hyunsooCho",
     profile: "/images/profile.webp",
     timezone: "Asia/Seoul",
     department: "Development Team 1",
