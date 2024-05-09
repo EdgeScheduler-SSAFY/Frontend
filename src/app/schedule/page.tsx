@@ -1,7 +1,7 @@
 "use client";
 import styled from "styled-components";
 import { CalendarHeader, MonthViewCalendar, WeekViewCalendar } from "@/widgets/schedule/index";
-import { useState } from "react";
+import { use, useState, useEffect } from "react";
 import { DayViewCalendar } from "@/widgets/schedule/index";
 import { fetchWithInterceptor } from "@/shared/index";
 
@@ -27,12 +27,14 @@ export default function Schedule() {
         console.log(data);
       });
   };
-  const currentTime = new Date();
-  const expiresAt: Date = new Date(
-    currentTime.getTime() + parseInt(sessionStorage.getItem("expiresIn") || "10") - 10 * 60 * 1000
-  );
-  sessionStorage.setItem("expiresAt", expiresAt.toISOString());
-  sessionStorage.setItem("now", currentTime.toISOString());
+  useEffect(() => {
+    const currentTime = new Date();
+    const expiresAt: Date = new Date(
+      currentTime.getTime() + parseInt(sessionStorage.getItem("expiresIn") || "10") - 10 * 60 * 1000
+    );
+    sessionStorage.setItem("expiresAt", expiresAt.toISOString());
+    sessionStorage.setItem("now", currentTime.toISOString());
+  }, []);
   const scheduleList = [
     {
       scheduleId: 1,

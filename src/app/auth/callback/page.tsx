@@ -1,6 +1,9 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
 import LoginResponse from "./LoginResponse";
-export function Page() {
-  LoginResponse();
+export default function Page() {
+  useEffect(() => {
+    LoginResponse();
+  }, []);
   return <div></div>;
 }
