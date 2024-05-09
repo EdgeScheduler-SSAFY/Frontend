@@ -22,7 +22,7 @@ export function WeekAllday({ date, schedules, changeMore, more }: IWeekAlldayPro
       </AlldayMoreDiv>
       {Array.from({ length: 7 }, (_, index) => (
         <div key={index}>
-          <TextDiv key={index}>{addDays(date, index).getDate() - 1}</TextDiv>
+          <TextDiv key={index}>{addDays(date, index).getDate()}</TextDiv>
           {schedules && renderSchedules({ date, schedules: schedules[index] }, false)}
         </div>
       ))}
