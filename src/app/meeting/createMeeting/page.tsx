@@ -484,7 +484,7 @@ export default function CreateMeeting() {
                             <OptionalButton
                               className={noto.className}
                               onClick={(e) =>
-                                optionalButtonClickHandle(e, member.memberid)
+                                optionalButtonClickHandle(e, member.memberId)
                               }
                               $isRequired={member.isRequired}
                             >
