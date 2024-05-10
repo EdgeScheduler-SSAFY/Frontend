@@ -6,27 +6,32 @@ interface userInfoProps {
   profilePath: string;
   altText: string;
   userName: string;
-  timeZone: string;
+  zoneId: string;
 }
 
 export default function UserInfo(props: userInfoProps) {
   const draggables = document.querySelectorAll(".draggable");
 
-  draggables.forEach(draggable => {
+  draggables.forEach((draggable) => {
     draggable.addEventListener("dragstart", () => {
       draggable.classList.add("dragging");
     });
-  
+
     draggable.addEventListener("dragend", () => {
       draggable.classList.remove("dragging");
     });
   });
-  
+
   return (
     <UserButton draggable="true">
-      <ProfileImage src={props.profilePath} alt={props.altText} width={25} height={25} />
+      <ProfileImage
+        src={props.profilePath}
+        alt={props.altText}
+        width={25}
+        height={25}
+      />
       <UserName>{props.userName}</UserName>
-      <TimeZone> {props.timeZone}</TimeZone>
+      <TimeZone> {props.zoneId}</TimeZone>
     </UserButton>
   );
 }
