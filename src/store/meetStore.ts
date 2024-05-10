@@ -1,12 +1,14 @@
+import { userList } from "@/shared/lib/type";
 import { create } from "zustand";
 
 // Zustand 스토어 생성
 interface member {
-  memberId: number;
+  user: userList;
   isRequired: boolean;
 }
 
 export interface MeetState {
+  meetName: string;
   startDatetime: string;
   endDatetime: string;
   runningtime: number;
@@ -15,9 +17,11 @@ export interface MeetState {
   setEndDatetime: (endDatetime: string) => void;
   setRunningTime: (runningtime: number) => void;
   setMemberList: (memberList: member[]) => void;
+  setMeetName: (meetName: string) => void;
 }
 
 const useMeetStore = create<MeetState>((set) => ({
+  meetName: "",
   startDatetime: "",
   endDatetime: "",
   runningtime: 15,
@@ -26,6 +30,7 @@ const useMeetStore = create<MeetState>((set) => ({
   setEndDatetime: (endDatetime) => set({ endDatetime }),
   setRunningTime: (runningtime) => set({ runningtime }),
   setMemberList: (memberList) => set({ memberList }),
+  setMeetName: (meetName) => set({ meetName }),
 }));
 
 export default useMeetStore;
