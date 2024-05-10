@@ -18,7 +18,9 @@ function PageContent() {
       if (expiresIn) {
         const currentTime = new Date();
         const expiresAt = new Date(
-          currentTime.getTime() + parseInt(expiresIn, 10) * 1000 - 10 * 60 * 1000
+          currentTime.getTime() +
+            parseInt(expiresIn, 10) * 1000 -
+            10 * 60 * 1000
         );
         sessionStorage.setItem("expiresAt", expiresAt.toISOString());
       }

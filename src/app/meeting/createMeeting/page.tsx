@@ -13,7 +13,7 @@ import Input from "@/shared/ui/input";
 import SelectTime from "@/shared/ui/selectTime";
 import TextArea from "@/shared/ui/textArea";
 import useMeetStore, { MeetState } from "@/store/meetStore";
-import { MiniCalendar } from "@/shared";
+import { MiniCalendar, fetchWithInterceptor } from "@/shared";
 import ButtonBox from "./ui/buttonBox";
 import { filterUserList, highlightSearchTerm } from "./model/searchUtils";
 import { useRouter } from "next/navigation";
@@ -244,6 +244,13 @@ export default function CreateMeeting() {
     // console.log("MeetingData:", meetingData);
   }, [meetingData, searchTerm]);
 
+  useEffect(() => {
+    console.log("뭐라도 출력해바");
+    fetchWithInterceptor("/user-service/members")
+      .then((res) => res.json())
+      .then((data) => console.log(data));
+  }, []);
+
   return (
     <MainLayout>
       <CreateWidget>
@@ -345,7 +352,7 @@ export default function CreateMeeting() {
                                       height={25}
                                     />
                                     <UserName>{member.name}</UserName>
-                                    <TimeZone>{member.timezone}</TimeZone>
+                                    <TimeZone>{member.zoneid}</TimeZone>
                                   </UserButton>
                                 </MenuItem>
                               ))}
