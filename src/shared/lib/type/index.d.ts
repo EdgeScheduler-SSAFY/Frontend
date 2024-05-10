@@ -1,3 +1,4 @@
+import exp from "constants";
 
 export interface MeetingData {
   name: string;
@@ -10,7 +11,7 @@ export interface MeetingData {
   period: { start: string; end: string };
   isPublic: boolean;
   isRecurrence: boolean;
-  memberList: { memberid: number; isRequired: boolean }[];
+  memberList: { memberId: number; isRequired: boolean }[];
 }
 
 export interface selectList {
@@ -22,8 +23,13 @@ export interface userList {
   id: number;
   name: string;
   profile: string;
-  timezone: string;
+  zoneId: string;
   department: string;
+}
+
+export interface developmentType {
+  name: string;
+  folded: boolean;
 }
 
 export interface ScheduleComponentProps {
@@ -44,6 +50,12 @@ export interface timeStampProps {
 export interface timeDivProps {
   selected: number;
   personindex: number;
+  timeindex: number;
+  startindex: number;
+  endindex: number;
+} // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 border 색깔 바꾸기 위함
+
+export interface RecommendTimeDivProps {
   timeindex: number;
   startindex: number;
   endindex: number;

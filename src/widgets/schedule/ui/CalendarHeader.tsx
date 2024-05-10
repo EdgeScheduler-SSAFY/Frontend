@@ -34,12 +34,12 @@ export function CalendarHeader({
         <CalendarNavButton
           selectedDate={
             view === "month"
-              ? format(selectedDate, "yyyy. M")
+              ? format(selectedDate, "yyyy.MM")
               : view === "week"
-              ? format(startOfWeek(selectedDate), "yyyy. M. d") +
+              ? format(startOfWeek(selectedDate), "yyyy. MM. dd") +
                 "~" +
-                format(endOfWeek(selectedDate), "yyyy. M. d")
-              : format(selectedDate, "yyyy. M. d")
+                format(endOfWeek(selectedDate), "yyyy. MM. dd")
+              : format(selectedDate, "yyyy. MM. dd")
           }
           onclick={() => setShowMiniCalendar(!showMiniCalendar)}
           leftClick={() =>
