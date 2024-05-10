@@ -26,8 +26,13 @@ const noto = Noto_Sans_KR({
 export default function CreateMeeting() {
   // 회의 정보
   const router = useRouter();
-  const { setStartDatetime, setEndDatetime, setRunningTime, setMemberList } =
-    useMeetStore((state) => state);
+  const {
+    setStartDatetime,
+    setEndDatetime,
+    setRunningTime,
+    setMemberList,
+    setMeetName,
+  } = useMeetStore((state) => state);
   const [meetingData, setMeetingData] = useState<MeetingData>({
     name: "",
     description: "",
@@ -168,23 +173,27 @@ export default function CreateMeeting() {
     const clickedUser = userLists.find((user) => user.id === userId);
     // 이미 참가자 목록에 있는 사용자인지 확인
     const isParticipant = meetingData.memberList.some(
-      (user) => user.memberId === userId
+      (member) => member.user.id === userId
     );
 
     // 참가자 목록에 추가된 사용자라면 제거, 추가되지 않은 사용자라면 추가
     if (clickedUser && isParticipant) {
       setMeetingData((prev) => ({
         ...prev,
-        memberList: prev.memberList.filter((user) => user.memberId !== userId),
+        memberList: prev.memberList.filter(
+          (member) => member.user.id !== userId
+        ),
       }));
     } else {
-      setMeetingData((prev) => ({
-        ...prev,
-        memberList: [
-          ...prev.memberList,
-          { memberId: userId, isRequired: false },
-        ],
-      }));
+      if (clickedUser) {
+        setMeetingData((prev) => ({
+          ...prev,
+          memberList: [
+            ...prev.memberList,
+            { user: clickedUser, isRequired: false },
+          ],
+        }));
+      }
     }
 
     setClickedUsers((prev) => ({
@@ -200,9 +209,7 @@ export default function CreateMeeting() {
   const participantRemoveHandle = (userId: number) => {
     setMeetingData((prev) => ({
       ...prev,
-      memberList: prev.memberList.filter(
-        (member) => member.memberId !== userId
-      ),
+      memberList: prev.memberList.filter((member) => member.user.id !== userId),
     }));
 
     setClickedUsers((prev) => ({
@@ -219,7 +226,7 @@ export default function CreateMeeting() {
     e.stopPropagation(); // 이벤트 버블링 중단
     setMeetingData((prev) => {
       const updatedMemberList = prev.memberList.map((member) => {
-        if (member.memberId === userId) {
+        if (member.user.id === userId) {
           return { ...member, isRequired: !member.isRequired };
         }
         return member;
@@ -232,6 +239,7 @@ export default function CreateMeeting() {
     router.push("/");
   };
   const nextHandle = () => {
+    setMeetName(meetingData.name);
     setStartDatetime(meetingData.period.start);
     setEndDatetime(meetingData.period.end);
     setRunningTime(meetingData.runningTime);
@@ -478,14 +486,14 @@ export default function CreateMeeting() {
               <ParticipantDiv id="participant">
                 {meetingData.memberList.map((member) => {
                   const user = userLists.find(
-                    (user) => user.id === member.memberId
+                    (user) => user.id === member.user.id
                   );
                   return (
-                    <div key={member.memberId}>
+                    <div key={member.user.id}>
                       {user ? (
                         <ParticipantInfoDiv
                           onClick={() =>
-                            participantRemoveHandle(member.memberId)
+                            participantRemoveHandle(member.user.id)
                           }
                         >
                           <div>
@@ -504,7 +512,7 @@ export default function CreateMeeting() {
                             <OptionalButton
                               className={noto.className}
                               onClick={(e) =>
-                                optionalButtonClickHandle(e, member.memberId)
+                                optionalButtonClickHandle(e, member.user.id)
                               }
                               $isRequired={member.isRequired}
                             >

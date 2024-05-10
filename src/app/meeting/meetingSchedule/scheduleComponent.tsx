@@ -4,7 +4,7 @@ import Image from "next/image";
 import { people, person } from "./dummyData";
 import React, { useEffect, useRef, useState } from "react";
 import { Color } from "@/shared/lib/styles/color";
-import { ScheduleComponentProps, vipDivProps } from "@/shared/lib/type";
+import { ScheduleComponentProps, isRequiredDiv } from "@/shared/lib/type";
 import TimeDiv from "@/features/meetingSchedule/ui/TimeDiv";
 import TimeStampDiv from "@/features/meetingSchedule/ui/TimeStampDiv";
 import RecommendTimeDiv from "@/features/meetingSchedule/ui/RecommendTimeDiv";
@@ -125,7 +125,7 @@ export default function ScheduleComponent({
         </PersonTitleLayout>
         {people.map((person: person, index: number) => {
           return (
-            <PersonLayout key={index} vipperson={vip[index]}>
+            <PersonLayout key={index} $isRequired={vip[index]}>
               <PersonImagePart>
                 <Image
                   src={person.image}
@@ -148,7 +148,7 @@ export default function ScheduleComponent({
         })}
       </PeopleLayout>
       <TimeTableLayout
-        data-testId="timeTableLayout"
+        data-testid="timeTableLayout"
         onMouseDown={(event) => handleMouseDown(event)}
         ref={timeDivGroupRef}
       >
@@ -257,15 +257,15 @@ const PersonTitleLayout = styled.div`
   position: relative;
 `;
 
-const PersonLayout = styled.div<vipDivProps>`
+const PersonLayout = styled.div<isRequiredDiv>`
   display: flex;
   align-items: center;
   justify-content: center;
   height: 3rem;
   padding: 0 0.5rem;
   margin-bottom: 10px;
-  background-color: ${({ vipperson }) =>
-    vipperson ? Color("yellow100") : Color("blue50")};
+  background-color: ${({ $isRequired }) =>
+    $isRequired ? Color("yellow100") : Color("blue50")};
 `;
 
 const RecommendTimeScheduleLayout = styled.div`

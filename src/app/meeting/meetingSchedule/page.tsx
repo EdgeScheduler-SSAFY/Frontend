@@ -17,7 +17,7 @@ export default function MeetingSchedule() {
     (state: MeetState) => state
   );
 
-  // console.log(startDatetime, endDatetime, runningtime, memberList);
+  console.log(startDatetime, endDatetime, runningtime, memberList);
 
   const todayDate = new Date();
   const [date, setDate] = useState<Date>(todayDate);

@@ -11,7 +11,11 @@ export interface MeetingData {
   period: { start: string; end: string };
   isPublic: boolean;
   isRecurrence: boolean;
-  memberList: { memberId: number; isRequired: boolean }[];
+  memberList: { user: userList; isRequired: boolean }[];
+}
+
+export interface isRequiredDiv {
+  $isRequired: boolean;
 }
 
 export interface selectList {
@@ -37,10 +41,6 @@ export interface ScheduleComponentProps {
   setParentStartIndex: (timeIndex: number) => void;
   setParentEndIndex: (timeIndex: number) => void;
 }
-
-export interface vipDivProps {
-  vipperson: boolean;
-} //필수 사람 선택용
 
 export interface timeStampProps {
   personindex: number;
