@@ -46,16 +46,16 @@ export default function NewNotice() {
 
     setAnimationClass("slide-in");
 
-    // // 5초 후에 알림을 숨김
-    setTimeout(() => {
-      setAnimationClass("slide-out");
-      setTimeout(() => {
-        setNoticeState((prev) => ({
-          ...prev,
-          [eventType]: { state: undefined, eventType: eventType },
-        }));
-      }, 500);
-    }, 5000);
+    // 5초 후에 알림을 숨김
+    // setTimeout(() => {
+    //   setAnimationClass("slide-out");
+    //   setTimeout(() => {
+    //     setNoticeState((prev) => ({
+    //       ...prev,
+    //       [eventType]: { state: undefined, eventType: eventType },
+    //     }));
+    //   }, 500);
+    // }, 5000);
   };
 
   useEffect(() => {
@@ -134,7 +134,7 @@ const NoticeLayout = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 599;
   width: 22rem;
 
   &.slide-in {

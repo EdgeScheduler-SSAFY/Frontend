@@ -18,6 +18,7 @@ interface InputProps {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  pattern?: string;
 }
 
 export default function Input(props: InputProps) {
@@ -44,4 +45,18 @@ const CustomInput = styled.input<InputProps>`
     outline: none;
     background-color: ${Color("blue50")};
   }
+
+  // type이 'date'일 때만 적용
+  ${(props) =>
+    props.type === "date" &&
+    `    
+ 
+    &::-webkit-inner-spin-button,
+    &::-webkit-calendar-picker-indicator {
+      display: none;
+      -webkit-appearance: none;
+    }
+
+    
+  `}
 `;

@@ -26,9 +26,9 @@ const CustomButton = styled.button<ButtonProps>`
   cursor: pointer;
   font-weight: 600;
   transition: all 0.2s ease-in-out;
-  width: ${(props) => (props.width ? `${props.width}rem` : "6.5rem")};
-  height: ${(props) => (props.height ? `${props.height}rem` : "2.8rem")};
-  font-size: ${(props) => (props.fontSize ? `${props.fontSize}rem` : "1rem")};
+  width: ${(props) => (props.width ? `${props.width}rem` : "6rem")};
+  height: ${(props) => (props.height ? `${props.height}rem` : "2.5rem")};
+  font-size: ${(props) => (props.fontSize ? `${props.fontSize}px` : "14px")};
   background-color: ${(props) => (props.$bgColor ? props.$bgColor : Color("blue"))};
   color: ${(props) => (props.color ? Color(props.color) : "white")};
   &:hover {
