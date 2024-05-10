@@ -1,3 +1,5 @@
+import exp from "constants";
+
 export interface MeetingData {
   name: string;
   description: string;
@@ -21,8 +23,13 @@ export interface userList {
   id: number;
   name: string;
   profile: string;
-  zoneid: string;
+  zoneId: string;
   department: string;
+}
+
+export interface developmentType {
+  name: string;
+  folded: boolean;
 }
 
 export interface ScheduleComponentProps {

@@ -5,8 +5,8 @@ import { useState, useEffect, useRef } from "react";
 import { MdKeyboardArrowRight, MdKeyboardArrowDown } from "react-icons/md";
 import Image from "next/image";
 
-import { runningTime, intervalTime, userLists } from "@/shared/lib/data";
-import { MeetingData, userList } from "@/shared/lib/type";
+import { runningTime, intervalTime } from "@/shared/lib/data";
+import { MeetingData, developmentType, userList } from "@/shared/lib/type";
 import { Color } from "@/shared/lib/styles/color";
 import Label from "@/shared/ui/label";
 import Input from "@/shared/ui/input";
@@ -17,7 +17,6 @@ import { MiniCalendar, fetchWithInterceptor } from "@/shared";
 import ButtonBox from "./ui/buttonBox";
 import { filterUserList, highlightSearchTerm } from "./model/searchUtils";
 import { useRouter } from "next/navigation";
-import SelectLocalTime from "@/shared/ui/selectLocalTime";
 
 const noto = Noto_Sans_KR({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -42,14 +41,15 @@ export default function CreateMeeting() {
     isRecurrence: false,
     memberList: [],
   });
+  const [userLists, setUserLists] = useState<userList[]>([]);
 
   const [searchTerm, setSearchTerm] = useState<string>(""); // 검색어
   const [showSearchList, setShowSearchList] = useState(false); // 검색 리스트 표시 여부
   const searchRef = useRef<HTMLDivElement>(null);
   const [isFolded, setIsFolded] = useState(true); // 전체 부서 주소록
-  const [teamStates, setTeamStates] = useState([
-    { name: "Development Team 1", folded: true },
-    { name: "Development Team 2", folded: true },
+  const [teamStates, setTeamStates] = useState<developmentType[]>([
+    { name: "development 1", folded: true },
+    { name: "development 2", folded: true },
   ]); // 각 부서에 대한 상태를 관리할 배열
   const [sameDate, setSameDate] = useState<boolean>(true);
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
@@ -245,10 +245,21 @@ export default function CreateMeeting() {
   }, [meetingData, searchTerm]);
 
   useEffect(() => {
-    console.log("뭐라도 출력해바");
-    fetchWithInterceptor("/user-service/members")
+    fetchWithInterceptor("https://user-service.edgescheduler.co.kr/members")
       .then((res) => res.json())
-      .then((data) => console.log(data));
+      .then((data) => {
+        setUserLists(data);
+        const developmentSet: Set<string> = new Set(
+          data.map((user: userList) => user.department)
+        );
+        const teamSet: developmentType[] = Array.from(developmentSet).map(
+          (name) => ({
+            name,
+            folded: true,
+          })
+        );
+        setTeamStates(teamSet);
+      });
   }, []);
 
   return (
@@ -352,7 +363,7 @@ export default function CreateMeeting() {
                                       height={25}
                                     />
                                     <UserName>{member.name}</UserName>
-                                    <TimeZone>{member.zoneid}</TimeZone>
+                                    <TimeZone>{member.zoneId}</TimeZone>
                                   </UserButton>
                                 </MenuItem>
                               ))}
