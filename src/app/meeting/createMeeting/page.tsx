@@ -48,8 +48,8 @@ export default function CreateMeeting() {
   const searchRef = useRef<HTMLDivElement>(null);
   const [isFolded, setIsFolded] = useState(true); // 전체 부서 주소록
   const [teamStates, setTeamStates] = useState<developmentType[]>([
-    { name: "development 1", folded: true },
-    { name: "development 2", folded: true },
+    { name: "team 1", folded: true },
+    { name: "team 2", folded: true },
   ]); // 각 부서에 대한 상태를 관리할 배열
   const [sameDate, setSameDate] = useState<boolean>(true);
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
