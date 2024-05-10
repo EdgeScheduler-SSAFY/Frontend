@@ -4,12 +4,10 @@ import Image from "next/image";
 import { people, person } from "./dummyData";
 import React, { useEffect, useRef, useState } from "react";
 import { Color } from "@/shared/lib/styles/color";
-import {
-  ScheduleComponentProps,
-  vipDivProps,
-} from "@/shared/lib/type";
+import { ScheduleComponentProps, vipDivProps } from "@/shared/lib/type";
 import TimeDiv from "@/features/meetingSchedule/ui/TimeDiv";
 import TimeStampDiv from "@/features/meetingSchedule/ui/TimeStampDiv";
+import RecommendTimeDiv from "@/features/meetingSchedule/ui/RecommendTimeDiv";
 
 const vip: boolean[] = [true, true, true, true, false, false];
 const checkedTime: number[][] = [];
@@ -154,7 +152,18 @@ export default function ScheduleComponent({
         onMouseDown={(event) => handleMouseDown(event)}
         ref={timeDivGroupRef}
       >
-        <RecommendTimeSchedule />
+        <RecommendTimeScheduleLayout>
+          {RecommendTime.map((v: boolean, timeIndex: number) => {
+            return (
+              <RecommendTimeDiv
+                key={timeIndex}
+                timeindex={timeIndex}
+                startindex={startIndex}
+                endindex={endIndex}
+              />
+            );
+          })}
+        </RecommendTimeScheduleLayout>
         {checkedTime.map((checkTimes: number[], personindex: number) => {
           return (
             <PersonTime key={personindex}>
@@ -259,8 +268,10 @@ const PersonLayout = styled.div<vipDivProps>`
     vipperson ? Color("yellow100") : Color("blue50")};
 `;
 
-const RecommendTimeSchedule = styled.div`
-  min-height: 3rem;
+const RecommendTimeScheduleLayout = styled.div`
+  display: flex;
+  padding-left: 3px;
+  height: 3rem;
   width: 112rem;
   background-color: ${Color("black50")};
 `;
