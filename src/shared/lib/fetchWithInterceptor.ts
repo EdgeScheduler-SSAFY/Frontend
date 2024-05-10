@@ -3,7 +3,10 @@ type RequestOptions = {
   headers?: HeadersInit;
   body?: string;
 };
-export function fetchWithInterceptor(url: string, options: RequestOptions = {}) {
+export function fetchWithInterceptor(
+  url: string,
+  options: RequestOptions = {}
+) {
   const accessToken = sessionStorage.getItem("accessToken");
   if (!accessToken) {
     console.log("access token is not found");
@@ -22,9 +25,12 @@ export function fetchWithInterceptor(url: string, options: RequestOptions = {}) 
     })
       .then((response) => response.json())
       .then((data) => {
-        data["access-token"] && sessionStorage.setItem("accessToken", data["access-token"]);
-        data["refresh-token"] && sessionStorage.setItem("refreshToken", data["refresh-token"]);
-        data["expires_in"] && sessionStorage.setItem("expiresIn", data["expires_in"]);
+        data["access-token"] &&
+          sessionStorage.setItem("accessToken", data["access-token"]);
+        data["refresh-token"] &&
+          sessionStorage.setItem("refreshToken", data["refresh-token"]);
+        data["expires_in"] &&
+          sessionStorage.setItem("expiresIn", data["expires_in"]);
         const expiresIn = sessionStorage.getItem("expiresIn");
         if (expiresIn) {
           const currentTime = new Date();
@@ -42,7 +48,6 @@ export function fetchWithInterceptor(url: string, options: RequestOptions = {}) 
     ...options.headers,
   };
   //url 설정
-  const finalUrl = "https://gateway.edgescheduler.co.kr" + url;
   // 요청 설정에 헤더 추가
   const finalOptions = {
     ...options,
@@ -52,7 +57,7 @@ export function fetchWithInterceptor(url: string, options: RequestOptions = {}) 
   };
 
   // 요청 보내기
-  return fetch(finalUrl, finalOptions).then((response) => {
+  return fetch(url, finalOptions).then((response) => {
     return response;
   });
 }

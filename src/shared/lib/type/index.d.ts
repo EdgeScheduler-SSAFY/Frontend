@@ -21,7 +21,7 @@ export interface userList {
   id: number;
   name: string;
   profile: string;
-  timezone: string;
+  zoneid: string;
   department: string;
 }
 
