@@ -430,12 +430,14 @@ export default function CreateMeeting() {
                     />
                   </EndCalendarDiv>
                 )}
-                <SelectLocalTime
+                <SelectTime
                   options={intervalTime}
+                  show={false}
                   width={6.5}
-                  margin={1}
-                  onSelectChange={endTimeChangeHandle}
-                ></SelectLocalTime>
+                  onSelectChange={startTimeChangeHandle}
+                  standardIdx={0}
+                  disabledIndex={-1}
+                ></SelectTime>
               </PeriodDiv>
             </div>
             <div>
