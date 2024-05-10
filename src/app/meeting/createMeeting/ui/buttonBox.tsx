@@ -2,7 +2,13 @@ import styled from "styled-components";
 
 import Button from "@/shared/ui/button";
 
-export default function ButtonBox({ handleNext, handleCancel }) {
+export default function ButtonBox({
+  handleNext,
+  handleCancel,
+}: {
+  handleNext: () => void;
+  handleCancel: () => void;
+}) {
   return (
     <ButtonDiv>
       <Button onClick={handleNext}>next</Button>
