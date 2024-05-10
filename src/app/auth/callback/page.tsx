@@ -22,6 +22,18 @@ function PageContent() {
         );
         sessionStorage.setItem("expiresAt", expiresAt.toISOString());
       }
+      fetch("https://user-service.edgescheduler.co.kr/auth/me", {
+        headers: {
+          "content-type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          sessionStorage.setItem("user", JSON.stringify(data));
+        });
 
       router.push("/");
     }
