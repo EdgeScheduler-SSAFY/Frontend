@@ -1,5 +1,9 @@
-"use client";
+import AlarmBox from './ui/alarmBox';
 
 export default function AlarmLog() {
-  return <div>알람 내역 페이지</div>;
+  return (
+    <div>
+      <AlarmBox />
+    </div>
+  );
 }

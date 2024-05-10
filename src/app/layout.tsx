@@ -1,15 +1,17 @@
 "use client";
-
 import type { Metadata } from "next";
+import { Roboto } from "next/font/google";
 import { Noto_Sans_KR } from "next/font/google";
-import StyledComponentsRegistry from "@/lib/registry";
-
-import Header from "@/components/header";
-import Footer from "@/components/footer";
-import GlobalStyle from "@/styles/globalStyle";
+import StyledComponentsRegistry from "@/../lib/registry";
+import styled, { ThemeProvider } from "styled-components";
+import { Header } from "@/widgets/header/index";
+import { Footer } from "@/widgets/footer/index";
+import GlobalStyle from "@/shared/lib/styles/globalStyle";
+import * as theme from "@/shared/lib/styles/theme";
 
 const noto = Noto_Sans_KR({
-  subsets: ["latin"], // 또는 preload: false
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
 });
 
 // export const metadata: Metadata = {
@@ -23,15 +25,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={noto.className}>
-        <GlobalStyle />
-        <StyledComponentsRegistry>
-          <Header />
-          <main>{children}</main>
-          <Footer />
-        </StyledComponentsRegistry>
+    <html lang='en' className={noto.className}>
+      <body>
+        <ThemeProvider theme={theme}>
+          <GlobalStyle theme={theme} />
+          <StyledComponentsRegistry>
+            <Header />
+            <Main>
+              {children}
+              <Footer />
+            </Main>
+          </StyledComponentsRegistry>
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+
+const Main = styled.main`
+  min-height: calc(100% - 50px);
+`;
