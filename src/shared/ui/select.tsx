@@ -24,7 +24,7 @@ export default function Select(props: SelectProrps) {
   useEffect(() => {
     if (props.options.length > 0 && props.standardIdx !== undefined) {
       // 시작시간 선택하면 끝 시간은 idx + 1 되는데
-      // 시작시간에서 마지막 idx 선택하면  idx로 되도록 설정
+      // 시작시간에서 마지막 idx 선택하면  idx로 되도록
       const lastIdx = props.options.length - 1;
       const finalIdx = props.standardIdx > lastIdx ? lastIdx : props.standardIdx;
       setSelectedValue(props.options[finalIdx].option);
@@ -144,10 +144,9 @@ const SelectOption = styled.li<{ $disabled: boolean }>`
   padding-left: 0.7rem;
   cursor: ${({ $disabled }) => ($disabled ? "default" : "pointer")};
   box-sizing: border-box;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in;
   &:hover {
     font-weight: 500;
     background-color: ${({ $disabled }) => ($disabled ? Color("black50") : Color("blue50"))};
-    box-sizing: border-box;
   }
 `;

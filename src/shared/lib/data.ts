@@ -165,3 +165,6 @@ export const intervalTime = [
   { value: "23:30:00", option: "PM 11:30" },
   { value: "23:45:00", option: "PM 11:45" },
 ];
+
+export const dayList = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+export const MonthList = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

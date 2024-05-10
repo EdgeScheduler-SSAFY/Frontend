@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Image from "next/image";
 
@@ -6,6 +6,7 @@ import { Color } from "@/shared/lib/styles/color";
 import Button from "@/shared/ui/button";
 export default function AlarmLog() {
   const [buttonClicked, setButtonClicked] = useState<string>("");
+
 
   const onClick = (id: string) => {
     setButtonClicked(id);

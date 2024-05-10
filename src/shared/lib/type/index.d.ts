@@ -54,3 +54,16 @@ export interface NoticeState {
     eventType: string;
   };
 }
+
+export interface ModalProps {
+  open: boolean;
+  children: React.ReactNode;
+  onClose: () => void;
+}
+
+export interface DeclineMeetingData {
+  status: string;
+  reason: string;
+  startDateTime: string;
+  endDateTime: string;
+}
