@@ -10,6 +10,7 @@ import RecommendTypeSetButton from "@/features/meetingSchedule/ui/RecommendTypeS
 import CancelButton from "@/features/meetingSchedule/ui/CancelButton";
 import SubmitButton from "@/features/meetingSchedule/ui/SubmitButton";
 import useMeetStore, { MeetState } from "@/store/meetStore";
+import { fetchWithInterceptor } from "@/shared";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export default function MeetingSchedule() {
@@ -17,7 +18,7 @@ export default function MeetingSchedule() {
     (state: MeetState) => state
   );
 
-  // console.log(startDatetime, endDatetime, runningtime, memberList);
+  console.log(startDatetime, endDatetime, runningtime, memberList);
 
   const todayDate = new Date();
   const [date, setDate] = useState<Date>(todayDate);
@@ -144,6 +145,29 @@ export default function MeetingSchedule() {
     }
     return nowTime;
   };
+
+  useEffect(() => {
+    
+    const recData = async() => {
+      try {
+        const res = await fetchWithInterceptor("https://gateway.edgescheduler.co.kr//schedule-service/schedules/members/calculate-time-availability", {
+      method: "POST", 
+      body: JSON.stringify({
+        organizerId: null,
+        startDatetime: startDatetime,
+        endDatetime: endDatetime,
+        runningTime: runningtime,
+        memberList: memberList
+      }),
+    });
+    const data = await res.json();
+    console.log("hi");
+    console.log(data);
+    } catch (error) {
+      console.log(error)
+    }}
+    recData();
+  }, []);
   return (
     <MainLayout>
       <HeaderLayout>

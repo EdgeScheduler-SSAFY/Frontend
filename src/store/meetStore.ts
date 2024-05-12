@@ -1,20 +1,19 @@
+import { userList } from "@/shared/lib/type";
 import { create } from "zustand";
 
 // Zustand 스토어 생성
-interface member {
-  memberId: number;
-  isRequired: boolean;
-}
+
+
 
 export interface MeetState {
   startDatetime: string;
   endDatetime: string;
   runningtime: number;
-  memberList: member[];
+  memberList: { user: userList; isRequired: boolean }[];
   setStartDatetime: (startdatetime: string) => void;
   setEndDatetime: (endDatetime: string) => void;
   setRunningTime: (runningtime: number) => void;
-  setMemberList: (memberList: member[]) => void;
+  setMemberList: (memberList: { user: userList; isRequired: boolean }[]) => void;
 }
 
 const useMeetStore = create<MeetState>((set) => ({
