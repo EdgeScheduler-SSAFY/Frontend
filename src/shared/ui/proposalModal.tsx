@@ -1,9 +1,9 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
-import styled from "styled-components";
+'use client';
+import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
+import styled from 'styled-components';
 
-import { ModalProps } from "@/shared/lib/type/index";
+import { ModalProps } from '@/shared/lib/type/index';
 
 export default function ProposalModal({ open, children, onClose }: ModalProps) {
   const [prevScrollY, setPrevScrollY] = useState<number | undefined>(undefined);
@@ -24,19 +24,19 @@ export default function ProposalModal({ open, children, onClose }: ModalProps) {
   // 스크롤을 방지하고 현재 위치를 반환
   const preventScroll = (): void => {
     const currentScrollY = window.scrollY;
-    document.body.style.position = "fixed";
-    document.body.style.width = "100%";
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
     document.body.style.top = `-${currentScrollY}px`; // 현재 스크롤 위치
-    document.body.style.overflowY = hasScrollbar ? "scroll" : "hidden";
+    document.body.style.overflowY = hasScrollbar ? 'scroll' : 'hidden';
     setPrevScrollY(currentScrollY);
   };
 
   // 스크롤을 허용하고, 스크롤 방지 함수에서 반환된 위치로 이동
   const allowScroll = (): void => {
-    document.body.style.position = "";
-    document.body.style.width = "";
-    document.body.style.top = "";
-    document.body.style.overflowY = "";
+    document.body.style.position = '';
+    document.body.style.width = '';
+    document.body.style.top = '';
+    document.body.style.overflowY = '';
     if (prevScrollY !== undefined) {
       window.scrollTo(0, prevScrollY);
     }
@@ -71,7 +71,7 @@ export default function ProposalModal({ open, children, onClose }: ModalProps) {
       <MainLayout onClick={handleBackdropClick} />
       <ModalLayout>{children}</ModalLayout>
     </div>,
-    document.getElementById("globalModal") as HTMLElement
+    document.getElementById('globalModal') as HTMLElement
   );
 }
 
@@ -94,7 +94,7 @@ const ModalLayout = styled.div`
   border-radius: 10px;
   padding: 20px;
   width: 35%;
-  height: 50%;
+  height: 60%;
   max-height: 80%;
   overflow-y: auto;
 `;

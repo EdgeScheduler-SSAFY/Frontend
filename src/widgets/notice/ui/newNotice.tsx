@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { EventSourcePolyfill, NativeEventSource } from "event-source-polyfill";
-import styled, { keyframes } from "styled-components";
+import React, { useEffect, useState } from 'react';
+import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
+import styled, { keyframes } from 'styled-components';
 
-import { NoticeState } from "@/shared/lib/type/index";
-import CreateNotice from "./createNotice";
+import { NoticeState } from '@/shared/lib/type/index';
+import CreateNotice from './createNotice';
+import AttendeeProposalNotice from './attendeeProposalNotice';
 
 interface ExtendedEventSourceInit extends EventSourceInit {
   heartbeatTimeout?: number;
@@ -14,17 +15,17 @@ const eventSourceInit: ExtendedEventSourceInit = {
 };
 
 const initialNoticeState: NoticeState = {
-  createNotice: { state: undefined, eventType: "meeting-created" },
-  deleteNotice: { state: undefined, eventType: "meeting-deleted" },
-  updatedNotice: { state: undefined, eventType: "meeting-updated-fields" },
-  updatedTimeNotice: { state: undefined, eventType: "meeting-updated-time" },
-  attendeeResNotice: { state: undefined, eventType: "attendee-response" },
-  attendeeProNotice: { state: undefined, eventType: "attendee-proposal" },
+  createNotice: { state: undefined, eventType: 'meeting-created' },
+  deleteNotice: { state: undefined, eventType: 'meeting-deleted' },
+  updatedNotice: { state: undefined, eventType: 'meeting-updated-fields' },
+  updatedTimeNotice: { state: undefined, eventType: 'meeting-updated-time' },
+  attendeeResNotice: { state: undefined, eventType: 'attendee-response' },
+  attendeeProNotice: { state: undefined, eventType: 'attendee-proposal' },
 };
 
 export default function NewNotice() {
   const [noticeState, setNoticeState] = useState<NoticeState>(initialNoticeState);
-  const [animationClass, setAnimationClass] = useState("");
+  const [animationClass, setAnimationClass] = useState('');
   const userId = 1; // 임시
 
   const handleClose = (eventType: string) => {
@@ -44,7 +45,7 @@ export default function NewNotice() {
       [eventType]: { state: eventData, eventType: eventType },
     }));
 
-    setAnimationClass("slide-in");
+    setAnimationClass('slide-in');
 
     // 5초 후에 알림을 숨김
     // setTimeout(() => {
@@ -60,26 +61,26 @@ export default function NewNotice() {
 
   useEffect(() => {
     const EventSource = NativeEventSource || EventSourcePolyfill;
-    const eventSource = new EventSource("https://gateway.edgescheduler.co.kr/notification-service/notify/subscribe/1");
+    const eventSource = new EventSource('https://gateway.edgescheduler.co.kr/notification-service/notify/subscribe/1');
 
-    eventSource.addEventListener("connected", (e: MessageEvent) => {
+    eventSource.addEventListener('connected', (e: MessageEvent) => {
       const { data: receivedConnectData } = e;
       if (receivedConnectData === `Connected Successfully`) {
-        console.log("SSE CONNECTED");
+        console.log('SSE CONNECTED');
       }
     });
 
     // 이벤트 핸들러 등록
-    eventSource.addEventListener("meeting-created", handleMeetingEvent);
-    eventSource.addEventListener("meeting-deleted", handleMeetingEvent);
-    eventSource.addEventListener("meeting-updated-fields", handleMeetingEvent);
-    eventSource.addEventListener("meeting-updated-time", handleMeetingEvent);
-    eventSource.addEventListener("attendee-response", handleMeetingEvent);
-    eventSource.addEventListener("attendee-proposal", handleMeetingEvent);
+    eventSource.addEventListener('meeting-created', handleMeetingEvent);
+    eventSource.addEventListener('meeting-deleted', handleMeetingEvent);
+    eventSource.addEventListener('meeting-updated-fields', handleMeetingEvent);
+    eventSource.addEventListener('meeting-updated-time', handleMeetingEvent);
+    eventSource.addEventListener('attendee-response', handleMeetingEvent);
+    eventSource.addEventListener('attendee-proposal', handleMeetingEvent);
 
     return () => {
       eventSource.close();
-      console.log("SSE CLOSED");
+      console.log('SSE CLOSED');
     };
   }, [userId]);
 
@@ -91,8 +92,20 @@ export default function NewNotice() {
         const { state, eventType } = value;
         if (state !== undefined) {
           switch (eventType) {
-            case "meeting-created":
+            case 'meeting-created':
               return <CreateNotice key={eventType} eventData={state} onClose={() => handleClose(eventType)} />;
+            case 'meeting-deleted':
+              return null;
+            case 'meeting-updated-fields':
+              return null;
+            case 'meeting-updated-time':
+              return null;
+            case 'attendee-response':
+              return null;
+            case 'attendee-proposal':
+              return (
+                <AttendeeProposalNotice key={eventType} eventData={state} onClose={() => handleClose(eventType)} />
+              );
             // 추가해야됨
 
             default:
