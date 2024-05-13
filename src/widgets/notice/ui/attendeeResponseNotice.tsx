@@ -5,6 +5,7 @@ import { MdClose } from "react-icons/md";
 import { Color } from "@/shared/lib/styles/color";
 
 export default function AttendeeResponseNotice({ eventData, onClose }: { eventData: any; onClose: () => void }) {
+  const responseType = eventData.response;
   // sse 알림 닫는 함수
   const closeHandle = () => {
     onClose();
@@ -12,15 +13,21 @@ export default function AttendeeResponseNotice({ eventData, onClose }: { eventDa
 
   return (
     <AttendeeResponseLayout>
- <NoticeTitle>
+      <NoticeTitle>
         <NoticeTitleDetail>
-          <div>{eventData.organizerName}&nbsp;</div>
-          <CategoryDiv>sent a request&nbsp;</CategoryDiv>
-          <div>to attend the meeting.</div>
+          <div>{eventData.attendeeName}&nbsp;</div>
+          <CategoryDiv responseType={responseType}>
+            {responseType === "ACCEPTED" ? "accepted" : "declined"}
+            &nbsp;
+          </CategoryDiv>
+          <div>an invitation to this event.</div>
         </NoticeTitleDetail>
         <CustomMdClose size={15} onClick={closeHandle} />
       </NoticeTitle>
       <TitleLineDiv />
+      <InfoDiv>
+        <TitleDiv>{eventData.scheduleName}</TitleDiv>
+      </InfoDiv>
     </AttendeeResponseLayout>
   );
 }
@@ -44,11 +51,10 @@ const NoticeTitle = styled.div`
   padding-top: 0.5rem;
 `;
 
-const CategoryDiv = styled.div`
-  color: ${Color("blue")};
+const CategoryDiv = styled.div<{ responseType: string }>`
+  color: ${(props) => (props.responseType === "ACCEPTED" ? Color("green") : Color("orange"))};
   font-weight: 600;
 `;
-
 
 const NoticeTitleDetail = styled.div`
   display: flex;
@@ -64,3 +70,15 @@ const TitleLineDiv = styled.hr`
   margin: 0.3rem 1rem;
   border: 0.5px solid ${Color("black100")};
 `;
+
+const InfoDiv = styled.div`
+  width: 14rem;
+  padding-left: 1rem;
+`;
+
+const TitleDiv = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+
+`;
+const TimeDiv = styled.div``;
