@@ -1,23 +1,23 @@
-"use client";
-import React from "react";
-import styled from "styled-components";
-import { useRouter } from "next/navigation";
+'use client';
+import React from 'react';
+import styled from 'styled-components';
+import { useRouter } from 'next/navigation';
 
-import { MdOutlineMarkChatRead, MdOutlineMarkunread, MdOutlineDeleteSweep } from "react-icons/md";
+import { MdOutlineMarkChatRead, MdOutlineMarkunread, MdOutlineDeleteSweep } from 'react-icons/md';
 
-import { Color } from "@/shared/lib/styles/color";
+import { Color } from '@/shared/lib/styles/color';
 
 export function NoticeList({ onClose }: { onClose: () => void }) {
   const router = useRouter();
 
   const tmpAccessToken =
-    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcxNTU4MzE2Nn0.wo58LM8DNf4vlV-X5kZADTxUqJGupCdJW6-ySoGFeE4";
+    'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcxNTYxMjg3NX0.gJa7WfsFlFfagYbU4SmnQVWPPp7xuQw-gL7-lzbhVIQ';
 
   const getNoticeList = async () => {
     try {
-      const res = await fetch("https://gateway.edgescheduler.co.kr/notification-service/notify/notifications/history", {
+      const res = await fetch('https://gateway.edgescheduler.co.kr/notification-service/notify/notifications/history', {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${tmpAccessToken}`,
         },
       });
@@ -39,7 +39,7 @@ export function NoticeList({ onClose }: { onClose: () => void }) {
   };
 
   const notificationBoxClickHandle = (e: React.MouseEvent) => {
-    router.push("/myPage/notificationBox");
+    router.push('/myPage/notificationBox');
     onClose();
   };
 
@@ -111,17 +111,17 @@ const NoticeListButton = styled.button`
   align-items: center;
   justify-content: center;
   font-size: 10px;
-  color: ${Color("black")};
+  color: ${Color('black')};
   margin-right: 1.5rem;
   height: 60%;
   background: none;
-  border: 1px solid ${Color("black400")};
+  border: 1px solid ${Color('black400')};
   border-radius: 3px;
   transition: all 0.2s ease-in;
   &:hover {
     cursor: pointer;
-    /* border: 1px solid ${Color("blue400")};
-    color: ${Color("blue400")}; */
-    background-color: ${Color("blue50")};
+    /* border: 1px solid ${Color('blue400')};
+    color: ${Color('blue400')}; */
+    background-color: ${Color('blue50')};
   }
 `;
