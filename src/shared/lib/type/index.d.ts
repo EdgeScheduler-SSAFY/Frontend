@@ -32,14 +32,24 @@ export interface developmentType {
   folded: boolean;
 }
 
+export interface vipDidProps {
+  $isRequired: boolean;
+}
 export interface ScheduleComponentProps {
   setParentStartIndex: (timeIndex: number) => void;
   setParentEndIndex: (timeIndex: number) => void;
+  dayCount: number;
+  recommendedTime: {startIndex:number, endIndex:number}[];
+  schedulesAndAvailabilities: PersonalSchedule[];
 }
 
-export interface vipDivProps {
-  vipperson: boolean;
-} //필수 사람 선택용
+export interface PersonalSchedule {
+  availability : string[];
+  isRequired: boolean;
+  memberId: number;
+  schedules: {type: string, startIndexInclusive: number, endIndexExclusive: number, isPublic: true, name: string}[];
+  tzOffset: string;
+}
 
 export interface timeStampProps {
   personindex: number;
@@ -48,11 +58,11 @@ export interface timeStampProps {
 }
 
 export interface timeDivProps {
-  selected: number;
-  personindex: number;
-  timeindex: number;
-  startindex: number;
-  endindex: number;
+  $type: string;
+  $personindex: number;
+  $timeindex: number;
+  $startindex: number;
+  $endindex: number;
 } // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 border 색깔 바꾸기 위함
 
 export interface RecommendTimeDivProps {
@@ -60,3 +70,12 @@ export interface RecommendTimeDivProps {
   startindex: number;
   endindex: number;
 } // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 border 색깔 바꾸기 위함
+
+export interface PersonalScheduleInformation {
+  availability: string[];
+  isRequired: boolean;
+  memberId: number;
+  schedules: { type: string; startIndexInclusive: number; endIndexExclusive: number; isPublic: true; name: string }[];
+  tzOffset: string;
+
+}
