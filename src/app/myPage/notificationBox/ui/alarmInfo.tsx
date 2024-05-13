@@ -18,7 +18,7 @@ export default function AlarmLog() {
         <div>
           <ProfileImage src='/images/profile.webp' alt='프로필사진' width={18} height={18} />
           조현수
-        </div>
+        </div>&nbsp;
         <AlarmTextDiv>sent a request&nbsp;</AlarmTextDiv>
         <div>to attend the meeting.</div>
       </AlarmCategoryDiv>
