@@ -4,6 +4,7 @@ import { Color } from "../lib/styles/color";
 import { ColorName } from "../lib/type/types";
 
 interface ButtonProps {
+  id?: string;
   width?: number;
   height?: number;
   color?: ColorName;
@@ -25,13 +26,16 @@ const CustomButton = styled.button<ButtonProps>`
   cursor: pointer;
   font-weight: 600;
   transition: all 0.2s ease-in-out;
-  width: ${(props) => (props.width ? `${props.width}rem` : "6.5rem")};
-  height: ${(props) => (props.height ? `${props.height}rem` : "2.8rem")};
-  font-size: ${(props) => (props.fontSize ? `${props.fontSize}rem` : "1rem")};
+  width: ${(props) => (props.width ? `${props.width}rem` : "6rem")};
+  height: ${(props) => (props.height ? `${props.height}rem` : "2.5rem")};
+  font-size: ${(props) => (props.fontSize ? `${props.fontSize}px` : "14px")};
   background-color: ${(props) => (props.$bgColor ? props.$bgColor : Color("blue"))};
   color: ${(props) => (props.color ? Color(props.color) : "white")};
   &:hover {
     /* box-shadow: 0 0.5em 0.5em -0.4em ${(props) => (props.color ? props.color : Color("blue600"))}; */
     background-color: ${(props) => (props.$hoverColor ? Color(props.$hoverColor) : Color("blue600"))};
+  }
+  &:focus {
+    background-color: ${(props) => (props.$bgColor ? Color(props.$bgColor) : Color("blue"))};
   }
 `;

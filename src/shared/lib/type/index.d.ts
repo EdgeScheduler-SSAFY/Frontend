@@ -60,3 +60,30 @@ export interface RecommendTimeDivProps {
   startindex: number;
   endindex: number;
 } // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 border 색깔 바꾸기 위함
+
+export interface NoticeState {
+  [key: string]: {
+    state: any;
+    eventType: string;
+  };
+}
+
+export interface ModalProps {
+  open: boolean;
+  children: React.ReactNode;
+  onClose: () => void;
+}
+
+export interface DeclineMeetingData {
+  status: string;
+  reason: string;
+  startDatetime: string;
+  endDatetime: string;
+}
+
+export interface RetrieveData {
+  retrieverId?: number;
+  scheduleId: number;
+  startDatetime: string;
+  endDatetime: string;
+}

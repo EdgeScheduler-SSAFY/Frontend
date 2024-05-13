@@ -5,19 +5,11 @@ import Image from "next/image";
 import { Color } from "@/shared/lib/styles/color";
 import Button from "@/shared/ui/button";
 export default function AlarmLog() {
-  const [attendClicked, setAttendClicked] = useState(false);
-  const [absenceClicked, setAbsenceClicked] = useState(false);
+  const [buttonClicked, setButtonClicked] = useState<string>("");
 
-  // attend 버튼 클릭 시 상태 토글
-  const handleAttendClick = () => {
-    setAttendClicked((prev) => !prev);
-    setAbsenceClicked(false); // attend 클릭 시 absence 버튼 상태는 false로 설정
-  };
 
-  // absence 버튼 클릭 시 상태 토글
-  const handleAbsenceClick = () => {
-    setAbsenceClicked((prev) => !prev);
-    setAttendClicked(false); // absence 클릭 시 attend 버튼 상태는 false로 설정
+  const onClick = (id: string) => {
+    setButtonClicked(id);
   };
 
   return (
@@ -25,8 +17,8 @@ export default function AlarmLog() {
       <AlarmCategoryDiv>
         <div>
           <ProfileImage src='/images/profile.webp' alt='프로필사진' width={18} height={18} />
-          조현수&nbsp;
-        </div>
+          조현수
+        </div>&nbsp;
         <AlarmTextDiv>sent a request&nbsp;</AlarmTextDiv>
         <div>to attend the meeting.</div>
       </AlarmCategoryDiv>
@@ -44,18 +36,20 @@ export default function AlarmLog() {
         </AlarmDetailDiv>
         <ButtonDiv>
           <Button
+            id='attend'
             color='black'
-            $bgColor={attendClicked ? "black100" : "black50"}
+            $bgColor={buttonClicked === "attend" ? "black100" : "black50"}
             $hoverColor='black100'
-            onClick={handleAttendClick}
+            onClick={() => onClick("attend")}
           >
             attend
           </Button>
           <Button
+            id='absence'
             color='black'
-            $bgColor={absenceClicked ? "black100" : "black50"}
+            $bgColor={buttonClicked === "absence" ? "black100" : "black50"}
             $hoverColor='black100'
-            onClick={handleAbsenceClick}
+            onClick={() => onClick("absence")}
           >
             absence
           </Button>
@@ -80,7 +74,7 @@ const AlarmCategoryDiv = styled.div`
 
 const ProfileImage = styled(Image)`
   border-radius: 50%;
-  margin-right: 0.6rem;
+  margin-right: 0.3rem;
 `;
 
 const DividingLine = styled.hr`

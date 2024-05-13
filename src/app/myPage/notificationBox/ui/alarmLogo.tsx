@@ -10,7 +10,7 @@ export default function AlarmLogo() {
   return (
     <CalendarDiv>
       <DateDiv>
-        <div>{months[today.getMonth()]} &nbsp;</div>
+        <div>{months[today.getMonth()]}&nbsp;</div>
         <div>{today.getDate()}</div>
       </DateDiv>
       <DayDiv>{days[today.getDay()]}</DayDiv>

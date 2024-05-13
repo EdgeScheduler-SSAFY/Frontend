@@ -1,9 +1,9 @@
-"use client";
-import styled from "styled-components";
-import { Noto_Sans_KR } from "next/font/google";
-import { useState, useEffect, useRef } from "react";
-import { MdKeyboardArrowRight, MdKeyboardArrowDown } from "react-icons/md";
-import Image from "next/image";
+'use client';
+import styled from 'styled-components';
+import { Noto_Sans_KR } from 'next/font/google';
+import { useState, useEffect, useRef } from 'react';
+import { MdKeyboardArrowRight, MdKeyboardArrowDown } from 'react-icons/md';
+import Image from 'next/image';
 
 import { runningTime, intervalTime } from "@/shared/lib/data";
 import { MeetingData, developmentType, userList } from "@/shared/lib/type";
@@ -19,8 +19,8 @@ import { filterUserList, highlightSearchTerm } from "./model/searchUtils";
 import { useRouter } from "next/navigation";
 
 const noto = Noto_Sans_KR({
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  subsets: ["latin"],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  subsets: ['latin'],
 });
 
 export default function CreateMeeting() {
@@ -29,12 +29,12 @@ export default function CreateMeeting() {
   const { setStartDatetime, setEndDatetime, setRunningTime, setMemberList } =
     useMeetStore((state) => state);
   const [meetingData, setMeetingData] = useState<MeetingData>({
-    name: "",
-    description: "",
-    type: "MEETING",
+    name: '',
+    description: '',
+    type: 'MEETING',
     color: 4,
-    startDatetime: "2024-05-10T04:15:00",
-    endDatetime: "2024-05-10T04:15:00",
+    startDatetime: '2024-05-10T04:15:00',
+    endDatetime: '2024-05-10T04:15:00',
     runningTime: 15,
     period: { start: `2024-05-10T00:00:00`, end: `2024-05-10T00:00:00` },
     isPublic: true,
@@ -43,7 +43,7 @@ export default function CreateMeeting() {
   });
   const [userLists, setUserLists] = useState<userList[]>([]);
 
-  const [searchTerm, setSearchTerm] = useState<string>(""); // 검색어
+  const [searchTerm, setSearchTerm] = useState<string>(''); // 검색어
   const [showSearchList, setShowSearchList] = useState(false); // 검색 리스트 표시 여부
   const searchRef = useRef<HTMLDivElement>(null);
   const [isFolded, setIsFolded] = useState(true); // 전체 부서 주소록
@@ -67,7 +67,7 @@ export default function CreateMeeting() {
   const searchInputChangehandle = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     // 검색어가 비어있으면 검색 리스트를 닫음
-    setShowSearchList(e.target.value !== "");
+    setShowSearchList(e.target.value !== '');
   };
 
   // 외부를 클릭하면 검색 리스트를 닫음
@@ -77,9 +77,9 @@ export default function CreateMeeting() {
         setShowSearchList(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -110,9 +110,9 @@ export default function CreateMeeting() {
       setSelectedEndDate(selectedDate);
     }
     const year = selectedDate.getFullYear();
-    const month = ("0" + (selectedDate.getMonth() + 1)).slice(-2);
-    const date = ("0" + selectedDate.getDate()).slice(-2);
-    const startTime = meetingData.period.start.split("T")[1]; // 기존 시작 시간
+    const month = ('0' + (selectedDate.getMonth() + 1)).slice(-2);
+    const date = ('0' + selectedDate.getDate()).slice(-2);
+    const startTime = meetingData.period.start.split('T')[1]; // 기존 시작 시간
     setMeetingData({
       ...meetingData,
       period: {
@@ -138,9 +138,9 @@ export default function CreateMeeting() {
   const endDateHandle = (selectedDate: Date) => {
     setSelectedEndDate(selectedDate);
     const year = selectedDate.getFullYear();
-    const month = ("0" + (selectedDate.getMonth() + 1)).slice(-2);
-    const date = ("0" + selectedDate.getDate()).slice(-2);
-    const endTime = meetingData.period.end.split("T")[1]; // 기존 시작 시간
+    const month = ('0' + (selectedDate.getMonth() + 1)).slice(-2);
+    const date = ('0' + selectedDate.getDate()).slice(-2);
+    const endTime = meetingData.period.end.split('T')[1]; // 기존 시작 시간
     setMeetingData({
       ...meetingData,
       period: {
@@ -192,7 +192,7 @@ export default function CreateMeeting() {
       [clickedMember.user.id]: !prev[clickedMember.user.id],
     }));
 
-    setSearchTerm("");
+    setSearchTerm('');
     setShowSearchList(false);
   };
 
@@ -281,7 +281,7 @@ export default function CreateMeeting() {
                   value={searchTerm}
                   onChange={searchInputChangehandle}
                   onFocus={() => {
-                    if (searchTerm !== "") setShowSearchList(true);
+                    if (searchTerm !== '') setShowSearchList(true);
                   }}
                 />
               </SearchBox>
@@ -509,7 +509,7 @@ export default function CreateMeeting() {
                               }
                               $isRequired={member.isRequired}
                             >
-                              {member.isRequired ? "required" : "optional"}
+                              {member.isRequired ? 'required' : 'optional'}
                             </OptionalButton>
                           </div>
                           {/* <CloseButton onClick={() => {}}>
@@ -577,7 +577,7 @@ const SearchDiv = styled.div`
   width: 20rem;
   padding: 0 0.7rem;
   background-color: white;
-  border: 1px solid ${Color("black200")};
+  border: 1px solid ${Color('black200')};
   border-radius: 3px;
   z-index: 1;
 `;
@@ -610,7 +610,7 @@ const AdressBookDiv = styled.div`
   overflow-y: scroll;
   width: 20rem;
   padding: 0.5rem 0.7rem;
-  border: 1px solid ${Color("black200")};
+  border: 1px solid ${Color('black200')};
   border-radius: 3px;
   font-size: 14px;
   height: 24rem;
@@ -623,7 +623,7 @@ const ParticipantDiv = styled.div`
   padding: 0.5rem 0.7rem;
   font-size: 14px;
   height: 8rem;
-  border: 1px solid ${Color("black200")};
+  border: 1px solid ${Color('black200')};
   border-radius: 3px;
   display: flex;
   flex-wrap: wrap;
@@ -637,7 +637,7 @@ const ButtonFold = styled.button`
   border: none;
   cursor: pointer;
   padding: 0;
-  color: Color("black");
+  color: Color('black');
   font-weight: 700;
 `;
 
@@ -694,10 +694,10 @@ const TimeZone = styled.div`
 `;
 
 const Department = styled.div`
-  color: ${Color("black300")};
+  color: ${Color('black300')};
 `;
 const ParticipantInfoDiv = styled.div`
-  border: 1px solid ${Color("black200")};
+  border: 1px solid ${Color('black200')};
   border-radius: 10px;
   padding: 0.5rem;
   width: 10.3rem;
@@ -708,7 +708,7 @@ const ParticipantInfoDiv = styled.div`
   margin: 0.2rem;
   transition: all 0.2s ease-in;
   &:hover {
-    background-color: ${Color("orange50")};
+    background-color: ${Color('orange50')};
     cursor: pointer;
   }
 `;
@@ -758,7 +758,7 @@ const DateButton = styled.div`
   width: 5rem;
   height: 2rem;
   background: none;
-  border: 1px solid ${Color("black200")};
+  border: 1px solid ${Color('black200')};
   border-radius: 3px;
   cursor: pointer;
   margin-right: 0.5rem;
@@ -773,5 +773,5 @@ const LineDiv = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${Color("black")};
+  color: ${Color('black')};
 `;

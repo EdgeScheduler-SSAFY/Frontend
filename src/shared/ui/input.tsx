@@ -1,12 +1,12 @@
-"use client";
-import styled from "styled-components";
-import { Noto_Sans_KR } from "next/font/google";
+'use client';
+import styled from 'styled-components';
+import { Noto_Sans_KR } from 'next/font/google';
 
-import { Color } from "../lib/styles/color";
+import { Color } from '../lib/styles/color';
 
 const noto = Noto_Sans_KR({
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  subsets: ["latin"],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  subsets: ['latin'],
 });
 
 interface InputProps {
@@ -18,6 +18,7 @@ interface InputProps {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  pattern?: string;
 }
 
 export default function Input(props: InputProps) {
@@ -33,15 +34,26 @@ export default function Input(props: InputProps) {
 }
 
 const CustomInput = styled.input<InputProps>`
-  width: ${(props) => (props.width ? `${props.width}rem` : "10rem")};
-  height: ${(props) => (props.height ? `${props.height}rem` : "2rem")};
+  width: ${(props) => (props.width ? `${props.width}rem` : '10rem')};
+  height: ${(props) => (props.height ? `${props.height}rem` : '2rem')};
   padding: 0.1rem 0.7rem;
   font-size: 14px;
-  border: 1px solid ${Color("black200")};
+  border: 1px solid ${Color('black200')};
   border-radius: 3px;
   transition: all 0.2s ease-in;
   &:focus {
     outline: none;
-    background-color: ${Color("blue50")};
+    background-color: ${Color('blue50')};
   }
+
+  // type이 'date'일 때만 적용
+  ${(props) =>
+    props.type === 'date' &&
+    `    
+    &::-webkit-inner-spin-button,
+    &::-webkit-calendar-picker-indicator {
+      display: none;
+      -webkit-appearance: none;
+    }
+  `}
 `;

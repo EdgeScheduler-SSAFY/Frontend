@@ -1,9 +1,9 @@
-"use client";
-import React, { useState, useRef, useEffect } from "react";
-import styled from "styled-components";
+'use client';
+import React, { useState, useRef, useEffect } from 'react';
+import styled from 'styled-components';
 
-import { Color } from "../lib/styles/color";
-import { selectList } from "../lib/type";
+import { Color } from '../lib/styles/color';
+import { selectList } from '../lib/type';
 
 interface SelectProps {
   width: number;
@@ -11,20 +11,20 @@ interface SelectProps {
   options: selectList[];
   standardIdx?: number;
   disabledIndex?: number;
-  disabledLastIndex?: boolean;
+  disabledLastIndex?: number;
   show: boolean;
   onSelectChange: (value: number | string) => void;
 }
 
 export default function SelectTime(props: SelectProps) {
   const [selectFlag, setSelectFlag] = useState<boolean>(props.show);
-  const [selectedValue, setSelectedValue] = useState<string>("");
+  const [selectedValue, setSelectedValue] = useState<string>('');
 
   // 외부에서 options이 변경될 때 selectedValue를 초기화
   useEffect(() => {
     if (props.options.length > 0 && props.standardIdx !== undefined) {
       // 시작시간 선택하면 끝 시간은 idx + 1 되는데
-      // 시작시간에서 마지막 idx 선택하면  idx로 되도록 설정
+      // 시작시간에서 마지막 idx 선택하면  idx로 되도록
       const lastIdx = props.options.length - 1;
       const finalIdx =
         props.standardIdx > lastIdx ? lastIdx : props.standardIdx;
@@ -45,7 +45,8 @@ export default function SelectTime(props: SelectProps) {
   };
 
   const isLastDisabled = (index: number) => {
-    if (props.disabledLastIndex) return index === props.options.length - 1;
+    if (props.disabledLastIndex === undefined) return false;
+    return index >= props.disabledLastIndex;
   };
   // 선택값
   const handleOptionClick = (value: number | string) => {
@@ -72,9 +73,9 @@ export default function SelectTime(props: SelectProps) {
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -89,7 +90,7 @@ export default function SelectTime(props: SelectProps) {
             <SelectOption
               key={option.value}
               onClick={
-                isDisabled(index)
+                isDisabled(index) || isLastDisabled(index)
                   ? undefined
                   : () => handleOptionClick(option.value)
               }
@@ -106,13 +107,13 @@ export default function SelectTime(props: SelectProps) {
 
 const SelectDiv = styled.div<{ width: number }>`
   position: relative;
-  width: ${(props) => (props.width ? `${props.width}rem` : "10rem")};
+  width: ${(props) => (props.width ? `${props.width}rem` : '10rem')};
   height: 2rem;
 `;
 
 const SelectedDiv = styled.div<{ width: number }>`
-  width: ${(props) => (props.width ? `${props.width}rem` : "10rem")};
-  border: solid 1px ${Color("black200")};
+  width: ${(props) => (props.width ? `${props.width}rem` : '10rem')};
+  border: solid 1px ${Color('black200')};
   border-radius: 3px;
   box-sizing: border-box;
   font-size: 14px;
@@ -130,15 +131,15 @@ const SelectedValue = styled.span`
 
 const SelectList = styled.ul<{ $show: boolean; width: number }>`
   overflow-y: auto; /* 세로 스크롤 적용 */
-  display: ${(props) => (props.$show ? "block" : "none")};
+  display: ${(props) => (props.$show ? 'block' : 'none')};
   list-style-type: none;
   padding-left: 0;
   position: absolute;
   font-size: 14px;
-  width: ${(props) => (props.width ? `${props.width}rem` : "10rem")};
+  width: ${(props) => (props.width ? `${props.width}rem` : '10rem')};
   height: 8rem;
   z-index: 15;
-  border: solid 1px ${Color("black200")};
+  border: solid 1px ${Color('black200')};
   text-align: left;
   margin-top: 1px;
   box-sizing: border-box;
@@ -153,9 +154,9 @@ const SelectOption = styled.li<{ $disabled: boolean }>`
   line-height: 1.9rem;
   margin: 0.05rem 0;
   padding-left: 0.7rem;
-  cursor: ${({ $disabled }) => ($disabled ? "default" : "pointer")};
+  cursor: ${({ $disabled }) => ($disabled ? 'default' : 'pointer')};
   box-sizing: border-box;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in;
   &:hover {
     font-weight: 500;
     background-color: ${({ $disabled }) =>
