@@ -1,14 +1,42 @@
 "use client";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import styled, { DefaultTheme } from "styled-components";
+import styled from "styled-components";
+import { MdOutlineNotifications } from "react-icons/md";
 
 import { Color } from "@/shared/lib/styles/color";
 import { ColorName } from "@/shared/lib/type/types";
+import { NoticeList } from "@/widgets/notice/ui/noticeList";
+import NewNotice from "@/widgets/notice/ui/newNotice";
 
 export function Header() {
+  const [showNoticeList, setShowNoticeList] = useState<boolean>(false);
+
+  const noticeListHandle = () => {
+    setShowNoticeList((prev) => !prev);
+  };
+
+  const ref = useRef<HTMLDivElement>(null);
+  // 외부영역 클릭시 알림리스트 닫기
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setShowNoticeList(false);
+      }
+    };
+
+    if (showNoticeList) document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showNoticeList]);
+
   return (
     <HeaderNav>
+      <NewNotice />
       <MainLogo>
         <StyledLink href='/'>
           <Image src='/images/edgeScheduler.png' alt='edgeSchedulerLogo' height={50} width={50} />
@@ -21,13 +49,18 @@ export function Header() {
       <LinkDiv>
         <StyledLink href='/schedule'>schedule</StyledLink>
         <StyledLink href='/meeting'>create meeting</StyledLink>
-        <StyledLink href='/myPage/alarmLog'>my page</StyledLink>
+        <StyledLink href='/myPage/notificationBox'>my page</StyledLink>
         <StyledLink href='/login'>sign in</StyledLink>
       </LinkDiv>
+      <MdOutlineNotifications size={25} onClick={noticeListHandle} style={{ cursor: "pointer" }} />
+      {showNoticeList && (
+        <NoticeLayout ref={ref}>
+           <NoticeList onClose={() => setShowNoticeList(false)} />
+        </NoticeLayout>
+      )}
     </HeaderNav>
   );
 }
-
 const HeaderNav = styled.header`
   display: flex;
   justify-content: space-between;
@@ -54,6 +87,7 @@ const LinkDiv = styled.div`
 `;
 
 const StyledLink = styled(Link)`
+  color: ${Color("black")};
   display: flex;
   text-decoration: none;
   align-items: center;
@@ -65,4 +99,8 @@ const StyledLink = styled(Link)`
     cursor: pointer;
     color: ${Color("blue")};
   }
+`;
+
+const NoticeLayout = styled.div`
+  position: relative;
 `;

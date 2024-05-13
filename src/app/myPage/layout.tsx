@@ -34,7 +34,7 @@ export default function MyPageLayout({
       <SubLayout>
         <MyPageLink>
           <StyledLink href="/myPage/updateInfo">Update Information</StyledLink>
-          <StyledLink href="/myPage/alarmLog">Alarm Log</StyledLink>
+          <StyledLink href="/myPage/notificationBox">Notification Box</StyledLink>
           <div>
             Change my LocalTime
             <SelectLocalTime
