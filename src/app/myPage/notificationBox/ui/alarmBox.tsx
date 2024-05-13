@@ -14,7 +14,7 @@ export default function AlarmBox() {
   );
 }
 const AlarmBoxDiv = styled.div`
-  border: 1px solid ${Color("black300")};
+  border: 1px solid ${Color("black200")};
   display: flex;
   border-radius: 10px;
   margin: 1rem;

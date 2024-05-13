@@ -1,42 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { getDay } from 'date-fns';
-import { MdClose } from 'react-icons/md';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import { getDay } from "date-fns";
+import { MdClose } from "react-icons/md";
 
-import { Color } from '@/shared/lib/styles/color';
-import Button from '@/shared/ui/button';
-import ProposalModal from '@/shared/ui/proposalModal';
-import { dayList, MonthList } from '@/shared/lib/data';
-import ModalContent from '@/shared/ui/modalContent';
+import { Color } from "@/shared/lib/styles/color";
+import Button from "@/shared/ui/button";
+import ProposalModal from "@/shared/ui/proposalModal";
+import { dayList, MonthList } from "@/shared/lib/data";
+import ModalContent from "@/shared/ui/modalContent";
 
 export default function CreateNotice({ eventData, onClose }: { eventData: any; onClose: () => void }) {
-  const [startDate, startTime] = eventData.startTime.split('T');
-  const [endDate, endTime] = eventData.endTime.split('T');
-  const [year, month, date] = startDate.split('-');
+  const [startDate, startTime] = eventData.startTime.split("T");
+  const [endDate, endTime] = eventData.endTime.split("T");
+  const [year, month, date] = startDate.split("-");
   const day = getDay(new Date(startDate));
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [buttonClicked, setButtonClicked] = useState<string>('');
+  const [buttonClicked, setButtonClicked] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const tmpAccessToken =
-    'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcxNTMwNjcwNH0.Fu5ExU8lQ-wUnq2RvluuLdHEScyq7pB84VFdS4Z3w38';
+    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcxNTU3NTUwM30.q_v6N2EIEmB0NVnYhnsAti3SQGcs_dfDOpPhhGsx5ZE";
 
   useEffect(() => {
-    setAccessToken(sessionStorage.getItem('accessToken'));
+    setAccessToken(sessionStorage.getItem("accessToken"));
   }, []); // 토큰 저장
 
   const addMeetingAccepted = async (scheduleId: number) => {
     try {
       await fetch(`https://gateway.edgescheduler.co.kr/schedule-service/schedules/1/members/attendance`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${tmpAccessToken}`,
         },
         body: JSON.stringify({
-          status: 'ACCEPTED',
+          status: "ACCEPTED",
         }),
       });
+      console.log("success");
     } catch (error) {
       console.log(error);
     }
@@ -51,9 +52,9 @@ export default function CreateNotice({ eventData, onClose }: { eventData: any; o
   // 버튼 클릭 시 상태 변경 함수
   const onClick = (status: string, scheduleId: number) => {
     setButtonClicked(status);
-    if (status === 'attend') {
+    if (status === "attend") {
       addMeetingAccepted(scheduleId);
-    } else if (status === 'absence') {
+    } else if (status === "absence") {
       setIsModalOpen(true);
     }
   };
@@ -84,11 +85,11 @@ export default function CreateNotice({ eventData, onClose }: { eventData: any; o
           </TimeDiv>
           <ButtonDiv>
             <Button
-              id="attend"
-              color="black"
-              $bgColor={buttonClicked === 'attend' ? 'black100' : 'black50'}
-              $hoverColor="black100"
-              onClick={() => onClick('attend', eventData.scheduleId)}
+              id='attend'
+              color='black'
+              $bgColor={buttonClicked === "attend" ? "black100" : "black50"}
+              $hoverColor='black100'
+              onClick={() => onClick("attend", eventData.scheduleId)}
               width={5}
               height={2}
               fontSize={12}
@@ -96,11 +97,11 @@ export default function CreateNotice({ eventData, onClose }: { eventData: any; o
               attend
             </Button>
             <Button
-              id="absence"
-              color="black"
-              $bgColor={buttonClicked === 'absence' ? 'black100' : 'black50'}
-              $hoverColor="black100"
-              onClick={() => onClick('absence', eventData.scheduleId)}
+              id='absence'
+              color='black'
+              $bgColor={buttonClicked === "absence" ? "black100" : "black50"}
+              $hoverColor='black100'
+              onClick={() => onClick("absence", eventData.scheduleId)}
               width={5}
               height={2}
               fontSize={12}
@@ -130,7 +131,7 @@ export default function CreateNotice({ eventData, onClose }: { eventData: any; o
 const CreateNoticeLayout = styled.div`
   width: 20rem;
   height: 8rem;
-  border: 2px solid ${Color('black100')};
+  border: 2px solid ${Color("black100")};
   border-radius: 10px;
   background-color: white;
   font-size: 14px;
@@ -156,15 +157,16 @@ const CustomMdClose = styled(MdClose)`
 `;
 
 const CategoryDiv = styled.div`
-  color: ${Color('blue')};
+  color: ${Color("blue")};
   font-weight: 600;
 `;
 
 const TitleLineDiv = styled.hr`
   width: 90%;
   margin: 0.3rem 1rem;
-  border: 0.5px solid ${Color('black100')};
+  border: 0.5px solid ${Color("black100")};
 `;
+
 const NoticeContent = styled.div`
   display: flex;
   width: 100%;
@@ -192,7 +194,7 @@ const DateDiv = styled.div`
 const DotLineDiv = styled.hr`
   width: 80%;
   margin: 0;
-  border: 0.5px dashed ${Color('black100')};
+  border: 0.5px dashed ${Color("black100")};
 `;
 
 const DayDiv = styled.div``;
@@ -201,7 +203,7 @@ const LineDiv = styled.div`
   width: 0.5rem;
   margin-right: 0.5rem;
   border-radius: 10px;
-  background-color: ${Color('blue')};
+  background-color: ${Color("blue")};
 `;
 
 const InfoDiv = styled.div`

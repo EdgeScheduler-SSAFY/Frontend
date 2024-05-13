@@ -52,12 +52,10 @@ export function Header() {
         <StyledLink href='/myPage/notificationBox'>my page</StyledLink>
         <StyledLink href='/login'>sign in</StyledLink>
       </LinkDiv>
-      <div ref={ref}>
-        <MdOutlineNotifications size={25} onClick={noticeListHandle} style={{ cursor: "pointer" }} />
-      </div>
+      <MdOutlineNotifications size={25} onClick={noticeListHandle} style={{ cursor: "pointer" }} />
       {showNoticeList && (
-        <NoticeLayout>
-          <NoticeList />
+        <NoticeLayout ref={ref}>
+           <NoticeList onClose={() => setShowNoticeList(false)} />
         </NoticeLayout>
       )}
     </HeaderNav>

@@ -64,6 +64,13 @@ export interface ModalProps {
 export interface DeclineMeetingData {
   status: string;
   reason: string;
-  startDateTime: string;
-  endDateTime: string;
+  startDatetime: string;
+  endDatetime: string;
+}
+
+export interface RetrieveData {
+  retrieverId?: number;
+  scheduleId: number;
+  startDatetime: string;
+  endDatetime: string;
 }
