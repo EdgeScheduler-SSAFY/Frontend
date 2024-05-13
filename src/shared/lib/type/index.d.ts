@@ -87,3 +87,9 @@ export interface RetrieveData {
   startDatetime: string;
   endDatetime: string;
 }
+
+export interface MemberList {
+  memberId: number,
+  memberName: string,
+  isRequired: boolean,
+}

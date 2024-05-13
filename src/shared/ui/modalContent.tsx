@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { RiUserFollowLine, RiUserForbidLine, RiSearchLine } from "react-icons/ri";
+import Image from "next/image";
 
 import { intervalTime } from "@/shared/lib/data";
-import { DeclineMeetingData, RetrieveData } from "@/shared/lib/type";
+import { DeclineMeetingData, RetrieveData, MemberList } from "@/shared/lib/type";
 import TextArea from "@/shared/ui/textArea";
 import Button from "@/shared/ui/button";
 import Input from "@/shared/ui/input";
 import SelectTime from "@/shared/ui/selectTime";
 import { Color } from "@/shared/lib/styles/color";
 import { ColorName } from "@/shared/lib/type/types";
+import { Togle } from "..";
 
 export default function ModalContent({ eventData, onClose }: { eventData: any; onClose: () => void }) {
-  const runningTime = 60 / 15; // 임시
+  const runningTime = 120 / 15; // 임시
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
+  const [isSuggestTime, setIsSuggestTime] = useState<boolean>(false); // 종일 여부
   const [declinedData, setDeclinedData] = useState<DeclineMeetingData>({
     status: "DECLINED",
     reason: "",
@@ -23,14 +26,16 @@ export default function ModalContent({ eventData, onClose }: { eventData: any; o
   });
 
   const [retreiveData, setRetreiveData] = useState<RetrieveData>({
-    retrieverId: 5,
-    scheduleId: eventData.scheduleId,
+    scheduleId: 89,
     startDatetime: declinedData.startDatetime,
     endDatetime: declinedData.endDatetime,
-  }); // 임시
+  });
+
+  const [availableMember, setAvailableMember] = useState<MemberList[]>([]);
+  const [unAvailableMember, setunAvailableMember] = useState<MemberList[]>([]);
 
   const tmpAccessToken =
-    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcxNTU3NTUwM30.q_v6N2EIEmB0NVnYhnsAti3SQGcs_dfDOpPhhGsx5ZE";
+    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcxNTU4MzE2Nn0.wo58LM8DNf4vlV-X5kZADTxUqJGupCdJW6-ySoGFeE4";
 
   useEffect(() => {
     setAccessToken(sessionStorage.getItem("accessToken"));
@@ -91,7 +96,7 @@ export default function ModalContent({ eventData, onClose }: { eventData: any; o
     return true;
   };
 
-  const searchAvailableAttendds = async (scheduleId: number) => {
+  const searchAvailableAttendds = async () => {
     try {
       const res = await fetch(
         `https://gateway.edgescheduler.co.kr/schedule-service/schedules/calculate-time-availability-with-proposal`,
@@ -102,8 +107,12 @@ export default function ModalContent({ eventData, onClose }: { eventData: any; o
             Authorization: `Bearer ${tmpAccessToken}`,
           },
           body: JSON.stringify(retreiveData),
-        });
-      console.log(res.json());
+        }
+      );
+      const participantList = await res.json();
+      console.log(participantList);
+      setunAvailableMember(participantList.unavailableMembers);
+      setAvailableMember(participantList.availableMembers);
     } catch (error) {
       console.log(error);
     }
@@ -123,50 +132,78 @@ export default function ModalContent({ eventData, onClose }: { eventData: any; o
         value={declinedData.reason}
         onChange={(e) => setDeclinedData({ ...declinedData, reason: e.target.value })}
       />
-      <TimeSuggestTitle>Suggest another time</TimeSuggestTitle>
-      <TimeSuggestDiv>
-        <Input
-          id='startDate'
-          width={6}
-          type='date'
-          value={declinedData.startDatetime.split("T")[0]}
-          onChange={(e) => startDateHandle(e)}
+      <TimeSuggestTitle>
+        Suggest another time{" "}
+        <Togle
+          $isOn={isSuggestTime}
+          onToggle={() => {
+            setIsSuggestTime((prev) => !prev);
+          }}
         />
-        <SelectTime
-          options={intervalTime}
-          show={false}
-          width={6}
-          onSelectChange={startTimeChangeHandle}
-          standardIdx={0}
-          disabledLastIndex={intervalTime.length - runningTime}
-        ></SelectTime>
-        <LineDiv>-</LineDiv>
-        <EndDateDiv id='endDate'>{declinedData.endDatetime.split("T")[0]}</EndDateDiv>
-        <EndTimeDiv>{intervalTime[disabledIndex + runningTime].option}</EndTimeDiv>
-        <SearchBtn onClick={() => searchAvailableAttendds(eventData.scheduleId)}>
-          <RiSearchLine size={20} />
-        </SearchBtn>
-      </TimeSuggestDiv>
-      <ParticipantDiv>
-        <PossibleDiv>
-          <ParticipantTitleDiv color='green'>
-            <RiUserFollowLine />
-            &nbsp; Possible
-          </ParticipantTitleDiv>
-          <ParticipantListDiv>
-            <div>Participants</div>
-          </ParticipantListDiv>
-        </PossibleDiv>
-        <ImpossibleDiv>
-          <ParticipantTitleDiv color='orange'>
-            <RiUserForbidLine />
-            &nbsp; Impossible
-          </ParticipantTitleDiv>
-          <ParticipantListDiv>
-            <div>Participants</div>
-          </ParticipantListDiv>
-        </ImpossibleDiv>
-      </ParticipantDiv>
+      </TimeSuggestTitle>
+      {isSuggestTime && (
+        <div>
+          <TimeSuggestDiv>
+            <Input
+              id='startDate'
+              width={6}
+              type='date'
+              value={declinedData.startDatetime.split("T")[0]}
+              onChange={(e) => startDateHandle(e)}
+            />
+            <SelectTime
+              options={intervalTime}
+              show={false}
+              width={6}
+              onSelectChange={startTimeChangeHandle}
+              standardIdx={0}
+              disabledLastIndex={intervalTime.length - runningTime}
+            ></SelectTime>
+            <LineDiv>-</LineDiv>
+            <EndDateDiv id='endDate'>{declinedData.endDatetime.split("T")[0]}</EndDateDiv>
+            <EndTimeDiv>{intervalTime[disabledIndex + runningTime].option}</EndTimeDiv>
+            <SearchBtn onClick={() => searchAvailableAttendds()}>
+              <RiSearchLine size={20} />
+            </SearchBtn>
+          </TimeSuggestDiv>
+          <ParticipantDiv>
+            <PossibleDiv>
+              <ParticipantTitleDiv color='green'>
+                <RiUserFollowLine />
+                &nbsp; Possible
+              </ParticipantTitleDiv>
+              <ParticipantListDiv>
+                {availableMember &&
+                  availableMember.map((member) => (
+                    <EachMemberDiv key={member.memberId} $isRequired={member.isRequired}>
+                        <ProfileImage
+                          src="/images/profile.webp"
+                          alt="프로필사진"
+                          width={20}
+                          height={20}
+                        />
+                      {member.memberName}
+                    </EachMemberDiv>
+                  ))}
+              </ParticipantListDiv>
+            </PossibleDiv>
+            <ImpossibleDiv>
+              <ParticipantTitleDiv color='orange'>
+                <RiUserForbidLine />
+                &nbsp; Impossible
+              </ParticipantTitleDiv>
+              <ParticipantListDiv>
+                {unAvailableMember &&
+                  unAvailableMember.map((member) => (
+                    <EachMemberDiv key={member.memberId} $isRequired={member.isRequired}>
+                      {member.memberName}
+                    </EachMemberDiv>
+                  ))}
+              </ParticipantListDiv>
+            </ImpossibleDiv>
+          </ParticipantDiv>
+        </div>
+      )}
       <ButtonDiv>
         <Button width={5} onClick={() => addMeetingDeclined(eventData.scheduleId)}>
           save
@@ -193,8 +230,12 @@ const ModalTitle = styled.div`
   margin-bottom: 0.5rem;
 `;
 const TimeSuggestTitle = styled.div`
+  width: 38%;
   margin: 0.5rem 0;
   font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 const TimeSuggestDiv = styled.div`
   width: 98%;
@@ -228,8 +269,11 @@ const ImpossibleDiv = styled.div`
   width: 45%;
 `;
 const ParticipantListDiv = styled.div`
-  height: 7rem;
+  height: 7.5rem;
   border: solid 1px ${Color("black200")};
+  border-radius: 3px;
+  padding: 0.5rem;
+  overflow-y: scroll;
 `;
 
 const ButtonDiv = styled.div`
@@ -275,4 +319,19 @@ const SearchBtn = styled.button`
   &:hover {
     background-color: ${Color("blue100")};
   }
+`;
+
+const EachMemberDiv = styled.div<{ $isRequired: boolean }>`
+  font-size: 13px;
+  margin: 0.25rem 0;
+  background-color: ${(props) => (props.$isRequired ? Color("yellow100") : Color("black50"))};
+  border-radius: 5px;
+  padding: 0.1rem 0.5rem;
+  display: flex;
+  align-items: center;
+`;
+
+const ProfileImage = styled(Image)`
+  border-radius: 50%;
+  margin-right: 0.3rem;
 `;

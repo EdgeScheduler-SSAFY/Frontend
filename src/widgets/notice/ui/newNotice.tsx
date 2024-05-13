@@ -28,7 +28,7 @@ export default function NewNotice() {
   const [animationClass, setAnimationClass] = useState("");
   const userId = 1; // 임시
   const tmpAccessToken =
-    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcxNTU3NTUwM30.q_v6N2EIEmB0NVnYhnsAti3SQGcs_dfDOpPhhGsx5ZE";
+  "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcxNTU4MzE2Nn0.wo58LM8DNf4vlV-X5kZADTxUqJGupCdJW6-ySoGFeE4";
 
   const handleClose = (eventType: string) => {
     setNoticeState((prev) => ({
@@ -68,6 +68,7 @@ export default function NewNotice() {
         Authorization: `Bearer ${tmpAccessToken}`,
       },
       withCredentials: true,
+      ...eventSourceInit,
     });
 
     eventSource.addEventListener("connected", (e: any) => {

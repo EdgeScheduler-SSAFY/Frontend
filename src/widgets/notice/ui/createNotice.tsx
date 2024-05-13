@@ -19,7 +19,7 @@ export default function CreateNotice({ eventData, onClose }: { eventData: any; o
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const tmpAccessToken =
-    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcxNTU3NTUwM30.q_v6N2EIEmB0NVnYhnsAti3SQGcs_dfDOpPhhGsx5ZE";
+    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcxNTU4MzE2Nn0.wo58LM8DNf4vlV-X5kZADTxUqJGupCdJW6-ySoGFeE4";
 
   useEffect(() => {
     setAccessToken(sessionStorage.getItem("accessToken"));
