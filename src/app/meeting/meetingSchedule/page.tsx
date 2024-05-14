@@ -389,7 +389,7 @@ export default function MeetingSchedule() {
         </RecommendLayout>
         <ButtonLayout>
           <CancelButton>Cancel</CancelButton>
-          <SubmitButton>Submit</SubmitButton>
+          <SubmitButton onClick={() => {}}>Submit</SubmitButton>
         </ButtonLayout>
       </ButtonAndRecommendLayout>
     </MainLayout>
