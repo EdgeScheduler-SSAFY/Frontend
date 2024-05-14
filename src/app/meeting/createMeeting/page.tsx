@@ -49,13 +49,7 @@ export default function CreateMeeting() {
   const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are 0-based in JavaScript
   const date = String(now.getDate()).padStart(2, "0");
   const todayString = `${year}-${month}-${date}T00:00:00`;
-  const userItem = sessionStorage?.getItem("user");
-  let me: User | null = null;
-  if (userItem === null) {
-    router.push("/");
-  } else {
-    me = JSON.parse(userItem);
-  }
+
   const [meetingData, setMeetingData] = useState<MeetingData>({
     name: "",
     description: "",
@@ -67,19 +61,7 @@ export default function CreateMeeting() {
     period: { start: `${todayString}`, end: `${todayString}` },
     isPublic: true,
     isRecurrence: false,
-    memberList: [
-      {
-        user: {
-          id: me!.id,
-          name: me!.name,
-          profile: me!.profile,
-          zoneId: me!.zoneId,
-          department: me!.department,
-          region: me!.region,
-        },
-        isRequired: true,
-      },
-    ],
+    memberList: [],
   });
 
   const [userLists, setUserLists] = useState<userList[]>([]); // 유저 리스트
@@ -90,13 +72,27 @@ export default function CreateMeeting() {
   const [teamStates, setTeamStates] = useState<developmentType[]>([]); // 각 부서에 대한 상태를 관리할 배열
   const [clickedUsers, setClickedUsers] = useState<{
     [userId: number]: boolean;
-  }>({ [me!.id]: true }); // 클릭 여부 사용자 ID 기준
+  }>({ }); // 클릭 여부 사용자 ID 기준
   const [showStartMiniCalendar, setShowStartMiniCalendar] =
     useState<boolean>(false);
   const [showEndMiniCalendar, setShowEndMiniCalendar] =
     useState<boolean>(false);
   const [selectedStartDate, setSelectedStartDate] = useState(new Date());
   const [selectedEndDate, setSelectedEndDate] = useState(new Date());
+
+  useEffect(() => {
+    const userItem = sessionStorage.getItem("user");
+    if (userItem) {
+      setMeetingData((prev) => ({
+        ...prev,
+        memberList: [{ user: JSON.parse(userItem), isRequired: true }],
+      }));
+      setClickedUsers((prev) => ({
+        ...prev,
+        [JSON.parse(userItem).id]: true,
+      }));
+    }
+  }, []);
 
   // 검색어 입력 시 호출되는 함수
   const searchInputChangehandle = (e: React.ChangeEvent<HTMLInputElement>) => {
