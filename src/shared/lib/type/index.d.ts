@@ -100,3 +100,7 @@ export interface RetrieveData {
   startDatetime: string;
   endDatetime: string;
 }
+
+export interface isRequiredDiv {
+  $isRequired: boolean;
+}
