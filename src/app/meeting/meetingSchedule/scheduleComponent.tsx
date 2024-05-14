@@ -1,40 +1,54 @@
 "use client";
 import { styled } from "styled-components";
 import Image from "next/image";
-import { people, person } from "./dummyData";
 import React, { useEffect, useRef, useState } from "react";
 import { Color } from "@/shared/lib/styles/color";
 import {
-  PersonalScheduleInformation,
   ScheduleComponentProps,
   userList,
-  vipDidProps,
+  isRequiredDiv,
+  SchedulesAndAvailabilitiesProps,
 } from "@/shared/lib/type";
 import TimeDiv from "@/features/meetingSchedule/ui/TimeDiv";
 import TimeStampDiv from "@/features/meetingSchedule/ui/TimeStampDiv";
 import RecommendTimeDiv from "@/features/meetingSchedule/ui/RecommendTimeDiv";
 import useMeetStore, { MeetState } from "@/store/meetStore";
 
-const allDayTime: boolean[] = Array(112).fill(false);
-
-const startTime: number[] = [0, 4, 6, 8, 8, 12];
-const RecommendTime: boolean[] = Array(112).fill(false);
+const startTime: number[] = [0];
 
 export default function ScheduleComponent({
   setParentStartIndex,
   setParentEndIndex,
   dayCount,
-  recommendedTime,
+  recommendedTimes,
   schedulesAndAvailabilities,
 }: ScheduleComponentProps) {
+  schedulesAndAvailabilities.forEach(
+    (schedulesAndAvailability, index: number) => {
+      if (index === 0) {
+        return;
+      }
+      const standardTimeArr = schedulesAndAvailabilities[0].tzOffset.split(":");
+      const timeArr = schedulesAndAvailability.tzOffset.split(":");
+      const timeDiff =
+        Number(standardTimeArr[0]) -
+        Number(timeArr[0]) +
+        (Number(standardTimeArr[1]) - Number(timeArr[1])) / 60;
+      startTime.push(timeDiff);
+    }
+  );
+
   let fixedIndex = -1;
 
   const { startDatetime, endDatetime, runningtime, memberList } = useMeetStore(
     (state: MeetState) => state
   );
-  console.log(startDatetime);
-  console.log("recommendedTime", recommendedTime);
-  console.log("schedulesAndAvailabilities", schedulesAndAvailabilities);
+  // useEffect(() => {
+  //   console.log("startDatetime", startDatetime);
+  //   console.log("endDatetime", endDatetime);
+  //   console.log("recommendedTimes", recommendedTimes);
+  //   console.log("schedulesAndAvailabilities", schedulesAndAvailabilities);
+  // }, p[]);
 
   const [startIndex, setStartIndex] = useState<number>(-2);
   const [endIndex, setEndIndex] = useState<number>(-2);
@@ -52,11 +66,11 @@ export default function ScheduleComponent({
     );
     let timeIndex: number;
     if (tmpIndex < 0) {
-      timeIndex = dayCount * 96 + 0;
+      timeIndex = 0;
     } else if (tmpIndex > 111) {
-      timeIndex = dayCount * 96 + 111;
+      timeIndex = 111;
     } else {
-      timeIndex = dayCount * 96 + tmpIndex;
+      timeIndex = tmpIndex;
     } // 범위 밖으로 나가면 초기값 혹은 끝값 바꿔줌
 
     if (timeIndex >= fixedIndex) {
@@ -73,9 +87,7 @@ export default function ScheduleComponent({
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
     const nowPositionX = event.clientX + timeDivGroupRef.current!.scrollLeft;
-    fixedIndex =
-      dayCount * 96 +
-      Math.floor((nowPositionX - timeDivGroupleftX.current) / 16);
+    fixedIndex = Math.floor((nowPositionX - timeDivGroupleftX.current) / 16);
     updateStartIndex(fixedIndex);
     updateEndIndex(fixedIndex);
     window.addEventListener("mousemove", handleMouseMove);
@@ -98,6 +110,54 @@ export default function ScheduleComponent({
   const updateEndIndex = (timeIndex: number) => {
     setEndIndex(timeIndex);
     setParentEndIndex(timeIndex + 1);
+  };
+
+  const renderTimeStampDiv = (timeIndex: number, personindex: number) => {
+    if (Number.isInteger(startTime[personindex])) {
+      if (timeIndex % 4 === 0) {
+        return (
+          <TimeStampDiv
+            key={timeIndex}
+            personindex={personindex}
+            timeindex={timeIndex}
+          >
+            {(startTime[personindex] + Math.floor(timeIndex / 4) + 24) % 24}
+          </TimeStampDiv>
+        );
+      } else {
+        return (
+          <TimeStampDiv
+            key={timeIndex}
+            personindex={personindex}
+            timeindex={timeIndex}
+          ></TimeStampDiv>
+        );
+      }
+    } // startTime 이 정수일때
+    else {
+      if (timeIndex % 4 === 2) {
+        return (
+          <TimeStampDiv
+            key={timeIndex}
+            personindex={personindex}
+            timeindex={timeIndex}
+          >
+            {(Math.floor(startTime[personindex]) +
+              Math.ceil(timeIndex / 4) +
+              24) %
+              24}
+          </TimeStampDiv>
+        );
+      } else {
+        return (
+          <TimeStampDiv
+            key={timeIndex}
+            personindex={personindex}
+            timeindex={timeIndex}
+          ></TimeStampDiv>
+        );
+      }
+    }
   };
   return (
     <MainLayout>
@@ -149,20 +209,20 @@ export default function ScheduleComponent({
         ref={timeDivGroupRef}
       >
         <RecommendTimeScheduleLayout>
-          {RecommendTime.map((v: boolean, timeIndex: number) => {
+          {Array.from({ length: 112 }).map((_, timeIndex) => {
             return (
               <RecommendTimeDiv
                 key={timeIndex}
-                timeindex={timeIndex}
-                startindex={startIndex}
-                endindex={endIndex}
+                $dayCount={dayCount}
+                $timeindex={timeIndex}
+                $recommendedTimes={recommendedTimes}
               />
             );
           })}
         </RecommendTimeScheduleLayout>
         {schedulesAndAvailabilities.map(
           (
-            personalScheduleInformation: PersonalScheduleInformation,
+            personalScheduleInformation: SchedulesAndAvailabilitiesProps,
             personindex: number
           ) => {
             return (
@@ -170,13 +230,11 @@ export default function ScheduleComponent({
                 <TimeDivGroup>
                   {personalScheduleInformation.availability
                     .slice(dayCount * 96, dayCount * 96 + 112)
-                    .map((v: string, timeindex: number) => {
+                    .map((type: string, timeindex: number) => {
                       return (
                         <TimeDiv
-                          key={timeindex}
-                          $type={
-                            personalScheduleInformation.availability[timeindex]
-                          }
+                          key={dayCount * 96 + timeindex}
+                          $type={type}
                           $personindex={personindex}
                           $timeindex={timeindex}
                           $startindex={startIndex}
@@ -187,29 +245,8 @@ export default function ScheduleComponent({
                 </TimeDivGroup>
 
                 <TimeStampGroup>
-                  {allDayTime.map((v: boolean, timeIndex: number) => {
-                    if (timeIndex % 4 === 0) {
-                      return (
-                        <TimeStampDiv
-                          key={timeIndex}
-                          personindex={personindex}
-                          timeindex={timeIndex}
-                        >
-                          {(startTime[personindex] +
-                            Math.floor(timeIndex / 4) +
-                            24) %
-                            24}
-                        </TimeStampDiv>
-                      );
-                    } else {
-                      return (
-                        <TimeStampDiv
-                          key={timeIndex}
-                          personindex={personindex}
-                          timeindex={timeIndex}
-                        ></TimeStampDiv>
-                      );
-                    }
+                  {Array.from({ length: 112 }).map((_, timeIndex) => {
+                    return renderTimeStampDiv(timeIndex, personindex);
                   })}
                 </TimeStampGroup>
               </PersonTime>
@@ -217,14 +254,6 @@ export default function ScheduleComponent({
           }
         )}
       </TimeTableLayout>
-
-      <RecommendTimeLayout>
-        {recommendedTime.map((value, index) => {
-          return (
-            <div key={index}>{`${value.startIndex} ${value.endIndex}`}</div>
-          );
-        })}
-      </RecommendTimeLayout>
     </MainLayout>
   );
 }
@@ -288,10 +317,6 @@ const RecommendTimeScheduleLayout = styled.div`
   height: 3rem;
   width: 112rem;
   background-color: ${Color("black50")};
-`;
-
-const RecommendTimeLayout = styled.div`
-  display: flex;
 `;
 
 const TimeDivGroup = styled.div`

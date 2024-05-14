@@ -23,27 +23,39 @@ const noto = Noto_Sans_KR({
   subsets: ["latin"],
 });
 
+interface User {
+  id: number;
+  profile: string;
+  name: string;
+  role: string;
+  email: string | null;
+  department: string;
+  region: string;
+  zoneId: string;
+}
 export default function CreateMeeting() {
   // 회의 정보
   const router = useRouter();
-<<<<<<< HEAD
   const {
+    setMeetName,
     setStartDatetime,
     setEndDatetime,
     setRunningTime,
     setMemberList,
-    setMeetName,
-  } = useMeetStore((state) => state);
-=======
-  const { setStartDatetime, setEndDatetime, setRunningTime, setMemberList } =
-    useMeetStore((state) => state);
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
-    const date = String(now.getDate()).padStart(2, '0');
-    const todayString = `${year}-${month}-${date}T00:00:00`;
-
->>>>>>> 9336ed43dd7e7d96071bd7d66b8b8cd5f43979f7
+    setDescription,
+  } = useMeetStore((state: MeetState) => state);
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are 0-based in JavaScript
+  const date = String(now.getDate()).padStart(2, "0");
+  const todayString = `${year}-${month}-${date}T00:00:00`;
+  const userItem = sessionStorage.getItem("user");
+  let me: User | null = null;
+  if (userItem === null) {
+    router.push("/");
+  } else {
+    me = JSON.parse(userItem);
+  }
   const [meetingData, setMeetingData] = useState<MeetingData>({
     name: "",
     description: "",
@@ -55,23 +67,29 @@ export default function CreateMeeting() {
     period: { start: `${todayString}`, end: `${todayString}` },
     isPublic: true,
     isRecurrence: false,
-    memberList: [],
+    memberList: [
+      {
+        user: {
+          id: me!.id,
+          name: me!.name,
+          profile: me!.profile,
+          zoneId: me!.zoneId,
+          department: me!.department,
+        },
+        isRequired: true,
+      },
+    ],
   });
-  const [userLists, setUserLists] = useState<userList[]>([]);
 
+  const [userLists, setUserLists] = useState<userList[]>([]); // 유저 리스트
   const [searchTerm, setSearchTerm] = useState<string>(""); // 검색어
   const [showSearchList, setShowSearchList] = useState(false); // 검색 리스트 표시 여부
   const searchRef = useRef<HTMLDivElement>(null);
   const [isFolded, setIsFolded] = useState(true); // 전체 부서 주소록
-  const [teamStates, setTeamStates] = useState<developmentType[]>([
-    { name: "team 1", folded: true },
-    { name: "team 2", folded: true },
-  ]); // 각 부서에 대한 상태를 관리할 배열
-  const [sameDate, setSameDate] = useState<boolean>(true);
-  const [disabledIndex, setDisabledIndex] = useState<number>(0);
+  const [teamStates, setTeamStates] = useState<developmentType[]>([]); // 각 부서에 대한 상태를 관리할 배열
   const [clickedUsers, setClickedUsers] = useState<{
     [userId: number]: boolean;
-  }>({}); // 클릭 여부 사용자 ID 기준
+  }>({ [me!.id]: true }); // 클릭 여부 사용자 ID 기준
   const [showStartMiniCalendar, setShowStartMiniCalendar] =
     useState<boolean>(false);
   const [showEndMiniCalendar, setShowEndMiniCalendar] =
@@ -140,14 +158,12 @@ export default function CreateMeeting() {
 
   // 시작시간 값이 변경될 때 실행될 함수
   const startTimeChangeHandle = (value: number | string) => {
+    console.log("startTimeChange : ", value);
     const startDate = meetingData.period.start.split("T")[0]; // 기존 시작 날짜
     setMeetingData({
       ...meetingData,
       period: { ...meetingData.period, start: `${startDate}T${value}` },
     });
-    setDisabledIndex(
-      intervalTime.findIndex((option) => option.value === value)
-    );
   };
 
   // 끝날짜 값이 변경될 때 실행될 함수
@@ -166,11 +182,11 @@ export default function CreateMeeting() {
     });
 
     // 두 날짜가 같은지 확인
-    setSameDate(selectedDate.getDate() === selectedStartDate.getDate());
   };
 
   // 끝시간 값이 변경될 때 실행될 함수
   const endTimeChangeHandle = (value: number | string) => {
+    console.log("endTimeChange : ", value);
     const endDate = meetingData.period.end.split("T")[0]; // 기존 시작 날짜
     setMeetingData({
       ...meetingData,
@@ -179,25 +195,25 @@ export default function CreateMeeting() {
   };
 
   // 사용자 버튼 클릭 이벤트
-  const userButtonClickHandle = (clickedMember: {user:userList, isRequired:boolean}) => {
+  const userButtonClickHandle = (clickedMember: {
+    user: userList;
+    isRequired: boolean;
+  }) => {
     // console.log("userButtonClickHandle called with userId:", clickedMember.user.id);
-    const clickedUser = userLists.find((user) => user.id === clickedMember.user.id);
+    const clickedUser = userLists.find(
+      (user) => user.id === clickedMember.user.id
+    );
     // 이미 참가자 목록에 있는 사용자인지 확인
     const isParticipant = meetingData.memberList.some(
-<<<<<<< HEAD
-      (member) => member.user.id === userId
-=======
       (member) => member.user.id === clickedMember.user.id
->>>>>>> 9336ed43dd7e7d96071bd7d66b8b8cd5f43979f7
     );
 
     // 참가자 목록에 추가된 사용자라면 제거, 추가되지 않은 사용자라면 추가
     if (clickedUser && isParticipant) {
       setMeetingData((prev) => ({
         ...prev,
-<<<<<<< HEAD
         memberList: prev.memberList.filter(
-          (member) => member.user.id !== userId
+          (member) => member.user.id !== clickedMember.user.id
         ),
       }));
     } else {
@@ -210,18 +226,6 @@ export default function CreateMeeting() {
           ],
         }));
       }
-=======
-        memberList: prev.memberList.filter((member) => member.user.id !== clickedMember.user.id),
-      }));
-    } else {
-      setMeetingData((prev) => ({
-        ...prev,
-        memberList: [
-          ...prev.memberList,
-          clickedMember,
-        ],
-      }));
->>>>>>> 9336ed43dd7e7d96071bd7d66b8b8cd5f43979f7
     }
 
     setClickedUsers((prev) => ({
@@ -237,13 +241,7 @@ export default function CreateMeeting() {
   const participantRemoveHandle = (userId: number) => {
     setMeetingData((prev) => ({
       ...prev,
-<<<<<<< HEAD
       memberList: prev.memberList.filter((member) => member.user.id !== userId),
-=======
-      memberList: prev.memberList.filter(
-        (member) => member.user.id !== userId
-      ),
->>>>>>> 9336ed43dd7e7d96071bd7d66b8b8cd5f43979f7
     }));
 
     setClickedUsers((prev) => ({
@@ -272,19 +270,23 @@ export default function CreateMeeting() {
   const cancleHandle = () => {
     router.push("/");
   };
-  const nextHandle = () => {
-    setMeetName(meetingData.name);
-    setStartDatetime(meetingData.period.start);
-    setEndDatetime(meetingData.period.end);
-    setRunningTime(meetingData.runningTime);
-    setMemberList(meetingData.memberList);
+  const nextHandle = async () => {
+    await Promise.all([
+      setMeetName(meetingData.name),
+      setDescription(meetingData.description),
+      setStartDatetime(meetingData.period.start),
+      setEndDatetime(meetingData.period.end),
+      setRunningTime(meetingData.runningTime),
+      setMemberList(meetingData.memberList),
+    ]);
+
     router.push("./meetingSchedule");
   };
 
-  useEffect(() => {
-    // console.log("searchTerm:", searchTerm);
-    // console.log("MeetingData:", meetingData);
-  }, [meetingData, searchTerm]);
+  // useEffect(() => {
+  //   console.log("searchTerm:", searchTerm);
+  //   console.log("MeetingData:", meetingData);
+  // }, [meetingData, searchTerm]);
 
   useEffect(() => {
     fetchWithInterceptor("https://user-service.edgescheduler.co.kr/members")
@@ -303,7 +305,7 @@ export default function CreateMeeting() {
         );
         setTeamStates(teamSet);
       });
-  }, []);
+  }, []); // 멤버 리스트 불러오기
 
   return (
     <MainLayout>
@@ -335,7 +337,12 @@ export default function CreateMeeting() {
                     filterUserList(userLists, searchTerm).map((member) => (
                       <SearchListOption
                         key={member.id}
-                        onClick={() => userButtonClickHandle({user:member, isRequired:false})}
+                        onClick={() =>
+                          userButtonClickHandle({
+                            user: member,
+                            isRequired: false,
+                          })
+                        }
                       >
                         <ProfileImage
                           src="/images/profile.webp"
@@ -395,7 +402,10 @@ export default function CreateMeeting() {
                                   <UserButton
                                     $isClicked={clickedUsers[member.id]}
                                     onClick={() =>
-                                      userButtonClickHandle({user:member, isRequired:false})
+                                      userButtonClickHandle({
+                                        user: member,
+                                        isRequired: false,
+                                      })
                                     }
                                     className={noto.className}
                                   >
@@ -495,7 +505,7 @@ export default function CreateMeeting() {
                   options={intervalTime}
                   show={false}
                   width={6.5}
-                  onSelectChange={startTimeChangeHandle}
+                  onSelectChange={endTimeChangeHandle}
                   standardIdx={0}
                   disabledIndex={-1}
                 ></SelectTime>
