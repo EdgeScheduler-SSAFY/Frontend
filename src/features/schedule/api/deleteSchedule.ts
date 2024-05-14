@@ -15,10 +15,13 @@ export function deleteSchedule({
     deleteEndDatetime: deleteEndDatetime,
   };
   // 아이디
-  return fetchWithInterceptor("/schedule-service/schedules/" + scheduleId, {
-    method: "DELETE",
-    body: JSON.stringify(data),
-  })
+  return fetchWithInterceptor(
+    "https://gateway.edgescheduler.co.kr/schedule-service/schedules/" + scheduleId,
+    {
+      method: "DELETE",
+      body: JSON.stringify(data),
+    }
+  )
     .then((response) => {
       return response.headers;
     })

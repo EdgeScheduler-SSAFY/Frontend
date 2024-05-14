@@ -27,7 +27,7 @@ export function createSchedule({
     recurrence: recurrence,
     attedeeList: attedeeList,
   };
-  return fetchWithInterceptor("/schedule-service/schedules", {
+  return fetchWithInterceptor("https://gateway.edgescheduler.co.kr/schedule-service/schedules", {
     method: "POST",
     body: JSON.stringify(data),
   })
