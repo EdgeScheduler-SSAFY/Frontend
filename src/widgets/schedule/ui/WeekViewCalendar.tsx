@@ -85,6 +85,7 @@ export function WeekViewCalendar({
         while (currentDate <= endDate && currentDate < endOfWeek(selectedDate)) {
           allDaySchedules[differenceInCalendarDays(currentDate, startDate)].push(
             <SeparateSchedule
+              triggerReload={triggerReload}
               color={
                 schedule.color === 0
                   ? "blue"

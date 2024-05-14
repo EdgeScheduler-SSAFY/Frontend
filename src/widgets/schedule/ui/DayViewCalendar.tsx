@@ -6,44 +6,88 @@ import { schedule } from "@/widgets/schedule/model/type";
 
 interface IDayViewCalendarProps {
   selectedDate: Date;
-  schedules: schedule[];
+  scheduleList: schedule[];
+  triggerReload: () => void;
 }
 
-export function DayViewCalendar({ selectedDate, schedules }: IDayViewCalendarProps) {
+export function DayViewCalendar({
+  selectedDate,
+  scheduleList,
+  triggerReload,
+}: IDayViewCalendarProps) {
   const [more, setMore] = useState<boolean>(false);
-  schedules.sort(
+
+  scheduleList.sort(
     (a: any, b: any) =>
-      differenceInCalendarDays(b.endDateTime, b.startDateTime) -
-      differenceInCalendarDays(a.endDateTime, a.startDateTime)
+      differenceInCalendarDays(b.endDatetime, b.startDatetime) -
+      differenceInCalendarDays(a.endDatetime, a.startDatetime)
   );
   const allDaySchedules: ReactNode[] = [];
   const partialSchedules: schedule[] = [];
 
-  if (selectedDate.getMonth() === 4) {
-    // 일정별 날짜별 일정 렌더링
-    schedules.map((schedule: any) => {
-      const start = format(schedule.startDateTime, "yyyy-MM-dd"); // 시작일
-      const end = format(schedule.endDateTime, "yyyy-MM-dd"); // 종료일
-      // 시작일과 종료일이 다른 경우
-      if (start !== end) {
-        // 시작일부터 종료일까지 반복
-        allDaySchedules.push(
-          <AllDaySchedule width={100} key={`${schedule.id}`} title={schedule.name}></AllDaySchedule>
-        );
-      } else {
-        // 시작일과 종료일이 같은 경우
-        // 종일일정인지 확인
-        const isAllDay =
-          schedule.startDateTime.getHours() === 0 && schedule.endDateTime.getHours() === 23;
-        isAllDay
-          ? allDaySchedules.push(
-              <AllDaySchedule width={100} key={schedule.id} title={schedule.name} />
-            )
-          : partialSchedules.push(schedule as schedule);
-      }
-      return null;
-    });
-  }
+  // 일정별 날짜별 일정 렌더링
+  scheduleList.map((schedule: any) => {
+    if (schedule.type === "WORKING") return null;
+    const start = format(schedule.startDatetime, "yyyy-MM-dd"); // 시작일
+    const end = format(schedule.endDatetime, "yyyy-MM-dd"); // 종료일
+    // 시작일과 종료일이 다른 경우
+    if (start !== end) {
+      // 시작일부터 종료일까지 반복
+      allDaySchedules.push(
+        <AllDaySchedule
+          triggerReload={triggerReload}
+          color={
+            schedule.color === 0
+              ? "blue"
+              : schedule.color === 1
+              ? "green"
+              : schedule.color === 2
+              ? "orange"
+              : schedule.color === 3
+              ? "yellow"
+              : "black50" || "blue"
+          }
+          endDatetime={format(schedule.startDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
+          startDatetime={format(schedule.endDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
+          scheduleId={schedule.scheduleId}
+          width={100}
+          key={`${schedule.id}`}
+          title={schedule.name}
+        ></AllDaySchedule>
+      );
+    } else {
+      // 시작일과 종료일이 같은 경우
+      // 종일일정인지 확인
+      const isAllDay =
+        schedule.startDatetime.getHours() === 0 && schedule.endDatetime.getHours() === 23;
+      isAllDay
+        ? allDaySchedules.push(
+            <AllDaySchedule
+              triggerReload={triggerReload}
+              color={
+                schedule.color === 0
+                  ? "blue"
+                  : schedule.color === 1
+                  ? "green"
+                  : schedule.color === 2
+                  ? "orange"
+                  : schedule.color === 3
+                  ? "yellow"
+                  : "black50" || "blue"
+              }
+              endDatetime={format(schedule.endDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
+              startDatetime={format(schedule.startDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
+              scheduleId={schedule.scheduleId}
+              width={100}
+              key={schedule.id}
+              title={schedule.name}
+            />
+          )
+        : partialSchedules.push(schedule as schedule);
+    }
+    return null;
+  });
+
   const [showCreate, setShowCreate] = useState<boolean>(false); //일정 생성 모달 보여주기 여부
   const [createDate, setCreateDate] = useState<Date>(); // 일정 생성 날짜
   const getTimeFromPosition = (y: number, height: number) => {
@@ -89,7 +133,6 @@ export function DayViewCalendar({ selectedDate, schedules }: IDayViewCalendarPro
               const rect = event.currentTarget.getBoundingClientRect();
               const y = event.clientY - rect.top;
               const { hours, minutes } = getTimeFromPosition(y, 984);
-              console.log(`Clicked Time: ${hours}:${minutes < 10 ? "0" + minutes : minutes}`);
               setCreateDate(
                 new Date(
                   selectedDate.getFullYear(),
@@ -103,14 +146,16 @@ export function DayViewCalendar({ selectedDate, schedules }: IDayViewCalendarPro
               setShowCreate((prev) => !prev);
             }}
           >
-            <DayForWeek schedules={partialSchedules}></DayForWeek>
+            <DayForWeek triggerReload={triggerReload} scheduleList={partialSchedules}></DayForWeek>
           </DayLayout>
         </CalanderLayout>
       </WeekLayout>
       {showCreate && (
         <CreateSchedule
+          type="PERSONAL"
           startDate={createDate || new Date()}
           close={() => setShowCreate(false)}
+          triggerReload={triggerReload}
         ></CreateSchedule>
       )}
     </MainLayout>
