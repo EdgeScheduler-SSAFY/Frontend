@@ -55,16 +55,15 @@ export function MonthViewCalendar({
     if (schedule.type === "WORKING") return null;
     const start = format(schedule.startDatetime, "yyyy-MM-dd"); // 시작일
     const end = format(schedule.endDatetime, "yyyy-MM-dd"); // 종료일
-    const startDate = new Date(schedule.startDatetime); // 시작일
     const endDate = new Date(schedule.endDatetime); // 종료일
-    // if (startDate < cStartDate || startDate > cEndDate) {
-    //   return null;
-    // }
     let currentDate = schedule.startDatetime; // 현재 날짜
     // 시작일과 종료일이 다른 경우
     if (start !== end) {
       // 시작일부터 종료일까지 반복
       while (currentDate <= endDate) {
+        if (currentDate > cEndDate) {
+          return null;
+        }
         // 시작한날의 의 끝을 currentEnd로 설정
         let currentEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
         // currentEmd가 종료일보다 큰 경우 종료일로 설정
