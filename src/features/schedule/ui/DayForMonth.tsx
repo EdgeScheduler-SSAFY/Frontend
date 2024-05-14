@@ -50,11 +50,25 @@ export const renderSchedules = (day: dayT, more: boolean) => {
   // 일정 렌더링
   return day.schedules;
 };
+
 export function DayForMonth({ day, index, triggerReload }: IDayForMonthProps) {
   const [showCreate, setShowCreate] = useState<boolean>(false); //일정 생성 모달 보여주기 여부
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 }); // 모달 위치
+  const handleDayClick = (event: React.MouseEvent) => {
+    //클릭한곳의 위치를 바탕으로 모달 위치 정함
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const positionY = event.clientY;
+    const positionX = event.clientX;
+    const top = positionY > viewportHeight / 2 ? positionY - 400 : positionY;
+    const left = positionX > viewportWidth / 2 ? positionX - 450 : positionX;
+
+    setModalPosition({ x: left, y: top });
+    setShowCreate((prev) => !prev);
+  };
   // 날짜별 일정 렌더링
   return (
-    <DayDiv index={index} onClick={() => setShowCreate((prev) => !prev)}>
+    <DayDiv index={index} onClick={handleDayClick}>
       <Day>{day.date.getDate()}</Day>
       {renderSchedules(day, true)}
       <div onClick={(e) => e.stopPropagation()}>
@@ -65,6 +79,8 @@ export function DayForMonth({ day, index, triggerReload }: IDayForMonthProps) {
             type="PERSONAL"
             startDate={day.date}
             close={() => setShowCreate(false)}
+            left={modalPosition.x}
+            top={modalPosition.y}
           ></CreateSchedule>
         )}
       </div>

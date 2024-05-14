@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en' className={noto.className}>
+    <html lang="en" className={noto.className}>
       <body>
         <ThemeProvider theme={theme}>
           <GlobalStyle theme={theme} />
@@ -35,7 +35,8 @@ export default function RootLayout({
               {children}
               <Footer />
             </Main>
-            <div id='globalModal'></div>
+            <div id="globalModal"></div>
+            <div id="clickModal"></div>
           </StyledComponentsRegistry>
         </ThemeProvider>
       </body>

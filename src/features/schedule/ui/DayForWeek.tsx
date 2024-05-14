@@ -14,6 +14,19 @@ interface IDayForWeekProps {
 
 export function DayForWeek({ scheduleList, triggerReload }: IDayForWeekProps) {
   const [showDetails, setShowDetails] = useState<boolean>(false);
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 }); // 모달 위치
+  const handleDayClick = (event: React.MouseEvent) => {
+    //클릭한곳의 위치를 바탕으로 모달 위치 정함
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const positionY = event.clientY;
+    const positionX = event.clientX;
+    const top = positionY > viewportHeight / 2 ? positionY - 200 : positionY;
+    const left = positionX > viewportWidth / 2 ? positionX - 450 : positionX;
+
+    setModalPosition({ x: left, y: top });
+    setShowDetails((prev) => !prev);
+  };
   const [scheduleId, setScheduleId] = useState<number>(0);
   const [startDatetime, setStartDatetime] = useState<string>("");
   const [endDatetime, setEndDatetime] = useState<string>("");
@@ -92,7 +105,7 @@ export function DayForWeek({ scheduleList, triggerReload }: IDayForWeekProps) {
               setStartDatetime(format(schedule.startDatetime, "yyyy-MM-dd'T'HH:mm:ss"));
               setEndDatetime(format(schedule.endDatetime, "yyyy-MM-dd'T'HH:mm:ss"));
               setScheduleId(schedule.scheduleId);
-              setShowDetails((prev) => !prev);
+              handleDayClick(e);
               e.stopPropagation();
             }}
           >
@@ -103,6 +116,8 @@ export function DayForWeek({ scheduleList, triggerReload }: IDayForWeekProps) {
       {/* 일정상세 */}
       {showDetails && (
         <DetailSchedule
+          left={modalPosition.x}
+          top={modalPosition.y}
           triggerReload={triggerReload}
           endDatetime={endDatetime}
           startDatetime={startDatetime}

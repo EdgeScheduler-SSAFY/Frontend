@@ -23,6 +23,19 @@ export function WeekViewCalendar({
   triggerReload,
 }: IWeekViewCalendarProps) {
   const [showCreate, setShowCreate] = useState<boolean>(false); //일정 생성 모달 보여주기 여부
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 }); // 모달 위치
+  const handleDayClick = (event: React.MouseEvent) => {
+    //클릭한곳의 위치를 바탕으로 모달 위치 정함
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const positionY = event.clientY;
+    const positionX = event.clientX;
+    const top = positionY > viewportHeight / 2 ? positionY - 400 : positionY;
+    const left = positionX > viewportWidth / 2 ? positionX - 450 : positionX;
+
+    setModalPosition({ x: left, y: top });
+    setShowCreate((prev) => !prev);
+  };
   // 주간 캘린더 컴포넌트
   const startDate = startOfWeek(selectedDate); // 선택된 주의 첫날
   const [createDate, setCreateDate] = useState<Date>(); // 일정 생성 날짜
@@ -203,7 +216,7 @@ export function WeekViewCalendar({
                     0
                   )
                 );
-                setShowCreate((prev) => !prev);
+                handleDayClick(event);
               }}
             >
               <DayForWeek triggerReload={triggerReload} scheduleList={scheduleList}></DayForWeek>
@@ -212,6 +225,8 @@ export function WeekViewCalendar({
         </WeekLayout>
         {showCreate && (
           <CreateSchedule
+            left={modalPosition.x}
+            top={modalPosition.y}
             triggerReload={triggerReload}
             isWORKING={isWORKING}
             type={isWORKING ? "WORKING" : "PERSONAL"}
