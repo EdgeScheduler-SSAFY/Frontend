@@ -32,7 +32,7 @@ export default function Schedule() {
       startDatetime = new Date(selectedDate);
       endDatetime = new Date(selectedDate);
       startDatetime.setHours(0, 0, 0);
-      endDatetime.setHours(23, 59, 59);
+      endDatetime.setHours(23, 59, 59); // 끝시간
     }
     //api 호출
     const fetchData = async () => {

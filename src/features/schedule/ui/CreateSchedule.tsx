@@ -197,11 +197,11 @@ export function CreateSchedule({
   const [showRecurrenceMiniCalendar, setShowRecurrenceMiniCalendar] = useState<boolean>(false);
   const [selectedStartDate, setSelectedStartDate] = useState(startDate);
   const [selectedEndDate, setSelectedEndDate] = useState(
-    new Date(data?.endDatetime ?? new Date(startDate).setHours(23, 59, 59, 999))
+    new Date(data?.endDatetime ?? new Date(startDate).setHours(23, 59, 59, 999)) //시작시간의 마지막 시간으로 설정
   );
   const [sameDate, setSameDate] = useState<boolean>(true);
   const [disabledIndex, setDisabledIndex] = useState<number>(
-    Math.round((startDate.getHours() * 60 + startDate.getMinutes()) / 15)
+    Math.ceil((startDate.getHours() * 60 + startDate.getMinutes()) / 15)
   );
 
   console.log(disabledIndex);

@@ -57,10 +57,7 @@ export function DetailSchedule({
   const [showUpadate, setShowUpdate] = useState(false); // 수정창 보여주기 상태
   // 수정창 보여주기
   const handleUpdate = () => {
-    data?.type === "MEETING" &&
-    JSON.parse(sessionStorage.getItem("user") || "").id === data.organizerId
-      ? setShowUpdate((prev) => !prev)
-      : setShowUpdate((prev) => !prev);
+    setShowUpdate((prev) => !prev);
   };
   // 외부영역 클릭 확인을위한 ref
   const ref2 = useRef<HTMLDivElement>(null);
