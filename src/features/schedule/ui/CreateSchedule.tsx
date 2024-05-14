@@ -17,7 +17,7 @@ import {
 } from "@/features/schedule/index";
 import { MiniCalendar } from "@/shared";
 import { intervalTime } from "@/shared/lib/data";
-import Select from "@/shared/ui/select";
+import SelectTime from "@/shared/ui/selectTime";
 
 type colorT = "blue" | "green" | "orange" | "yellow" | "black50";
 
@@ -308,7 +308,7 @@ export function CreateSchedule({
           </StartCalendarDiv>
         )}
         {!isAllDay && (
-          <Select
+          <SelectTime
             options={intervalTime}
             show={false}
             width={6.5}
@@ -320,8 +320,8 @@ export function CreateSchedule({
                   )
                 : disabledIndex
             }
-            disabledLastIndex={sameDate ? true : false}
-          ></Select>
+            disabledLastIndex={intervalTime.length}
+          ></SelectTime>
         )}
         <LineDiv>-</LineDiv>
         <DateButton onClick={() => setShowEndMiniCalendar((prev) => !prev)}>
@@ -340,7 +340,7 @@ export function CreateSchedule({
           </EndCalendarDiv>
         )}
         {!isAllDay && (
-          <Select
+          <SelectTime
             options={intervalTime}
             show={false}
             width={6.5}
@@ -353,7 +353,7 @@ export function CreateSchedule({
                 : disabledIndex + 4
             }
             disabledIndex={sameDate ? disabledIndex : -1}
-          ></Select>
+          ></SelectTime>
         )}
       </PeriodDiv>
       {/* 수정일때만 표시하는 oneoff */}
