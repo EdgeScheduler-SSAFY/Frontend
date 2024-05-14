@@ -3,7 +3,7 @@ import { getScheduleByDateRequest } from "@/features/schedule/index";
 // 특정 날짜의 일정 목록 조회 api
 export function getSchedulesByDate({ startDatetime, endDatetime }: getScheduleByDateRequest) {
   return fetchWithInterceptor(
-    "/schedule-service/schedules/period?startDatetime=" +
+    "https://gateway.edgescheduler.co.kr/schedule-service/schedules/period?startDatetime=" +
       startDatetime +
       "&endDatetime=" +
       endDatetime,
