@@ -8,23 +8,31 @@ const StyledDiv = styled.div<timeDivProps>`
   width: 1rem;
   height: 2rem;
   background-color: ${({ $type }) => {
-  switch ($type) {
-    case "AVAILABLE" : return;
-    case "UNAVAILABLE" : return Color("orange200");
-    case "AVAILABLE_IN_WORKING_HOURS" : return Color("green100");
-    case "BLOCKED" : return Color("black100");
-  }
-}};
+    switch ($type) {
+      case "AVAILABLE":
+        return;
+      case "UNAVAILABLE":
+        return Color("orange200");
+      case "AVAILABLE_IN_WORKING_HOURS":
+        return Color("green100");
+      case "BLOCKED":
+        return Color("black100");
+    }
+  }};
   border-top: 2px solid ${Color("black200")};
   border-bottom: 2px solid ${Color("black200")};
   border-left: 2px solid ${Color("black200")};
   background-color: ${({ $timeindex, $startindex, $endindex, $type }) => {
     if ($timeindex <= $endindex && $timeindex >= $startindex) {
       switch ($type) {
-      case "AVAILABLE" : return ;
-    case "UNAVAILABLE" : return Color("orange300");
-    case "AVAILABLE_IN_WORKING_HOURS" : return Color("green300");
-    case "BLOCKED" : return Color("black100");
+        case "AVAILABLE":
+          return Color("blue200");
+        case "UNAVAILABLE":
+          return Color("orange300");
+        case "AVAILABLE_IN_WORKING_HOURS":
+          return Color("green300");
+        case "BLOCKED":
+          return Color("black100");
       }
     }
   }};
