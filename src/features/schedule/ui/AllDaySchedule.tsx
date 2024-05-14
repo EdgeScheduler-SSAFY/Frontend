@@ -2,16 +2,29 @@ import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { Color } from "@/shared/lib/styles/color";
 import { DetailSchedule } from "@/features/schedule/index";
-type color = "blue" | "green" | "orange" | "yellow";
+import { ColorName } from "@/shared/lib/type/types";
 
 // 종일 일정 컴포넌트의 props
 interface IAllDayScheduleProps {
   title: string;
   width: number; // 일정의 너비 비율 (날짜가 넘어가는 일정을 위해 추가)
+  scheduleId: number; // 일정 아이디
+  startDatetime: string; // 일정 시작 날짜
+  endDatetime: string; // 일정 종료 날짜
+  color: ColorName; // 일정 색상
+  triggerReload: () => void;
 }
 
 // 종일 일정 컴포넌트
-export function AllDaySchedule({ title, width }: IAllDayScheduleProps) {
+export function AllDaySchedule({
+  title,
+  width,
+  scheduleId,
+  startDatetime,
+  endDatetime,
+  color,
+  triggerReload,
+}: IAllDayScheduleProps) {
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const ref = useRef<HTMLDivElement>(null);
   // 외부영역 클릭시 더보기 일정 닫기
@@ -31,15 +44,24 @@ export function AllDaySchedule({ title, width }: IAllDayScheduleProps) {
 
   return (
     <MainLayout onClick={(e) => e.stopPropagation()}>
-      <Layout width={width} color="blue" onClick={() => setShowDetails((prev) => !prev)}>
+      <Layout width={width} color={color} onClick={() => setShowDetails((prev) => !prev)}>
         <TextDiv>{title}</TextDiv>
       </Layout>
-      {showDetails && <DetailSchedule close={() => setShowDetails(false)}></DetailSchedule>}
+      {/* 상세보기 */}
+      {showDetails && (
+        <DetailSchedule
+          scheduleId={scheduleId}
+          close={() => setShowDetails(false)}
+          startDatetime={startDatetime}
+          endDatetime={endDatetime}
+          triggerReload={triggerReload}
+        ></DetailSchedule>
+      )}
     </MainLayout>
   );
 }
 // 종일 일정 컴포넌트 스타일
-const Layout = styled.div<{ color: color; width: number }>`
+const Layout = styled.div<{ color: ColorName; width: number }>`
   width: ${(props) => props.width}%;
   background-color: ${(props) => Color(props.color)};
   border-radius: 5px;
