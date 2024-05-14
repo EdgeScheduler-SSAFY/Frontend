@@ -1,61 +1,41 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { format } from "date-fns";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { GoPencil } from "react-icons/go";
 import { Color } from "@/shared/lib/styles/color";
-import { Buttons } from "@testing-library/user-event/dist/cjs/system/pointer/buttons.js";
+import {
+  getScheduleDetailsResponse,
+  getScheduleDetails,
+  deleteSchedule,
+  CreateSchedule,
+} from "@/features/schedule/index";
+import Button from "@/shared/ui//button";
+
 interface IDetailScheduleProps {
   close: () => void;
+  scheduleId: number;
+  startDatetime: string;
+  endDatetime: string;
+  triggerReload: () => void;
 }
-export function DetailSchedule({ close }: IDetailScheduleProps) {
-  const data = {
-    scheduleId: 123456789, // 일정 Id
-    name: "Meeting", // 일정 이름
-    organizerId: 987654321, // 주최자id
-    description: "Discuss project updates", // 내용
-    color: 1, // 일정 색상
-    type: "MEETING", // 일정 타입(MEETING:회의,WORKING:근무시간,PERSONAL:개인일정)
-    startDatetime: "2022-01-01T09:00:00", // 시작 일시 (사용자 시간대)
-    endDatetime: "2022-01-02T10:00:00", // 종료 일시 (사용자 시간대)
-    isPublic: true, // 공개여부
-    attendeeList: [
-      {
-        memberId: 122,
-        isRequired: true,
-        status: "ACCEPTED", // 참여 여부(ACCEPTED:수락, DECLINED:거절, PENDING:대기중)
-        reason: "", // 거절 사유
-      },
-      {
-        memberId: 123,
-        isRequired: true,
-        status: "DECLINED", // 참여 여부(ACCEPTED:수락, DECLINED:거절, PENDING:대기중)
-        reason: "hospital", // 거절 사유
-      },
-      {
-        memberId: 124,
-        isRequired: true,
-        status: "PENDING", // 참여 여부(ACCEPTED:수락, DECLINED:거절, PENDING:대기중)
-        reason: "", // 거절 사유
-      },
-      {
-        memberId: 125,
-        isRequired: true,
-        status: "DECLINED", // 참여 여부(ACCEPTED:수락, DECLINED:거절, PENDING:대기중)
-        reason: "hospital", // 거절 사유
-        proposal: {
-          proposalId: 987654321, // 일정 제안 ID
-          startDatetime: "2022-01-01T09:00:00", // 시작 일시 (사용자 시간대)
-          endDatetime: "2022-01-01T10:00:00", // 종료 일시 (사용자 시간대)
-        },
-      },
-    ],
-    recurrenceDetails: {
-      freq: "DAILY",
-      intv: 1,
-      expiredDate: "2022-12-31",
-      count: 10,
-      recurrenceDay: ["MON", "WED", "FRI"],
-    },
-  };
+export function DetailSchedule({
+  close,
+  scheduleId,
+  startDatetime,
+  endDatetime,
+  triggerReload,
+}: IDetailScheduleProps) {
+  const [data, setData] = useState<getScheduleDetailsResponse | null>(null); //data api 가져온다.
+  //api 호출
+  useEffect(() => {
+    getScheduleDetails(scheduleId).then((response) => {
+      console.log(response);
+      const startDate = new Date(startDatetime);
+      const endDate = new Date(endDatetime);
+      setData({ ...response, startDatetime: startDate, endDatetime: endDate });
+    });
+  }, [scheduleId]);
   // 외부영역 클릭 확인을위한 ref
   const ref = useRef<HTMLDivElement>(null);
   // 외부영역 클릭시 더보기 일정 닫기
@@ -71,8 +51,14 @@ export function DetailSchedule({ close }: IDetailScheduleProps) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  const [showDetail, setShowDetail] = useState(false);
-  const [detailData, setDetailData] = useState<any>();
+  const [showDetail, setShowDetail] = useState(false); // 시간변경제안 상세보기
+  const [detailData, setDetailData] = useState<any>(); // 시간변경제안 상세보기 데이터
+  const [showDelete, setShowDelete] = useState(false); // 삭제 확인창 보여주기 상태
+  const [showUpadate, setShowUpdate] = useState(false); // 수정창 보여주기 상태
+  // 수정창 보여주기
+  const handleUpdate = () => {
+    setShowUpdate((prev) => !prev);
+  };
   // 외부영역 클릭 확인을위한 ref
   const ref2 = useRef<HTMLDivElement>(null);
   // 외부영역 클릭시 더보기 일정 닫기
@@ -88,70 +74,109 @@ export function DetailSchedule({ close }: IDetailScheduleProps) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+  // 삭제 api 호출
+  const handelDelete = async (deleteRange?: "ALL" | "ONE" | "AFTERALL") => {
+    await deleteSchedule({
+      scheduleId: scheduleId,
+      ...(deleteRange && {
+        deleteRange: deleteRange,
+        deleteStartDatetime: startDatetime,
+        deleteEndDatetime: endDatetime,
+      }),
+    });
+    close();
+  };
+  // 데이터가 없으면 null
+  if (!data) {
+    return null;
+  }
+
   return (
     <MainLayout onClick={(e) => e.stopPropagation()} ref={ref} data-testid="detail schedule">
       <NameLayout>
-        <div>{data.name}</div>
+        <TextDiv>
+          {/* 일정 이름 */}
+          <h3>{data.name}</h3>
+        </TextDiv>
         <div></div>
-        <IconLayout>
-          <div>수정</div>
-          <div>삭제</div>
-        </IconLayout>
+        {/* MEETING의 경우 주최자만 수정 삭제 가능하기때문에 보여주지 않는다. */}
+        {(data.type === "PERSONAL" ||
+          data.type === "WORKING" ||
+          (data.type === "MEETING" &&
+            JSON.parse(sessionStorage.getItem("user") || "").id === data.organizerId)) && (
+          <IconLayout>
+            <div>
+              <GoPencil size={20} onClick={() => handleUpdate()}></GoPencil>
+            </div>
+            <div></div>
+            <div onClick={() => setShowDelete((prev) => !prev)}>
+              <FaRegTrashAlt size={20}></FaRegTrashAlt>
+            </div>
+          </IconLayout>
+        )}
       </NameLayout>
+      {/* 일정 시간 */}
       <DataLayout>
         {data.startDatetime &&
         data.endDatetime &&
         format(data.startDatetime, "yyyy-MM-dd(EE)") !==
           format(data.endDatetime, "yyyy-MM-dd(EE)") ? (
           <div>
-            {format(data.startDatetime, "yyyy-MM-dd(EE) hh:mm a") +
+            {format(data.startDatetime, "yyyy-MM-dd(EE) HH:mm") +
               " ~ " +
-              format(data.endDatetime, "yyyy-MM-dd(EE) hh:mm a")}
+              format(data.endDatetime, "yyyy-MM-dd(EE) HH:mm")}
           </div>
         ) : (
           <div>
-            {format(data.startDatetime, "yyyy-MM-dd(EE) hh:mm a") +
+            {format(data.startDatetime, "yyyy-MM-dd(EE) HH:mm") +
               " ~ " +
-              format(data.endDatetime, "hh:mm a")}
+              format(data.endDatetime, "HH:mm")}
           </div>
         )}
       </DataLayout>
+      {/* 일정 설명 */}
       <DataLayout>{data.description && <div>{data.description}</div>}</DataLayout>
-      <DataLayout>attendee</DataLayout>
-      <AttendeesLayout>
-        {data.attendeeList.map((attendee: any) => (
-          <AttendeeLayout key={attendee.memberId}>
-            <ProfileLayout>
-              <ProfileImage src="" alt="" />
-              {attendee.status === "ACCEPTED" ? (
-                <CircleLayout color="green" />
-              ) : attendee.status === "DECLINED" ? (
-                <CircleLayout color="orange" />
-              ) : (
-                <CircleLayout color="black100" />
-              )}
-            </ProfileLayout>
-            <AteendeeNameLayout>
-              {attendee.memberId}
-              {attendee.proposal ? (
-                <SmTextDiv>{attendee.proposal.startDatetime}</SmTextDiv>
-              ) : attendee.reason ? (
-                <SmTextDiv>{attendee.reason}</SmTextDiv>
-              ) : null}
-            </AteendeeNameLayout>
-            {attendee.proposal && (
-              <button
-                onClick={() => {
-                  setShowDetail((prev) => !prev);
-                  setDetailData(attendee);
-                }}
-              >
-                detail
-              </button>
-            )}
-          </AttendeeLayout>
-        ))}
-      </AttendeesLayout>
+      {/* 회의인 경우에만 보여주는참석자 */}
+      {data.type === "MEETING" && <DataLayout>attendee</DataLayout>}
+      {data.type === "MEETING" && (
+        <AttendeesLayout>
+          {data.attendeeList.map((attendee: any) => (
+            <AttendeeLayout key={attendee.memberId}>
+              <ProfileLayout>
+                <ProfileImage src="" alt="" />
+                {attendee.status === "ACCEPTED" ? (
+                  <CircleLayout color="green" />
+                ) : attendee.status === "DECLINED" ? (
+                  <CircleLayout color="orange" />
+                ) : (
+                  <CircleLayout color="black100" />
+                )}
+              </ProfileLayout>
+              <AteendeeNameLayout>
+                {attendee.memberId}
+                {attendee.proposal ? (
+                  <SmTextDiv>{attendee.proposal.startDatetime}</SmTextDiv>
+                ) : attendee.reason ? (
+                  <SmTextDiv>{attendee.reason}</SmTextDiv>
+                ) : null}
+              </AteendeeNameLayout>
+              {/* 제안이 있는 참가자만 보여줌 */}
+              {attendee.proposal &&
+                JSON.parse(sessionStorage.getItem("user") || "").id === data.organizerId && (
+                  <button
+                    onClick={() => {
+                      setShowDetail((prev) => !prev);
+                      setDetailData(attendee);
+                    }}
+                  >
+                    detail
+                  </button>
+                )}
+            </AttendeeLayout>
+          ))}
+        </AttendeesLayout>
+      )}
+      {/* 시간변경제안 상세보기 */}
       {showDetail && (
         <ProposalDetailLayout ref={ref2}>
           <NameLayout>
@@ -164,15 +189,15 @@ export function DetailSchedule({ close }: IDetailScheduleProps) {
             format(data.startDatetime, "yyyy-MM-dd(EE)") !==
               format(data.endDatetime, "yyyy-MM-dd(EE)") ? (
               <div>
-                {format(data.startDatetime, "yyyy-MM-dd(EE) hh:mm a") +
+                {format(data.startDatetime, "yyyy-MM-dd(EE) HH:mm a") +
                   " ~ " +
-                  format(data.endDatetime, "yyyy-MM-dd(EE) hh:mm a")}
+                  format(data.endDatetime, "yyyy-MM-dd(EE) HH:mm a")}
               </div>
             ) : (
               <div>
-                {format(data.startDatetime, "yyyy-MM-dd(EE) hh:mm a") +
+                {format(data.startDatetime, "yyyy-MM-dd(EE) HH:mm a") +
                   " ~ " +
-                  format(data.endDatetime, "hh:mm a")}
+                  format(data.endDatetime, "HH:mm a")}
               </div>
             )}
           </DataLayout>
@@ -203,6 +228,106 @@ export function DetailSchedule({ close }: IDetailScheduleProps) {
           </ButtonLayout>
         </ProposalDetailLayout>
       )}
+      {/* 삭제확인체크 반복의 경우 삭제방식 선택 */}
+      {showDelete ? (
+        data.recurrenceDetails ? (
+          <div>
+            delete ?
+            <Button
+              width={3}
+              height={2}
+              fontSize={0.6}
+              $bgColor="orange"
+              $hoverColor="orange400"
+              onClick={async () => {
+                await handelDelete("ONE");
+                triggerReload();
+                close();
+              }}
+            >
+              one
+            </Button>
+            <Button
+              width={3}
+              height={2}
+              fontSize={0.6}
+              $bgColor="orange"
+              $hoverColor="orange400"
+              onClick={async () => {
+                await handelDelete("ALL");
+                triggerReload();
+                close();
+              }}
+            >
+              all
+            </Button>
+            <Button
+              width={3}
+              height={2}
+              fontSize={0.6}
+              $bgColor="orange"
+              $hoverColor="orange400"
+              onClick={async () => {
+                await handelDelete("AFTERALL");
+                triggerReload();
+                close();
+              }}
+            >
+              after all
+            </Button>
+            <Button
+              width={3}
+              height={2}
+              fontSize={0.6}
+              $bgColor="orange"
+              $hoverColor="orange400"
+              onClick={() => setShowDelete(false)}
+            >
+              cancle
+            </Button>
+          </div>
+        ) : (
+          <div>
+            sure?{" "}
+            <Button
+              width={3}
+              height={2}
+              fontSize={0.6}
+              $bgColor="orange"
+              $hoverColor="orange400"
+              onClick={async () => {
+                await handelDelete("ONE");
+                triggerReload();
+                close();
+              }}
+            >
+              yes
+            </Button>
+            <Button
+              width={3}
+              height={2}
+              fontSize={0.6}
+              $bgColor="orange"
+              $hoverColor="orange400"
+              onClick={() => setShowDelete(false)}
+            >
+              no
+            </Button>
+          </div>
+        )
+      ) : null}
+      {/* 수정창 */}
+      {showUpadate && (
+        <CreateSchedule
+          triggerReload={triggerReload}
+          isWORKING={data.type === "WORKING" ? true : false}
+          startDate={new Date(data.startDatetime)}
+          close={() => setShowUpdate(false)}
+          type={data.type}
+          isUpdate={true}
+          data={data}
+        ></CreateSchedule>
+      )}
     </MainLayout>
   );
 }
@@ -218,14 +343,19 @@ const MainLayout = styled.div`
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   padding: 20px;
 `;
+const TextDiv = styled.div`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
 const NameLayout = styled.div`
   display: grid;
-  grid-template-columns: 1fr 8fr 1fr;
+  grid-template-columns: 250px 1fr max-content;
   border-bottom: 2px solid black;
 `;
 const IconLayout = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
 `;
 const DataLayout = styled.div`
   padding: 10px 0 0 5px;

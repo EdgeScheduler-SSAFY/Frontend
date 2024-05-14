@@ -5,6 +5,7 @@ import { type dayT, CreateSchedule, MoreSchedule } from "@/features/schedule/ind
 interface IDayForMonthProps {
   day: dayT;
   index: number;
+  triggerReload: () => void;
 }
 export const renderSchedules = (day: dayT, more: boolean) => {
   // 일정이 없을 경우
@@ -49,7 +50,7 @@ export const renderSchedules = (day: dayT, more: boolean) => {
   // 일정 렌더링
   return day.schedules;
 };
-export function DayForMonth({ day, index }: IDayForMonthProps) {
+export function DayForMonth({ day, index, triggerReload }: IDayForMonthProps) {
   const [showCreate, setShowCreate] = useState<boolean>(false); //일정 생성 모달 보여주기 여부
   // 날짜별 일정 렌더링
   return (
@@ -57,8 +58,14 @@ export function DayForMonth({ day, index }: IDayForMonthProps) {
       <Day>{day.date.getDate()}</Day>
       {renderSchedules(day, true)}
       <div onClick={(e) => e.stopPropagation()}>
+        {/* 일정생성 */}
         {showCreate && (
-          <CreateSchedule startDate={day.date} close={() => setShowCreate(false)}></CreateSchedule>
+          <CreateSchedule
+            triggerReload={triggerReload}
+            type="PERSONAL"
+            startDate={day.date}
+            close={() => setShowCreate(false)}
+          ></CreateSchedule>
         )}
       </div>
     </DayDiv>
@@ -81,5 +88,5 @@ const Day = styled.div`
 const ChildrenLayout = styled.div<{ more: boolean }>`
   ${(props) => (props.more ? "grid-template-rows: 1fr 1fr 1fr" : "grid-auto-rows: 1fr")};
   display: grid;
-  width: 80%;
+  width: 100%;
 `;
