@@ -49,7 +49,7 @@ export default function CreateMeeting() {
   const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are 0-based in JavaScript
   const date = String(now.getDate()).padStart(2, "0");
   const todayString = `${year}-${month}-${date}T00:00:00`;
-  const userItem = sessionStorage.getItem("user");
+  const userItem = sessionStorage?.getItem("user");
   let me: User | null = null;
   if (userItem === null) {
     router.push("/");
