@@ -1,5 +1,3 @@
-import exp from "constants";
-
 export interface MeetingData {
   name: string;
   description: string;
@@ -11,7 +9,7 @@ export interface MeetingData {
   period: { start: string; end: string };
   isPublic: boolean;
   isRecurrence: boolean;
-  memberList: { user: userList; isRequired: boolean }[];
+  memberList: member[];
 }
 
 export interface selectList {
@@ -32,9 +30,24 @@ export interface developmentType {
   folded: boolean;
 }
 
+export interface SchedulesAndAvailabilitiesProps {
+  availability: string[];
+  isRequired: boolean;
+  memberId: number;
+  schedules: MeetingData[];
+  tzOffset: string;
+}
+export interface RecommendeTime {
+  startIndex: number;
+  endIndex: number;
+}
+
 export interface ScheduleComponentProps {
   setParentStartIndex: (timeIndex: number) => void;
   setParentEndIndex: (timeIndex: number) => void;
+  dayCount: number;
+  recommendedTimes: RecommendeTime[];
+  schedulesAndAvailabilities: SchedulesAndAvailabilitiesProps[];
 }
 
 export interface vipDivProps {
@@ -48,17 +61,17 @@ export interface timeStampProps {
 }
 
 export interface timeDivProps {
-  selected: number;
-  personindex: number;
-  timeindex: number;
-  startindex: number;
-  endindex: number;
+  $type: string;
+  $personindex: number;
+  $timeindex: number;
+  $startindex: number;
+  $endindex: number;
 } // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 border 색깔 바꾸기 위함
 
 export interface RecommendTimeDivProps {
-  timeindex: number;
-  startindex: number;
-  endindex: number;
+  $dayCount: number;
+  $timeindex: number;
+  $recommendedTimes: { startIndex: number; endIndex: number }[];
 } // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 border 색깔 바꾸기 위함
 
 export interface NoticeState {
