@@ -31,6 +31,11 @@ export interface developmentType {
   folded: boolean;
 }
 
+export interface member {
+  user: userList;
+  isRequired: boolean;
+}
+
 export interface SchedulesAndAvailabilitiesProps {
   availability: string[];
   isRequired: boolean;
