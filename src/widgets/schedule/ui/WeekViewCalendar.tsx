@@ -5,15 +5,23 @@ import { DayForWeek, WeekAllday } from "@/features/schedule/index";
 import { AllDaySchedule } from "@/features/schedule/index";
 import { SeparateSchedule, CreateSchedule } from "@/features/schedule/index";
 import { schedule } from "@/widgets/schedule/model/type";
+import { is } from "date-fns/locale";
 // 주간 캘린더의 props
 interface IWeekViewCalendarProps {
   selectedDate: Date;
-  scheduleList: any;
+  scheduleList: schedule[];
+  isWORKING?: boolean;
+  triggerReload: () => void;
 }
 // 요일배열
 const WeekDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-export function WeekViewCalendar({ selectedDate, scheduleList }: IWeekViewCalendarProps) {
+export function WeekViewCalendar({
+  selectedDate,
+  scheduleList,
+  isWORKING,
+  triggerReload,
+}: IWeekViewCalendarProps) {
   const [showCreate, setShowCreate] = useState<boolean>(false); //일정 생성 모달 보여주기 여부
   // 주간 캘린더 컴포넌트
   const startDate = startOfWeek(selectedDate); // 선택된 주의 첫날
@@ -25,62 +33,116 @@ export function WeekViewCalendar({ selectedDate, scheduleList }: IWeekViewCalend
     .fill(null)
     .map(() => []);
   scheduleList.sort(
-    (a: any, b: any) =>
-      differenceInCalendarDays(b.endDateTime, b.startDateTime) -
-      differenceInCalendarDays(a.endDateTime, a.startDateTime)
+    (a: schedule, b: schedule) =>
+      differenceInCalendarDays(b.endDatetime, b.startDatetime) -
+      differenceInCalendarDays(a.endDatetime, a.startDatetime)
   );
-
-  // api 연결전 임시 조건 삭제 예정
-  if (selectedDate.getMonth() === 4) {
-    // 일정별 날짜별 일정 렌더링
-    scheduleList.map((schedule: any) => {
-      const start = format(schedule.startDateTime, "yyyy-MM-dd"); // 시작일
-      const end = format(schedule.endDateTime, "yyyy-MM-dd"); // 종료일
-      const endDate = schedule.endDateTime; // 종료일
-      let currentDate = schedule.startDateTime; // 현재 날짜
-      // 시작일과 종료일이 다른 경우
-      if (start !== end) {
-        // 시작일부터 종료일까지 반복
-        while (currentDate <= endDate && currentDate <= endOfWeek(selectedDate)) {
-          // 시작일의 포맷
-          const startFormat = format(currentDate, "yyyy-MM-dd");
-          // 차이
-          const dayDiff = differenceInCalendarDays(endDate, currentDate);
-          // 차이만큼 길이를 계산해서 추가
+  // 일정별 날짜별 일정 렌더링
+  scheduleList.map((schedule: schedule) => {
+    if (isWORKING && schedule.type !== "WORKING") return null;
+    if (!isWORKING && schedule.type === "WORKING") return null;
+    const start = format(schedule.startDatetime, "yyyy-MM-dd"); // 시작일
+    const end = format(schedule.endDatetime, "yyyy-MM-dd"); // 종료일
+    const endDate = schedule.endDatetime; // 종료일
+    let currentDate = schedule.startDatetime; // 현재 날짜
+    if (schedule.startDatetime < startDate || schedule.startDatetime > endOfWeek(selectedDate)) {
+      return null;
+    }
+    // 시작일과 종료일이 다른 경우
+    if (start !== end) {
+      // 시작일부터 종료일까지 반복
+      while (currentDate <= endDate && currentDate <= endOfWeek(selectedDate)) {
+        // 시작일의 포맷
+        const startFormat = format(currentDate, "yyyy-MM-dd");
+        // 차이
+        const dayDiff = differenceInCalendarDays(endDate, currentDate);
+        // 차이만큼 길이를 계산해서 추가
+        allDaySchedules[differenceInCalendarDays(currentDate, startDate)].push(
+          <AllDaySchedule
+            triggerReload={triggerReload}
+            color={
+              schedule.color === 0
+                ? "blue"
+                : schedule.color === 1
+                ? "green"
+                : schedule.color === 2
+                ? "orange"
+                : schedule.color === 3
+                ? "yellow"
+                : "black50" || "blue"
+            }
+            endDatetime={format(schedule.endDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
+            startDatetime={format(schedule.startDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
+            scheduleId={schedule.scheduleId}
+            width={100 * dayDiff + 90}
+            key={`${schedule.scheduleId}-${startFormat}`}
+            title={schedule.name}
+          />
+        );
+        //하루 증가
+        currentDate = addDays(currentDate, 1);
+        // 첫날이후로 빈공간을 체우기 위한 SeparateSchedule 추가
+        while (currentDate <= endDate && currentDate < endOfWeek(selectedDate)) {
           allDaySchedules[differenceInCalendarDays(currentDate, startDate)].push(
+            <SeparateSchedule
+              color={
+                schedule.color === 0
+                  ? "blue"
+                  : schedule.color === 1
+                  ? "green"
+                  : schedule.color === 2
+                  ? "orange"
+                  : schedule.color === 3
+                  ? "yellow"
+                  : "black50" || "blue"
+              }
+              endDatetime={format(schedule.endDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
+              startDatetime={format(schedule.startDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
+              scheduleId={schedule.scheduleId}
+              view="hide"
+              title={schedule.name}
+              width={100}
+            ></SeparateSchedule>
+          );
+          currentDate = addDays(currentDate, 1);
+        }
+        return null;
+      }
+    } else {
+      // 시작일과 종료일이 같은 경우
+      // 종일일정인지 확인
+      const isAllDay =
+        schedule.startDatetime.getHours() === 0 && schedule.endDatetime.getHours() === 23;
+      isAllDay
+        ? allDaySchedules[differenceInCalendarDays(currentDate, startDate)].push(
             <AllDaySchedule
-              width={dayDiff * 110}
-              key={`${schedule.id}-${startFormat}`}
+              triggerReload={triggerReload}
+              color={
+                schedule.color === 0
+                  ? "blue"
+                  : schedule.color === 1
+                  ? "green"
+                  : schedule.color === 2
+                  ? "orange"
+                  : schedule.color === 3
+                  ? "yellow"
+                  : "black50" || "blue"
+              }
+              endDatetime={format(schedule.endDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
+              startDatetime={format(schedule.startDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
+              scheduleId={schedule.scheduleId}
+              width={90}
+              key={schedule.scheduleId}
               title={schedule.name}
             />
+          )
+        : partialSchedules[differenceInCalendarDays(currentDate, startDate)].push(
+            schedule as schedule
           );
-          //하루 증가
-          currentDate = addDays(currentDate, 1);
-          // 첫날이후로 빈공간을 체우기 위한 SeparateSchedule 추가
-          while (currentDate <= endDate && currentDate < endOfWeek(selectedDate)) {
-            allDaySchedules[differenceInCalendarDays(currentDate, startDate)].push(
-              <SeparateSchedule view="hide" title={schedule.name} width={100}></SeparateSchedule>
-            );
-            currentDate = addDays(currentDate, 1);
-          }
-          return null;
-        }
-      } else {
-        // 시작일과 종료일이 같은 경우
-        // 종일일정인지 확인
-        const isAllDay =
-          schedule.startDateTime.getHours() === 0 && schedule.endDateTime.getHours() === 23;
-        isAllDay
-          ? allDaySchedules[differenceInCalendarDays(currentDate, startDate)].push(
-              <AllDaySchedule width={100} key={schedule.id} title={schedule.name} />
-            )
-          : partialSchedules[differenceInCalendarDays(currentDate, startDate)].push(
-              schedule as schedule
-            );
-      }
-      return null;
-    });
-  }
+    }
+    return null;
+  });
+
   const [more, setMore] = useState<boolean>(false);
   const getTimeFromPosition = (y: number, height: number) => {
     const totalMinutes = (y / height) * 1440; // 1440은 하루의 총 분 수
@@ -103,12 +165,15 @@ export function WeekViewCalendar({ selectedDate, scheduleList }: IWeekViewCalend
         ))}
       </WeekDaysLayout>
       {/* 종일 캘린더 */}
-      <WeekAllday
-        more={more}
-        changeMore={() => setMore((prev: boolean) => !prev)}
-        date={startDate}
-        schedules={allDaySchedules}
-      ></WeekAllday>
+      {
+        <WeekAllday
+          isWORKING={isWORKING}
+          more={more}
+          changeMore={() => setMore((prev: boolean) => !prev)}
+          date={startDate}
+          schedules={allDaySchedules}
+        ></WeekAllday>
+      }
       {/* 시간 캘린더 */}
       <CalanderLayout>
         <WeekLayout>
@@ -117,7 +182,7 @@ export function WeekViewCalendar({ selectedDate, scheduleList }: IWeekViewCalend
               <IndexLayout key={index}>{`${index}:00`}</IndexLayout>
             ))}
           </IndexsLayout>
-          {partialSchedules.map((schedules, index) => (
+          {partialSchedules.map((scheduleList, index) => (
             <DayLayout
               data-testid={"day" + index}
               key={index} // 각 DayLayout에 고유한 key 제공
@@ -140,12 +205,15 @@ export function WeekViewCalendar({ selectedDate, scheduleList }: IWeekViewCalend
                 setShowCreate((prev) => !prev);
               }}
             >
-              <DayForWeek schedules={schedules}></DayForWeek>
+              <DayForWeek triggerReload={triggerReload} scheduleList={scheduleList}></DayForWeek>
             </DayLayout>
           ))}
         </WeekLayout>
         {showCreate && (
           <CreateSchedule
+            triggerReload={triggerReload}
+            isWORKING={isWORKING}
+            type={isWORKING ? "WORKING" : "PERSONAL"}
             startDate={createDate || new Date()}
             close={() => setShowCreate(false)}
           ></CreateSchedule>
