@@ -25,7 +25,7 @@ function PageContent() {
       fetch("https://user-service.edgescheduler.co.kr/auth/me", {
         headers: {
           "content-type": "application/json",
-          Authrization: "Bearer" + accessToken,
+          Authorization: "Bearer " + accessToken,
         },
       })
         .then((response) => {
