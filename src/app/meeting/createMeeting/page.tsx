@@ -75,6 +75,7 @@ export default function CreateMeeting() {
           profile: me!.profile,
           zoneId: me!.zoneId,
           department: me!.department,
+          region: me!.region,
         },
         isRequired: true,
       },
