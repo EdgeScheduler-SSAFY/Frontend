@@ -11,7 +11,7 @@ export interface MeetingData {
   period: { start: string; end: string };
   isPublic: boolean;
   isRecurrence: boolean;
-  memberList: { memberId: number; isRequired: boolean }[];
+  memberList: { user: userList; isRequired: boolean }[];
 }
 
 export interface selectList {
