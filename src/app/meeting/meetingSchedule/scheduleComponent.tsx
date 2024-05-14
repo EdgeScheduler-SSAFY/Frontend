@@ -1,51 +1,55 @@
 "use client";
 import { styled } from "styled-components";
 import Image from "next/image";
-import { people, person } from "./dummyData";
 import React, { useEffect, useRef, useState } from "react";
 import { Color } from "@/shared/lib/styles/color";
-import { ScheduleComponentProps, vipDivProps } from "@/shared/lib/type";
+import {
+  ScheduleComponentProps,
+  userList,
+  isRequiredDiv,
+  SchedulesAndAvailabilitiesProps,
+} from "@/shared/lib/type";
 import TimeDiv from "@/features/meetingSchedule/ui/TimeDiv";
 import TimeStampDiv from "@/features/meetingSchedule/ui/TimeStampDiv";
 import RecommendTimeDiv from "@/features/meetingSchedule/ui/RecommendTimeDiv";
+import useMeetStore, { MeetState } from "@/store/meetStore";
 
-const vip: boolean[] = [true, true, true, true, false, false];
-const checkedTime: number[][] = [];
-const allDayTime: boolean[] = Array(112).fill(false);
-//checkedTime 이 0이면 그냥 시간, 1이면 불가능한 시간, 2이면 업무 시간
-const startTime: number[] = [0, 4, 6, 8, 8, 12];
-const RecommendTime: boolean[] = Array(112).fill(false);
-
-people.forEach((person: person, index: number) => {
-  let arr: number[] = []; // 사람별 되는 시간 더미데이터
-  for (let i = 0; i < 112; i++) {
-    if (Math.floor(i / 8) === 1) {
-      arr.push(2);
-    } else {
-      arr.push(0);
-    }
-    // 여기에 추천받은 시간이면 true가 뜨도록 할 것.
-  }
-  checkedTime.push(arr);
-}); // 더미 데이터 생성
-
-checkedTime[0][3] = 1;
-checkedTime[0][4] = 1;
-checkedTime[0][5] = 1;
-
-checkedTime[3][44] = 1;
-checkedTime[3][45] = 1;
-checkedTime[3][46] = 1;
-//더미 데이터 생성
-RecommendTime[44] = true;
-RecommendTime[45] = true;
-RecommendTime[46] = true;
+const startTime: number[] = [0];
 
 export default function ScheduleComponent({
   setParentStartIndex,
   setParentEndIndex,
+  dayCount,
+  recommendedTimes,
+  schedulesAndAvailabilities,
 }: ScheduleComponentProps) {
+  schedulesAndAvailabilities.forEach(
+    (schedulesAndAvailability, index: number) => {
+      if (index === 0) {
+        return;
+      }
+      const standardTimeArr = schedulesAndAvailabilities[0].tzOffset.split(":");
+      const timeArr = schedulesAndAvailability.tzOffset.split(":");
+      const timeDiff =
+        Number(standardTimeArr[0]) -
+        Number(timeArr[0]) +
+        (Number(standardTimeArr[1]) - Number(timeArr[1])) / 60;
+      startTime.push(timeDiff);
+    }
+  );
+
   let fixedIndex = -1;
+
+  const { startDatetime, endDatetime, runningtime, memberList } = useMeetStore(
+    (state: MeetState) => state
+  );
+  // useEffect(() => {
+  //   console.log("startDatetime", startDatetime);
+  //   console.log("endDatetime", endDatetime);
+  //   console.log("recommendedTimes", recommendedTimes);
+  //   console.log("schedulesAndAvailabilities", schedulesAndAvailabilities);
+  // }, p[]);
+
   const [startIndex, setStartIndex] = useState<number>(-2);
   const [endIndex, setEndIndex] = useState<number>(-2);
   // 첫지점과 끝지점을 통해 scope 설정에 이용할 예정
@@ -107,6 +111,54 @@ export default function ScheduleComponent({
     setEndIndex(timeIndex);
     setParentEndIndex(timeIndex + 1);
   };
+
+  const renderTimeStampDiv = (timeIndex: number, personindex: number) => {
+    if (Number.isInteger(startTime[personindex])) {
+      if (timeIndex % 4 === 0) {
+        return (
+          <TimeStampDiv
+            key={timeIndex}
+            personindex={personindex}
+            timeindex={timeIndex}
+          >
+            {(startTime[personindex] + Math.floor(timeIndex / 4) + 24) % 24}
+          </TimeStampDiv>
+        );
+      } else {
+        return (
+          <TimeStampDiv
+            key={timeIndex}
+            personindex={personindex}
+            timeindex={timeIndex}
+          ></TimeStampDiv>
+        );
+      }
+    } // startTime 이 정수일때
+    else {
+      if (timeIndex % 4 === 2) {
+        return (
+          <TimeStampDiv
+            key={timeIndex}
+            personindex={personindex}
+            timeindex={timeIndex}
+          >
+            {(Math.floor(startTime[personindex]) +
+              Math.ceil(timeIndex / 4) +
+              24) %
+              24}
+          </TimeStampDiv>
+        );
+      } else {
+        return (
+          <TimeStampDiv
+            key={timeIndex}
+            personindex={personindex}
+            timeindex={timeIndex}
+          ></TimeStampDiv>
+        );
+      }
+    }
+  };
   return (
     <MainLayout>
       <PeopleLayout>
@@ -123,93 +175,84 @@ export default function ScheduleComponent({
             </NecDiv>
           </PersonInfo>
         </PersonTitleLayout>
-        {people.map((person: person, index: number) => {
-          return (
-            <PersonLayout key={index} vipperson={vip[index]}>
-              <PersonImagePart>
-                <Image
-                  src={person.image}
-                  width="30"
-                  height="30"
-                  alt="image"
-                  style={{ borderRadius: "50%" }}
-                />
-              </PersonImagePart>
-              <PersonNamePart>
-                <div> {person.name}</div>
-                <PersonRelateTeamDiv> {person.relatedTeam}</PersonRelateTeamDiv>
-              </PersonNamePart>
-              <PersonTimePart>
-                <div>{person.nowTime}</div>
-                <div>{`${person.country}/${person.city}`}</div>
-              </PersonTimePart>
-            </PersonLayout>
-          );
-        })}
+        {memberList.map(
+          (member: { user: userList; isRequired: boolean }, index: number) => {
+            return (
+              <PersonLayout key={index} $isRequired={member.isRequired}>
+                <PersonImagePart>
+                  <Image
+                    src="/images/profile.webp"
+                    width="30"
+                    height="30"
+                    alt="image"
+                    style={{ borderRadius: "50%" }}
+                  />
+                </PersonImagePart>
+                <PersonNamePart>
+                  <div> {member.user.name}</div>
+                  <PersonRelateTeamDiv>
+                    {" "}
+                    {member.user.department}
+                  </PersonRelateTeamDiv>
+                </PersonNamePart>
+                <PersonTimePart>
+                  <div>{member.user.zoneId}</div>
+                </PersonTimePart>
+              </PersonLayout>
+            );
+          }
+        )}
       </PeopleLayout>
       <TimeTableLayout
-        data-testId="timeTableLayout"
+        data-testid="timeTableLayout"
         onMouseDown={(event) => handleMouseDown(event)}
         ref={timeDivGroupRef}
       >
         <RecommendTimeScheduleLayout>
-          {RecommendTime.map((v: boolean, timeIndex: number) => {
+          {Array.from({ length: 112 }).map((_, timeIndex) => {
             return (
               <RecommendTimeDiv
                 key={timeIndex}
-                timeindex={timeIndex}
-                startindex={startIndex}
-                endindex={endIndex}
+                $dayCount={dayCount}
+                $timeindex={timeIndex}
+                $recommendedTimes={recommendedTimes}
               />
             );
           })}
         </RecommendTimeScheduleLayout>
-        {checkedTime.map((checkTimes: number[], personindex: number) => {
-          return (
-            <PersonTime key={personindex}>
-              <TimeDivGroup>
-                {checkTimes.map((checkTime: number, timeIndex: number) => {
-                  return (
-                    <TimeDiv
-                      key={timeIndex}
-                      selected={checkedTime[personindex][timeIndex]}
-                      personindex={personindex}
-                      timeindex={timeIndex}
-                      startindex={startIndex}
-                      endindex={endIndex}
-                    />
-                  );
-                })}
-              </TimeDivGroup>
-              <TimeStampGroup>
-                {allDayTime.map((v: boolean, timeIndex: number) => {
-                  if (timeIndex % 4 === 0) {
-                    return (
-                      <TimeStampDiv
-                        key={timeIndex}
-                        personindex={personindex}
-                        timeindex={timeIndex}
-                      >
-                        {(startTime[personindex] +
-                          Math.floor(timeIndex / 4) +
-                          24) %
-                          24}
-                      </TimeStampDiv>
-                    );
-                  } else {
-                    return (
-                      <TimeStampDiv
-                        key={timeIndex}
-                        personindex={personindex}
-                        timeindex={timeIndex}
-                      ></TimeStampDiv>
-                    );
-                  }
-                })}
-              </TimeStampGroup>
-            </PersonTime>
-          );
-        })}
+        {schedulesAndAvailabilities.map(
+          (
+            personalScheduleInformation: SchedulesAndAvailabilitiesProps,
+            personindex: number
+          ) => {
+            return (
+              <PersonTime key={personindex}>
+                <TimeDivGroup>
+                  {personalScheduleInformation.availability
+                    .slice(dayCount * 96, dayCount * 96 + 112)
+                    .map((type: string, timeindex: number) => {
+                      return (
+                        <TimeDiv
+                          key={dayCount * 96 + timeindex}
+                          $type={type}
+                          $personindex={personindex}
+                          $timeindex={timeindex}
+                          $startindex={startIndex}
+                          $endindex={endIndex}
+                        />
+                      );
+                    })}
+                </TimeDivGroup>
+
+                <TimeStampGroup>
+                  {Array.from({ length: 112 }).map((_, timeIndex) => {
+                    return renderTimeStampDiv(timeIndex, personindex);
+                  })}
+                </TimeStampGroup>
+              </PersonTime>
+            );
+          }
+        )}
       </TimeTableLayout>
     </MainLayout>
   );
@@ -223,7 +266,7 @@ const MainLayout = styled.div`
 const PeopleLayout = styled.div`
   display: flex;
   flex-direction: column;
-  min-width: 12rem;
+  width: 16rem;
   text-align: center;
   border: 1px solid black;
   border-right: none;
@@ -257,15 +300,15 @@ const PersonTitleLayout = styled.div`
   position: relative;
 `;
 
-const PersonLayout = styled.div<vipDivProps>`
+const PersonLayout = styled.div<isRequiredDiv>`
   display: flex;
   align-items: center;
   justify-content: center;
   height: 3rem;
   padding: 0 0.5rem;
   margin-bottom: 10px;
-  background-color: ${({ vipperson }) =>
-    vipperson ? Color("yellow100") : Color("blue50")};
+  background-color: ${({ $isRequired }) =>
+    $isRequired ? Color("yellow100") : Color("blue50")};
 `;
 
 const RecommendTimeScheduleLayout = styled.div`

@@ -7,43 +7,51 @@ const StyledDiv = styled.div<timeDivProps>`
   box-sizing: border-box;
   width: 1rem;
   height: 2rem;
-  background-color: ${({ selected }) =>
-    selected === 2
-      ? Color("green50")
-      : selected === 1
-      ? Color("orange50")
-      : ""};
+  background-color: ${({ $type }) => {
+    switch ($type) {
+      case "AVAILABLE":
+        return;
+      case "UNAVAILABLE":
+        return Color("orange200");
+      case "AVAILABLE_IN_WORKING_HOURS":
+        return Color("green100");
+      case "BLOCKED":
+        return Color("black100");
+    }
+  }};
   border-top: 2px solid ${Color("black200")};
   border-bottom: 2px solid ${Color("black200")};
   border-left: 2px solid ${Color("black200")};
-  background-color: ${({ timeindex, startindex, endindex, selected }) => {
-    if (timeindex <= endindex && timeindex >= startindex) {
-      switch (selected) {
-        case 1:
+  background-color: ${({ $timeindex, $startindex, $endindex, $type }) => {
+    if ($timeindex <= $endindex && $timeindex >= $startindex) {
+      switch ($type) {
+        case "AVAILABLE":
+          return Color("blue200");
+        case "UNAVAILABLE":
           return Color("orange300");
-        case 2:
-          return Color("blue300");
-        default:
-          return Color("blue100");
+        case "AVAILABLE_IN_WORKING_HOURS":
+          return Color("green300");
+        case "BLOCKED":
+          return Color("black100");
       }
     }
   }};
 `;
 
 const TimeDiv: React.FC<timeDivProps> = ({
-  timeindex,
-  startindex,
-  endindex,
-  selected,
-  personindex,
+  $timeindex,
+  $type,
+  $personindex,
+  $startindex,
+  $endindex,
 }) => {
   return (
     <StyledDiv
-      personindex={personindex}
-      timeindex={timeindex}
-      startindex={startindex}
-      endindex={endindex}
-      selected={selected}
+      $personindex={$personindex}
+      $timeindex={$timeindex}
+      $startindex={$startindex}
+      $endindex={$endindex}
+      $type={$type}
     ></StyledDiv>
   );
 };

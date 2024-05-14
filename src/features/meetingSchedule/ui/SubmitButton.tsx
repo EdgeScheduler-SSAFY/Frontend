@@ -5,6 +5,7 @@ import styled from "styled-components";
 
 interface SubmitButtonProps {
   children: React.ReactNode;
+  onClick: () => void;
 }
 
 const StyledButton = styled.button<SubmitButtonProps>`

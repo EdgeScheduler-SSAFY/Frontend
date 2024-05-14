@@ -4,29 +4,27 @@ import { worldTime } from "@/shared/lib/data";
 import SelectLocalTime from "@/shared/ui/selectLocalTime";
 import Link from "next/link";
 import styled from "styled-components";
+import { fetchWithInterceptor } from "@/shared";
+import { selectList } from "@/shared/lib/type";
 
 export default function MyPageLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const worldTimeChangeHandle = (value: string | number) => {
-    // fetch(
-    //   "https://gateway.edgescheduler.co.kr/user-service/members/my/timezone",
-    //   {
-    //     method: "PUT",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: `Bearer ${localStorage.getItem("token")}`,
-    //     },
-    //     body: JSON.stringify({ value }),
-    //   }
-    // ).then((res) => {
-    //   if (res.status === 200) {
-    //     alert("Timezone changed successfully.");
-    //   } else {
-    //     alert("Failed to change timezone.");
-    //   }
-    // });
-    console.log(value);
+  const worldTimeChangeHandle = (option: selectList) => {
+    fetchWithInterceptor(
+      "https://user-service.edgescheduler.co.kr/members/my/timezone",
+      {
+        method: "PUT",
+        body: JSON.stringify({ region: option.option, zoneId: option.value }),
+      }
+    ).then((res) => {
+      if (res.status === 200) {
+        alert("Timezone changed successfully.");
+      } else {
+        alert("Failed to change timezone.");
+      }
+    });
+    console.log(option);
     // 여기서 바로 api 요청 보내서 처리할 예정.
   };
   return (

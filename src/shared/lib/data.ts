@@ -1,49 +1,49 @@
 import { userList, selectList } from "./type";
 
-export const userLists: userList[] = [
-  {
-    id: 1,
-    name: "hyunsooCho",
-    profile: "/images/profile.webp",
-    zoneId: "Asia/Seoul",
-    department: "Development Team 1",
-  },
-  {
-    id: 2,
-    name: "김중광",
-    profile: "/images/profile.webp",
-    zoneId: "Asia/Seoul",
-    department: "Development Team 1",
-  },
-  {
-    id: 3,
-    name: "전은평",
-    profile: "/images/profile.webp",
-    zoneId: "Asia/Seoul",
-    department: "Development Team 1",
-  },
-  {
-    id: 4,
-    name: "조용환",
-    profile: "/images/profile.webp",
-    zoneId: "Asia/Seoul",
-    department: "Development Team 2",
-  },
-  {
-    id: 5,
-    name: "오형택",
-    profile: "/images/profile.webp",
-    zoneId: "Asia/Seoul",
-    department: "Development Team 2",
-  },
-  {
-    id: 6,
-    name: "노세희",
-    profile: "/images/profile.webp",
-    zoneId: "Europe/London",
-    department: "Development Team 2",
-  },
-];
+// export const userLists: userList[] = [
+//   {
+//     id: 1,
+//     name: "hyunsooCho",
+//     profile: "/images/profile.webp",
+//     zoneId: "Asia/Seoul",
+//     department: "Development Team 1",
+//   },
+//   {
+//     id: 2,
+//     name: "김중광",
+//     profile: "/images/profile.webp",
+//     zoneId: "Asia/Seoul",
+//     department: "Development Team 1",
+//   },
+//   {
+//     id: 3,
+//     name: "전은평",
+//     profile: "/images/profile.webp",
+//     zoneId: "Asia/Seoul",
+//     department: "Development Team 1",
+//   },
+//   {
+//     id: 4,
+//     name: "조용환",
+//     profile: "/images/profile.webp",
+//     zoneId: "Asia/Seoul",
+//     department: "Development Team 2",
+//   },
+//   {
+//     id: 5,
+//     name: "오형택",
+//     profile: "/images/profile.webp",
+//     zoneId: "Asia/Seoul",
+//     department: "Development Team 2",
+//   },
+//   {
+//     id: 6,
+//     name: "노세희",
+//     profile: "/images/profile.webp",
+//     zoneId: "Europe/London",
+//     department: "Development Team 2",
+//   },
+// ];
 
 export const runningTime: selectList[] = [
   { value: 15, option: "15 minutes" },
