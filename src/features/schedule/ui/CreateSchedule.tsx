@@ -4,18 +4,41 @@ import { MdOutlineDescription } from "react-icons/md";
 import { FaAngleDown } from "react-icons/fa";
 import { IoIosArrowUp } from "react-icons/io";
 import { IoIosArrowDown } from "react-icons/io";
-import { format, addDays } from "date-fns";
+import { format, addHours } from "date-fns";
 
 import { Togle } from "@/shared/index";
 import { Color } from "@/shared/lib/styles/color";
+import Button from "@/shared/ui/button";
+import Input from "@/shared/ui/input";
+import {
+  createSchedule,
+  getScheduleDetailsResponse,
+  updateSchedule,
+} from "@/features/schedule/index";
+import { MiniCalendar } from "@/shared";
+import { intervalTime } from "@/shared/lib/data";
+import Select from "@/shared/ui/select";
 
-type colorT = "blue" | "green" | "orange" | "yellow";
+type colorT = "blue" | "green" | "orange" | "yellow" | "black50";
 
 interface ICreateScheduleProps {
   close: () => void;
   startDate: Date;
+  type: "MEETING" | "WORKING" | "PERSONAL";
+  isUpdate?: boolean; // 일정 수정 여부
+  data?: getScheduleDetailsResponse; // 일정 수정시 초기값
+  isWORKING?: boolean; //  WORKING 일정 여부
+  triggerReload: () => void;
 }
-export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
+export function CreateSchedule({
+  close,
+  startDate,
+  isUpdate,
+  data,
+  type,
+  isWORKING,
+  triggerReload,
+}: ICreateScheduleProps) {
   // 외부영역 클릭 확인을위한 ref
   const ref = useRef<HTMLDivElement>(null);
   const ref2 = useRef<HTMLDivElement>(null);
@@ -32,6 +55,7 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (ref2.current && !ref2.current.contains(event.target as Node)) {
@@ -44,31 +68,58 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  const organizerId = "1"; // 주최자 아이디 나중에 수정
-  const [name, setName] = useState<string>(""); // 일정 이름
-  const [isDescription, setIsDescription] = useState<boolean>(false);
-  const [description, setDescription] = useState<string>(""); // 일정 설명
-  const type = "PERSONAL";
-  const [selectedColor, setSelectedColor] = useState<colorT>("blue");
+
+  const [name, setName] = useState<string>(data?.name || ""); // 일정 이름
+  const [isDescription, setIsDescription] = useState<boolean>(!!data?.description);
+  const [description, setDescription] = useState<string>(data?.description || ""); // 일정 설명
+  // 일정 수정시 초기값이 있으면 색상 초기값 설정
+  const initiallColor =
+    data?.color !== undefined && data?.color === 0
+      ? "blue"
+      : data?.color === 1
+      ? "green"
+      : data?.color === 2
+      ? "orange"
+      : data?.color === 3
+      ? "yellow"
+      : "blue";
+  const [selectedColor, setSelectedColor] = useState<colorT>(initiallColor || "blue");
   const [startDatetime, setStartDatetime] = useState<string>(
-    format(startDate, "yyyy-MM-ddHH:mm:ss")
+    data?.startDatetime
+      ? format(data.startDatetime, "yyyy-MM-dd'T'HH:mm:ss")
+      : format(startDate, "yyyy-MM-dd'T'HH:mm:ss")
   ); // 시작 날짜
   const [endDatetime, setEndDatetime] = useState<string>(
-    format(addDays(startDate, 1), "yyyy-MM-ddHH:mm:ss")
+    data?.endDatetime
+      ? format(data.endDatetime, "yyyy-MM-dd'T'HH:mm:ss")
+      : format(addHours(startDate, 1), "yyyy-MM-dd'T'HH:mm:ss")
   ); // 종료 날짜
-  console.log(startDatetime, endDatetime);
-  const [isAllDay, setIsAllDay] = useState<boolean>(false); // 종일 여부
-  const [isPublic, setIsPublic] = useState<boolean>(false); // 공개 여부
-  const [isRecurrence, setIsRecurrence] = useState<boolean>(false); // 반복 여부
-  const [freq, setFreq] = useState<string>("WEEKLY"); // 반복 주기
-  const [intv, setIntv] = useState<number>(1); // 반복 간격
-  const [isExpiredDate, setIsExpiredDate] = useState<boolean>(false); // 종료 날짜 여부
-  const [expiredDate, setExpiredDate] = useState<string>("2050-12-31"); // 종료 날짜
-  const [isCount, setIsCount] = useState<boolean>(false); // 반복 횟수 여부
-  const [count, setCount] = useState<number>(10); // 반복 횟수
+  // 일정 수정시 종일 일정 여부 확인
+  const initialIsAllDay =
+    data?.startDatetime && data?.endDatetime
+      ? format(data.startDatetime, "HH:mm:ss") === "00:00:00" &&
+        format(data.endDatetime, "HH:mm:ss") === "23:59:59"
+      : false;
+  const [isAllDay, setIsAllDay] = useState<boolean>(initialIsAllDay); // 종일 여부
+  const [isPublic, setIsPublic] = useState<boolean>(data?.isPublic || false); // 공개 여부
+  const [isRecurrence, setIsRecurrence] = useState<boolean>(!!data?.recurrenceDetails); // 반복 여부
+  const [freq, setFreq] = useState<"DAILY" | "WEEKLY" | "MONTHLY">(
+    data?.recurrenceDetails?.freq || "WEEKLY"
+  ); // 반복 주기
+  const [intv, setIntv] = useState<number>(data?.recurrenceDetails?.intv || 1); // 반복 간격
+  const [isExpiredDate, setIsExpiredDate] = useState<boolean>(
+    !!data?.recurrenceDetails?.expiredDate || false
+  ); // 종료 날짜 여부
+  const [expiredDate, setExpiredDate] = useState<Date>(
+    !!data?.recurrenceDetails?.expiredDate
+      ? new Date(data?.recurrenceDetails?.expiredDate)
+      : startDate
+  ); // 종료 날짜
+  const [isCount, setIsCount] = useState<boolean>(!!data?.recurrenceDetails?.count || false); // 반복 횟수 여부
+  const [count, setCount] = useState<number>(data?.recurrenceDetails?.count || 1); // 반복 횟수
   const [showRecurrence, setShowRecurrence] = useState<boolean>(false); // 반복 설정 보여주기 여부
 
-  const handleRadioChange = (event: any) => {
+  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     switch (value) {
       case "never":
@@ -86,37 +137,250 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
       default:
     }
   };
-  const [recurrenceDay, setRecurrenceDay] = useState<string[]>([]);
+  const [recurrenceDay, setRecurrenceDay] = useState<
+    ("MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN")[]
+  >(data?.recurrenceDetails?.recurrenceDay || []); // 반복 요일
   const [expanded, setExpanded] = useState<boolean>(false);
-  const day = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-  const handleDayClick = (day: string) => {
+  const day: ("MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN")[] = [
+    "MON",
+    "TUE",
+    "WED",
+    "THU",
+    "FRI",
+    "SAT",
+    "SUN",
+  ];
+  // 반복 요일 클릭시 실행될 함수
+  const handleDayClick = (day: "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN") => {
     setRecurrenceDay((prev) => {
       if (prev.includes(day)) {
-        return prev.filter((d) => d !== day);
+        return prev.filter((d) => d !== day); // 요일 삭제
       } else {
         return [...prev, day];
       }
     });
   };
+  const user = sessionStorage.getItem("user") || "{}"; // 유저 정보
+  // 일정 생성 api 호출
+  const saveSchedule = async () => {
+    await createSchedule({
+      organizerId: parseInt(JSON.parse(user).id),
+      name: name,
+      description: description,
+      type: type,
+      color:
+        selectedColor === "blue"
+          ? 0
+          : selectedColor === "green"
+          ? 1
+          : selectedColor === "orange"
+          ? 2
+          : 3,
+      startDatetime: isAllDay ? startDatetime.split("T")[0] + "T00:00:00" : startDatetime, //all day 일정이면 00:00:00으로 설정
+      endDatetime: isAllDay ? endDatetime.split("T")[0] + "T23:45:00" : endDatetime, // all day 일정이면 23:45:00으로 설정
+      isPublic: isWORKING ? true : isPublic,
+      isRecurrence: isRecurrence,
+      recurrence: isRecurrence
+        ? {
+            freq: freq,
+            intv: intv,
+            ...(isExpiredDate ? { expiredDate: format(expiredDate, "yyyy-MM-dd'T'HH:mm:ss") } : {}),
+            ...(isCount ? { count: count } : {}),
+            recurrenceDay: recurrenceDay,
+          }
+        : undefined,
+    });
+  };
+  // 날짜 와 시간선택을 위한 상태값
+  const [showStartMiniCalendar, setShowStartMiniCalendar] = useState<boolean>(false);
+  const [showEndMiniCalendar, setShowEndMiniCalendar] = useState<boolean>(false);
+  const [showRecurrenceMiniCalendar, setShowRecurrenceMiniCalendar] = useState<boolean>(false);
+  const [selectedStartDate, setSelectedStartDate] = useState(startDate);
+  const [selectedEndDate, setSelectedEndDate] = useState(
+    new Date(data?.endDatetime ?? new Date(startDate).setHours(23, 59, 59, 999))
+  );
+  const [sameDate, setSameDate] = useState<boolean>(true);
+  const [disabledIndex, setDisabledIndex] = useState<number>(
+    Math.round((startDate.getHours() * 60 + startDate.getMinutes()) / 15)
+  );
 
+  console.log(disabledIndex);
+  // 시작날짜 값이 변경될 때 실행될 함수
+  const startDateHandle = (selectedDate: Date) => {
+    setSelectedStartDate(selectedDate);
+    // 끝 날짜가 더 빠를 때만 변경
+    if (selectedDate > selectedEndDate) {
+      setSelectedEndDate(selectedDate);
+    }
+    const startTime = startDatetime.split("T")[1]; // 기존 시작 시간
+    setStartDatetime(format(selectedDate, "yyyy-MM-dd") + "T" + startTime);
+  };
+
+  // 시작시간 값이 변경될 때 실행될 함수
+  const startTimeChangeHandle = (value: number | string) => {
+    const startDate = startDatetime.split("T")[0]; // 기존 시작 날짜
+    setStartDatetime(startDate + "T" + value);
+    setDisabledIndex(intervalTime.findIndex((option) => option.value === value));
+  };
+  // 끝날짜 값이 변경될 때 실행될 함수
+  const endDateHandle = (selectedDate: Date) => {
+    setSelectedEndDate(selectedDate);
+    const endTime = endDatetime.split("T")[1]; // 기존 시작 시간
+    setEndDatetime(format(selectedDate, "yyyy-MM-dd") + "T" + endTime);
+
+    // 두 날짜가 같은지 확인
+    setSameDate(selectedDate.getDate() === selectedStartDate.getDate());
+  };
+  // 끝시간 값이 변경될 때 실행될 함수
+  const endTimeChangeHandle = (value: number | string) => {
+    const endDate = endDatetime.split("T")[0]; // 기존 시작 날짜
+    setEndDatetime(endDate + "T" + value);
+  };
+
+  const [isOneOff, setIsOneOff] = useState<boolean>(true); // 반복 일정의 수정시 일회성 여부
+
+  //일정 수정 api 호출
+  const handleupdateSchedule = async () => {
+    if (data === undefined) return;
+    await updateSchedule({
+      scheduleId: data?.scheduleId || 0,
+      organizerId: parseInt(JSON.parse(user).id),
+      name: name,
+      description: description,
+      type: data.type,
+      color:
+        selectedColor === "blue"
+          ? 0
+          : selectedColor === "green"
+          ? 1
+          : selectedColor === "orange"
+          ? 2
+          : 3,
+      startDatetime: isAllDay ? startDatetime.split("T")[0] + "T00:00:00" : startDatetime,
+      endDatetime: isAllDay ? endDatetime.split("T")[0] + "T23:45:00" : endDatetime,
+      isPublic: isPublic,
+      isRecurrence: isRecurrence,
+      isOneOff: isOneOff,
+      nameIsChanged: data.name !== name,
+      descriptionIsChanged: data.description !== description,
+      timeIsChanged:
+        format(data.startDatetime, "yyyy-MM-dd'T'HH:mm:ss") !== startDatetime ||
+        format(data.endDatetime, "yyyy-MM-dd'T'HH:mm:ss") !== endDatetime,
+      recurrence: isRecurrence
+        ? {
+            freq: freq,
+            intv: intv,
+            ...(isExpiredDate ? { expiredDate: format(expiredDate, "yyyy-MM-dd'T'HH:mm:ss") } : {}),
+            ...(isCount ? { count: count } : {}),
+            recurrenceDay: recurrenceDay,
+          }
+        : undefined,
+      parentEndDatetime: format(data.endDatetime, "yyyy-MM-dd'T'HH:mm:ss"),
+      parentStartDatetime: format(data.startDatetime, "yyyy-MM-dd'T'HH:mm:ss"),
+    });
+  };
   return (
     <MainLayout ref={ref} data-testid={"create schedule"}>
-      <div>Create Schedule</div>
-      <input
+      {isUpdate ? <h3>Update Schedule</h3> : <h3>Create Schedule</h3>}
+      <Input
+        id="name"
         placeholder="Add a title"
         value={name}
-        onChange={(e) => setName(e.target.value)}
-      ></input>
-      <input type="date"></input>
-      <TogleDiv>
-        allday
-        <Togle
-          isOn={isAllDay}
-          onToggle={() => {
-            setIsAllDay((prev) => !prev);
-          }}
-        ></Togle>
-      </TogleDiv>
+        onChange={(e) => {
+          setName(e.target.value);
+        }}
+      ></Input>
+      {/* 날짜 시간 설정 */}
+      <PeriodDiv id="period">
+        <DateButton onClick={() => setShowStartMiniCalendar((prev) => !prev)}>
+          {selectedStartDate.getFullYear()}.{("0" + (selectedStartDate.getMonth() + 1)).slice(-2)}.
+          {("0" + selectedStartDate.getDate()).slice(-2)}
+        </DateButton>
+        {showStartMiniCalendar && (
+          <StartCalendarDiv>
+            <MiniCalendar
+              selectDate={startDateHandle}
+              selectedDate={selectedStartDate}
+              close={() => setShowStartMiniCalendar(false)}
+              view="day"
+              $standardDate={new Date(new Date().setHours(0, 0, 0, 0))}
+            />
+          </StartCalendarDiv>
+        )}
+        {!isAllDay && (
+          <Select
+            options={intervalTime}
+            show={false}
+            width={6.5}
+            onSelectChange={startTimeChangeHandle}
+            standardIdx={
+              data?.startDatetime instanceof Date
+                ? Math.round(
+                    (data?.startDatetime.getHours() * 60 + data?.startDatetime.getMinutes()) / 15
+                  )
+                : disabledIndex
+            }
+            disabledLastIndex={sameDate ? true : false}
+          ></Select>
+        )}
+        <LineDiv>-</LineDiv>
+        <DateButton onClick={() => setShowEndMiniCalendar((prev) => !prev)}>
+          {selectedEndDate.getFullYear()}.{("0" + (selectedEndDate.getMonth() + 1)).slice(-2)}.
+          {("0" + selectedEndDate.getDate()).slice(-2)}
+        </DateButton>
+        {showEndMiniCalendar && (
+          <EndCalendarDiv>
+            <MiniCalendar
+              selectDate={endDateHandle}
+              selectedDate={selectedEndDate}
+              close={() => setShowEndMiniCalendar(false)}
+              view="day"
+              $standardDate={selectedStartDate}
+            />
+          </EndCalendarDiv>
+        )}
+        {!isAllDay && (
+          <Select
+            options={intervalTime}
+            show={false}
+            width={6.5}
+            onSelectChange={endTimeChangeHandle}
+            standardIdx={
+              data?.endDatetime instanceof Date
+                ? Math.round(
+                    (data?.endDatetime.getHours() * 60 + data?.endDatetime.getMinutes()) / 15
+                  )
+                : disabledIndex + 4
+            }
+            disabledIndex={sameDate ? disabledIndex : -1}
+          ></Select>
+        )}
+      </PeriodDiv>
+      {/* 수정일때만 표시하는 oneoff */}
+      {isUpdate && (
+        <TogleDiv>
+          is one off
+          <Togle
+            isOn={isOneOff}
+            onToggle={() => {
+              setIsOneOff((prev) => !prev);
+            }}
+          ></Togle>
+        </TogleDiv>
+      )}
+      {/* WORKING 등록시에는 사용x */}
+      {!isWORKING && (
+        <TogleDiv>
+          allday
+          <Togle
+            isOn={isAllDay}
+            onToggle={() => {
+              setIsAllDay((prev) => !prev);
+            }}
+          ></Togle>
+        </TogleDiv>
+      )}
+      {/* 반복설정 */}
       <TogleDiv>
         Recurrence{" "}
         <Togle
@@ -128,8 +392,15 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
         ></Togle>
         {isRecurrence && (
           <RecurrenceRowLayout2>
-            <button onClick={() => setShowRecurrence((prev) => !prev)}>setting</button>
-            <div>
+            <Button
+              width={3}
+              height={1.5}
+              fontSize={0.7}
+              onClick={() => setShowRecurrence((prev) => !prev)}
+            >
+              setting
+            </Button>
+            <RecurrenceText>
               {" "}
               every
               {intv +
@@ -141,15 +412,16 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
                   : freq === "WEEKLY"
                   ? recurrenceDay.map((d) => d).join(", ")
                   : format(new Date(), "dd"))}
-            </div>
+            </RecurrenceText>
           </RecurrenceRowLayout2>
         )}
         {showRecurrence && (
           <RecurrenceLayout ref={ref2}>
-            <div>Recurrence</div>
+            <h4>Recurrence</h4>
             <RecurrenceRowLayout>
               <div>Recurrence every</div>
               <RecurrenceEveryLayout>
+                {/* 반복횟수 */}
                 <div>{intv}</div>
                 <PlusMinusLayout>
                   <PlusMinusDiv onClick={() => setIntv((prev) => prev + 1)}>
@@ -160,6 +432,7 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
                   </PlusMinusDiv>
                 </PlusMinusLayout>
                 <FreqLayout onClick={() => setExpanded(!expanded)}>
+                  {/* 반복주기 */}
                   <FreqDiv>{freq}</FreqDiv>
                   <ArrowDiv>
                     <FaAngleDown size={10} />
@@ -167,19 +440,20 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
                   {/* 확장 시 view 선택 버튼 렌더링 */}
                   {expanded && (
                     <DropdownLayout>
-                      <div onClick={() => setFreq("MONTHLY")}>MONTHLY</div>
-                      <div onClick={() => setFreq("WEEKLY")}>WEEKLY</div>
-                      <div onClick={() => setFreq("DAILY")}>DAILY</div>
+                      <DropdownDiv onClick={() => setFreq("MONTHLY")}>MONTHLY</DropdownDiv>
+                      <DropdownDiv onClick={() => setFreq("WEEKLY")}>WEEKLY</DropdownDiv>
+                      <DropdownDiv onClick={() => setFreq("DAILY")}>DAILY</DropdownDiv>
                     </DropdownLayout>
                   )}
                 </FreqLayout>
               </RecurrenceEveryLayout>
             </RecurrenceRowLayout>
+            {/* 반복요일 */}
             <RecurrenceRowLayout>
               Recurrence on
               {freq === "WEEKLY" && (
                 <DayLayout>
-                  {day.map((d) => (
+                  {day.map((d: "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN") => (
                     <DayDiv
                       key={d}
                       color={recurrenceDay.includes(d) ? "lightgray" : "white"}
@@ -192,6 +466,7 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
               )}
             </RecurrenceRowLayout>
             <div>ends</div>
+            {/* 반복 종료 시점 */}
             <EndsLayout>
               <RadioLayout>
                 <RadioDiv>
@@ -199,7 +474,7 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
                     type="radio"
                     value={"never"}
                     checked={!isExpiredDate && !isCount}
-                    onClick={handleRadioChange}
+                    onChange={handleRadioChange}
                   />
                   <div>never</div>
                 </RadioDiv>
@@ -208,7 +483,7 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
                     type="radio"
                     value={"on"}
                     checked={isExpiredDate}
-                    onClick={handleRadioChange}
+                    onChange={handleRadioChange}
                   />
                   <div>on</div>
                 </RadioDiv>
@@ -216,23 +491,35 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
                   <input
                     type="radio"
                     checked={isCount}
-                    onClick={handleRadioChange}
+                    onChange={handleRadioChange}
                     value={"after"}
                   />
                   <div>after</div>
                 </RadioDiv>
               </RadioLayout>
+              {/* 반복 종료날짜 */}
               <RadioLayout>
                 <div></div>
                 {isExpiredDate ? (
-                  <input
-                    type="date"
-                    value={expiredDate}
-                    onChange={(e) => setExpiredDate(e.target.value)}
-                  ></input>
+                  <DateButton onClick={() => setShowRecurrenceMiniCalendar((prev) => !prev)}>
+                    {expiredDate.getFullYear()}.{("0" + (expiredDate.getMonth() + 1)).slice(-2)}.
+                    {("0" + expiredDate.getDate()).slice(-2)}
+                  </DateButton>
                 ) : (
                   <div></div>
                 )}
+                {showRecurrenceMiniCalendar && (
+                  <StartCalendarDiv>
+                    <MiniCalendar
+                      selectDate={setExpiredDate}
+                      selectedDate={expiredDate}
+                      close={() => setShowRecurrenceMiniCalendar(false)}
+                      view="day"
+                      $standardDate={new Date(new Date().setHours(0, 0, 0, 0))}
+                    />
+                  </StartCalendarDiv>
+                )}
+                {/* 반복 횟수 */}
                 {isCount ? (
                   <EndsLayout>
                     <div>{count} occurrences</div>
@@ -252,31 +539,45 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
             </EndsLayout>
             <ButtonLayout>
               <div></div>
-              <button>save</button>
-              <button
+              <Button
+                width={3}
+                height={1.5}
+                fontSize={0.7}
+                onClick={() => setShowRecurrence(false)}
+              >
+                save
+              </Button>
+              <Button
+                width={3}
+                height={1.5}
+                fontSize={0.7}
                 onClick={() => {
                   setShowRecurrence(false);
                   setIsCount(false);
                   setIsExpiredDate(false);
                   setCount(10);
-                  setExpiredDate("2050-12-31");
+                  setExpiredDate(startDate);
                 }}
               >
                 cancel
-              </button>
+              </Button>
             </ButtonLayout>
           </RecurrenceLayout>
         )}
       </TogleDiv>
-      <TogleDiv>
-        Public{" "}
-        <Togle
-          isOn={isPublic}
-          onToggle={() => {
-            setIsPublic((prev) => !prev);
-          }}
-        ></Togle>
-      </TogleDiv>
+      {/* 공개여부 WORKING은 항상공개이기떄문에 비활성화 */}
+      {!isWORKING && (
+        <TogleDiv>
+          Public{" "}
+          <Togle
+            isOn={isPublic}
+            onToggle={() => {
+              setIsPublic((prev) => !prev);
+            }}
+          ></Togle>
+        </TogleDiv>
+      )}
+      {/* 색상 */}
       <ColorDiv>
         <ColorCircle
           onClick={() => setSelectedColor("blue")}
@@ -307,6 +608,7 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
           {selectedColor === "yellow" && <CheckDiv>✔</CheckDiv>}
         </ColorCircle>
       </ColorDiv>
+      {/* 설명 */}
       {!isDescription && (
         <DescriptionText onClick={() => setIsDescription((prev) => !prev)}>
           add description
@@ -320,13 +622,28 @@ export function CreateSchedule({ close, startDate }: ICreateScheduleProps) {
           <textarea
             placeholder="Add a description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
           ></textarea>
         </DescriptionLayout>
       )}
       <ButtonLayout>
         <div></div>
-        <button>save</button> <button onClick={close}>cancel</button>
+        <Button
+          width={5}
+          height={2.5}
+          onClick={async () => {
+            isUpdate ? await handleupdateSchedule() : await saveSchedule();
+            close();
+            triggerReload();
+          }}
+        >
+          save
+        </Button>{" "}
+        <Button width={5} height={2.5} onClick={close}>
+          cancel
+        </Button>
       </ButtonLayout>
     </MainLayout>
   );
@@ -336,7 +653,7 @@ const MainLayout = styled.div`
   position: fixed;
   top: 10px;
   background-color: white;
-  width: 350px;
+  width: 450px;
   z-index: 100;
   color: black;
   border-radius: 5px;
@@ -344,12 +661,14 @@ const MainLayout = styled.div`
   padding: 20px;
   display: grid;
   justify-items: left;
-  row-gap: 2px;
+  row-gap: 10px;
   font-size: small;
 `;
 const TogleDiv = styled.div`
   display: grid;
   grid-template-columns: 80px 1fr 1fr;
+  align-items: center;
+  height: 40px;
   text-align: left;
 `;
 const ColorDiv = styled.div`
@@ -392,13 +711,14 @@ const ButtonLayout = styled.div`
   justify-content: right;
   grid-column-gap: 5px;
   margin-top: 10px;
+  margin-right: 10px;
 `;
 const IconDiv = styled.div`
   display: grid;
 `;
 const RecurrenceLayout = styled.div`
   display: grid;
-  grid-template-rows: 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
   position: absolute;
   width: 350px;
   padding: 20px;
@@ -408,14 +728,17 @@ const RecurrenceLayout = styled.div`
   z-index: 100;
   right: 0;
   gap: 5px;
+  row-gap: 10px;
 `;
 const RecurrenceRowLayout = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-items: center;
 `;
 const RecurrenceRowLayout2 = styled.div`
   display: grid;
   grid-template-columns: 1fr max-content;
+  align-items: center;
 `;
 const DayLayout = styled.div`
   display: grid;
@@ -425,10 +748,13 @@ const DayLayout = styled.div`
 const EndsLayout = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
+
+  align-items: center;
 `;
 const RadioLayout = styled.div`
   display: grid;
   grid-template-rows: 20px 20px 20px;
+  gap: 10px;
 `;
 const RadioDiv = styled.div`
   display: grid;
@@ -444,9 +770,14 @@ const DayDiv = styled.div<{ color: string }>`
   text-align: center;
   cursor: pointer;
 `;
+const RecurrenceText = styled.div`
+  display: grid;
+  align-items: center;
+`;
 const RecurrenceEveryLayout = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 2fr;
+  align-items: center;
 `;
 const PlusMinusLayout = styled.div`
   height: 35px;
@@ -474,7 +805,6 @@ const ArrowDiv = styled.div`
   margin: 0 auto;
 `;
 const DropdownLayout = styled.div`
-  height: 35px;
   display: grid;
   position: absolute;
   grid-template-rows: 1fr 1fr 1fr;
@@ -482,4 +812,44 @@ const DropdownLayout = styled.div`
   top: 25px;
   padding: 10px 20px 10px 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+`;
+const DropdownDiv = styled.div`
+  cursor: pointer;
+`;
+const PeriodDiv = styled.div`
+  width: 80%;
+  display: flex;
+  justify-content: start;
+`;
+const DateButton = styled.div`
+  width: 4%.5rem;
+  height: 2rem;
+  background: none;
+  border: 1px solid ${Color("black200")};
+  border-radius: 3px;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  padding: 0.1rem 0.7rem;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+`;
+const StartCalendarDiv = styled.div`
+  position: relative;
+  top: -4rem;
+  left: -15rem;
+`;
+
+const EndCalendarDiv = styled.div`
+  position: relative;
+  top: -4rem;
+  left: -15rem;
+`;
+
+const LineDiv = styled.div`
+  width: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${Color("black")};
 `;
