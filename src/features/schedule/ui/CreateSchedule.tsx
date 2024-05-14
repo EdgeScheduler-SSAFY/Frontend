@@ -115,7 +115,9 @@ export function CreateSchedule({
       ? new Date(data?.recurrenceDetails?.expiredDate)
       : startDate
   ); // 종료 날짜
-  const [isCount, setIsCount] = useState<boolean>(!!data?.recurrenceDetails?.count || false); // 반복 횟수 여부
+  const [isCount, setIsCount] = useState<boolean>(
+    data?.recurrenceDetails?.count && !data?.recurrenceDetails?.expiredDate ? true : false
+  ); // 반복 횟수 여부
   const [count, setCount] = useState<number>(data?.recurrenceDetails?.count || 1); // 반복 횟수
   const [showRecurrence, setShowRecurrence] = useState<boolean>(false); // 반복 설정 보여주기 여부
 
@@ -395,7 +397,7 @@ export function CreateSchedule({
             <Button
               width={3}
               height={1.5}
-              fontSize={0.7}
+              fontSize={12}
               onClick={() => setShowRecurrence((prev) => !prev)}
             >
               setting
@@ -539,18 +541,13 @@ export function CreateSchedule({
             </EndsLayout>
             <ButtonLayout>
               <div></div>
-              <Button
-                width={3}
-                height={1.5}
-                fontSize={0.7}
-                onClick={() => setShowRecurrence(false)}
-              >
+              <Button width={3} height={1.5} fontSize={12} onClick={() => setShowRecurrence(false)}>
                 save
               </Button>
               <Button
                 width={3}
                 height={1.5}
-                fontSize={0.7}
+                fontSize={12}
                 onClick={() => {
                   setShowRecurrence(false);
                   setIsCount(false);
