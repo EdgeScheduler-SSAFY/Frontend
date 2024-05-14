@@ -26,6 +26,7 @@ const noto = Noto_Sans_KR({
 export default function CreateMeeting() {
   // 회의 정보
   const router = useRouter();
+<<<<<<< HEAD
   const {
     setStartDatetime,
     setEndDatetime,
@@ -33,15 +34,25 @@ export default function CreateMeeting() {
     setMemberList,
     setMeetName,
   } = useMeetStore((state) => state);
+=======
+  const { setStartDatetime, setEndDatetime, setRunningTime, setMemberList } =
+    useMeetStore((state) => state);
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
+    const date = String(now.getDate()).padStart(2, '0');
+    const todayString = `${year}-${month}-${date}T00:00:00`;
+
+>>>>>>> 9336ed43dd7e7d96071bd7d66b8b8cd5f43979f7
   const [meetingData, setMeetingData] = useState<MeetingData>({
     name: "",
     description: "",
     type: "MEETING",
     color: 4,
-    startDatetime: "2024-05-10T04:15:00",
-    endDatetime: "2024-05-10T04:15:00",
+    startDatetime: todayString,
+    endDatetime: todayString,
     runningTime: 15,
-    period: { start: `2024-05-10T00:00:00`, end: `2024-05-10T00:00:00` },
+    period: { start: `${todayString}`, end: `${todayString}` },
     isPublic: true,
     isRecurrence: false,
     memberList: [],
@@ -168,18 +179,23 @@ export default function CreateMeeting() {
   };
 
   // 사용자 버튼 클릭 이벤트
-  const userButtonClickHandle = (userId: number) => {
-    console.log("userButtonClickHandle called with userId:", userId);
-    const clickedUser = userLists.find((user) => user.id === userId);
+  const userButtonClickHandle = (clickedMember: {user:userList, isRequired:boolean}) => {
+    // console.log("userButtonClickHandle called with userId:", clickedMember.user.id);
+    const clickedUser = userLists.find((user) => user.id === clickedMember.user.id);
     // 이미 참가자 목록에 있는 사용자인지 확인
     const isParticipant = meetingData.memberList.some(
+<<<<<<< HEAD
       (member) => member.user.id === userId
+=======
+      (member) => member.user.id === clickedMember.user.id
+>>>>>>> 9336ed43dd7e7d96071bd7d66b8b8cd5f43979f7
     );
 
     // 참가자 목록에 추가된 사용자라면 제거, 추가되지 않은 사용자라면 추가
     if (clickedUser && isParticipant) {
       setMeetingData((prev) => ({
         ...prev,
+<<<<<<< HEAD
         memberList: prev.memberList.filter(
           (member) => member.user.id !== userId
         ),
@@ -194,11 +210,23 @@ export default function CreateMeeting() {
           ],
         }));
       }
+=======
+        memberList: prev.memberList.filter((member) => member.user.id !== clickedMember.user.id),
+      }));
+    } else {
+      setMeetingData((prev) => ({
+        ...prev,
+        memberList: [
+          ...prev.memberList,
+          clickedMember,
+        ],
+      }));
+>>>>>>> 9336ed43dd7e7d96071bd7d66b8b8cd5f43979f7
     }
 
     setClickedUsers((prev) => ({
       ...prev,
-      [userId]: !prev[userId],
+      [clickedMember.user.id]: !prev[clickedMember.user.id],
     }));
 
     setSearchTerm("");
@@ -209,7 +237,13 @@ export default function CreateMeeting() {
   const participantRemoveHandle = (userId: number) => {
     setMeetingData((prev) => ({
       ...prev,
+<<<<<<< HEAD
       memberList: prev.memberList.filter((member) => member.user.id !== userId),
+=======
+      memberList: prev.memberList.filter(
+        (member) => member.user.id !== userId
+      ),
+>>>>>>> 9336ed43dd7e7d96071bd7d66b8b8cd5f43979f7
     }));
 
     setClickedUsers((prev) => ({
@@ -248,7 +282,7 @@ export default function CreateMeeting() {
   };
 
   useEffect(() => {
-    console.log("searchTerm:", searchTerm);
+    // console.log("searchTerm:", searchTerm);
     // console.log("MeetingData:", meetingData);
   }, [meetingData, searchTerm]);
 
@@ -256,6 +290,7 @@ export default function CreateMeeting() {
     fetchWithInterceptor("https://user-service.edgescheduler.co.kr/members")
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
         setUserLists(data);
         const developmentSet: Set<string> = new Set(
           data.map((user: userList) => user.department)
@@ -300,10 +335,10 @@ export default function CreateMeeting() {
                     filterUserList(userLists, searchTerm).map((member) => (
                       <SearchListOption
                         key={member.id}
-                        onClick={() => userButtonClickHandle(member.id)}
+                        onClick={() => userButtonClickHandle({user:member, isRequired:false})}
                       >
                         <ProfileImage
-                          src={member.profile}
+                          src="/images/profile.webp"
                           alt="프로필사진"
                           width={20}
                           height={20}
@@ -360,12 +395,12 @@ export default function CreateMeeting() {
                                   <UserButton
                                     $isClicked={clickedUsers[member.id]}
                                     onClick={() =>
-                                      userButtonClickHandle(member.id)
+                                      userButtonClickHandle({user:member, isRequired:false})
                                     }
                                     className={noto.className}
                                   >
                                     <ProfileImage
-                                      src={member.profile}
+                                      src="/images/profile.webp"
                                       alt="프로필사진"
                                       width={25}
                                       height={25}
@@ -498,7 +533,7 @@ export default function CreateMeeting() {
                         >
                           <div>
                             <ProfileImage
-                              src={user.profile}
+                              src="/images/profile.webp"
                               alt="프로필사진"
                               width={25}
                               height={25}
