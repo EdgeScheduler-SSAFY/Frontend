@@ -4,7 +4,6 @@ import styled from "styled-components";
 
 import { Color } from "../lib/styles/color";
 import { selectList, userList } from "../lib/type";
-import useUserStore, { userState } from "@/store/userStore";
 
 interface SelectLocalTimeProps {
   width: number;

@@ -23,6 +23,7 @@ export interface userList {
   profile: string;
   zoneId: string;
   department: string;
+  region: string;
 }
 
 export interface developmentType {
