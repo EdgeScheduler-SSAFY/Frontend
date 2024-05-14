@@ -236,7 +236,7 @@ export function DetailSchedule({
             <Button
               width={3}
               height={2}
-              fontSize={0.6}
+              fontSize={10}
               $bgColor="orange"
               $hoverColor="orange400"
               onClick={async () => {
@@ -250,7 +250,7 @@ export function DetailSchedule({
             <Button
               width={3}
               height={2}
-              fontSize={0.6}
+              fontSize={10}
               $bgColor="orange"
               $hoverColor="orange400"
               onClick={async () => {
@@ -264,7 +264,7 @@ export function DetailSchedule({
             <Button
               width={3}
               height={2}
-              fontSize={0.6}
+              fontSize={10}
               $bgColor="orange"
               $hoverColor="orange400"
               onClick={async () => {
@@ -278,7 +278,7 @@ export function DetailSchedule({
             <Button
               width={3}
               height={2}
-              fontSize={0.6}
+              fontSize={10}
               $bgColor="orange"
               $hoverColor="orange400"
               onClick={() => setShowDelete(false)}
@@ -292,7 +292,7 @@ export function DetailSchedule({
             <Button
               width={3}
               height={2}
-              fontSize={0.6}
+              fontSize={10}
               $bgColor="orange"
               $hoverColor="orange400"
               onClick={async () => {
@@ -306,7 +306,7 @@ export function DetailSchedule({
             <Button
               width={3}
               height={2}
-              fontSize={0.6}
+              fontSize={10}
               $bgColor="orange"
               $hoverColor="orange400"
               onClick={() => setShowDelete(false)}
