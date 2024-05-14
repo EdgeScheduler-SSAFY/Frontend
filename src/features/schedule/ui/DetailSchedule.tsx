@@ -4,6 +4,8 @@ import { format } from "date-fns";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { GoPencil } from "react-icons/go";
 import { Color } from "@/shared/lib/styles/color";
+import ReactDOM from "react-dom";
+
 import {
   getScheduleDetailsResponse,
   getScheduleDetails,
@@ -18,6 +20,8 @@ interface IDetailScheduleProps {
   startDatetime: string;
   endDatetime: string;
   triggerReload: () => void;
+  left: number;
+  top: number;
 }
 export function DetailSchedule({
   close,
@@ -25,6 +29,8 @@ export function DetailSchedule({
   startDatetime,
   endDatetime,
   triggerReload,
+  left,
+  top,
 }: IDetailScheduleProps) {
   const [data, setData] = useState<getScheduleDetailsResponse | null>(null); //data api 가져온다.
   //api 호출
@@ -41,7 +47,11 @@ export function DetailSchedule({
   // 외부영역 클릭시 더보기 일정 닫기
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
+      if (
+        ref.current &&
+        !ref.current.contains(event.target as Node) &&
+        !document.getElementById("createScheduleModal")?.contains(event.target as Node)
+      ) {
         close();
       }
     };
@@ -91,8 +101,14 @@ export function DetailSchedule({
     return null;
   }
 
-  return (
-    <MainLayout onClick={(e) => e.stopPropagation()} ref={ref} data-testid="detail schedule">
+  return ReactDOM.createPortal(
+    <MainLayout
+      onClick={(e) => e.stopPropagation()}
+      ref={ref}
+      data-testid="detail schedule"
+      left={left}
+      top={top}
+    >
       <NameLayout>
         <TextDiv>
           {/* 일정 이름 */}
@@ -184,20 +200,20 @@ export function DetailSchedule({
           </NameLayout>
           <div>{data.name}</div>
           <DataLayout>
-            {data.startDatetime &&
-            data.endDatetime &&
-            format(data.startDatetime, "yyyy-MM-dd(EE)") !==
-              format(data.endDatetime, "yyyy-MM-dd(EE)") ? (
+            {detailData.startDatetime &&
+            detailData.endDatetime &&
+            format(detailData.startDatetime, "yyyy-MM-dd(EE)") !==
+              format(detailData.endDatetime, "yyyy-MM-dd(EE)") ? (
               <div>
-                {format(data.startDatetime, "yyyy-MM-dd(EE) HH:mm a") +
+                {format(detailData.startDatetime, "yyyy-MM-dd(EE) HH:mm a") +
                   " ~ " +
-                  format(data.endDatetime, "yyyy-MM-dd(EE) HH:mm a")}
+                  format(detailData.endDatetime, "yyyy-MM-dd(EE) HH:mm a")}
               </div>
             ) : (
               <div>
-                {format(data.startDatetime, "yyyy-MM-dd(EE) HH:mm a") +
+                {format(detailData.startDatetime, "yyyy-MM-dd(EE) HH:mm a") +
                   " ~ " +
-                  format(data.endDatetime, "HH:mm a")}
+                  format(detailData.endDatetime, "HH:mm a")}
               </div>
             )}
           </DataLayout>
@@ -236,7 +252,7 @@ export function DetailSchedule({
             <Button
               width={3}
               height={2}
-              fontSize={0.6}
+              fontSize={10}
               $bgColor="orange"
               $hoverColor="orange400"
               onClick={async () => {
@@ -250,7 +266,7 @@ export function DetailSchedule({
             <Button
               width={3}
               height={2}
-              fontSize={0.6}
+              fontSize={10}
               $bgColor="orange"
               $hoverColor="orange400"
               onClick={async () => {
@@ -264,7 +280,7 @@ export function DetailSchedule({
             <Button
               width={3}
               height={2}
-              fontSize={0.6}
+              fontSize={10}
               $bgColor="orange"
               $hoverColor="orange400"
               onClick={async () => {
@@ -278,7 +294,7 @@ export function DetailSchedule({
             <Button
               width={3}
               height={2}
-              fontSize={0.6}
+              fontSize={10}
               $bgColor="orange"
               $hoverColor="orange400"
               onClick={() => setShowDelete(false)}
@@ -292,7 +308,7 @@ export function DetailSchedule({
             <Button
               width={3}
               height={2}
-              fontSize={0.6}
+              fontSize={10}
               $bgColor="orange"
               $hoverColor="orange400"
               onClick={async () => {
@@ -306,7 +322,7 @@ export function DetailSchedule({
             <Button
               width={3}
               height={2}
-              fontSize={0.6}
+              fontSize={10}
               $bgColor="orange"
               $hoverColor="orange400"
               onClick={() => setShowDelete(false)}
@@ -319,6 +335,8 @@ export function DetailSchedule({
       {/* 수정창 */}
       {showUpadate && (
         <CreateSchedule
+          left={window.innerWidth / 2 - 200}
+          top={window.innerHeight / 2 - 225}
           triggerReload={triggerReload}
           isWORKING={data.type === "WORKING" ? true : false}
           startDate={new Date(data.startDatetime)}
@@ -328,13 +346,16 @@ export function DetailSchedule({
           data={data}
         ></CreateSchedule>
       )}
-    </MainLayout>
+    </MainLayout>,
+    document.getElementById("clickModal") as HTMLElement
   );
 }
 
-const MainLayout = styled.div`
-  position: fixed;
-  top: 10px;
+const MainLayout = styled.div<{ left: number; top: number }>`
+  /* position: fixed; */
+  position: absolute;
+  top: ${(props) => props.top}px;
+  left: ${(props) => props.left}px;
   background-color: white;
   width: 350px;
   z-index: 300;

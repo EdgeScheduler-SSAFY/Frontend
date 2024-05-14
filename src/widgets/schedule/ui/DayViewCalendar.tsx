@@ -89,6 +89,19 @@ export function DayViewCalendar({
   });
 
   const [showCreate, setShowCreate] = useState<boolean>(false); //일정 생성 모달 보여주기 여부
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 }); // 모달 위치
+  const handleDayClick = (event: React.MouseEvent) => {
+    //클릭한곳의 위치를 바탕으로 모달 위치 정함
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const positionY = event.clientY;
+    const positionX = event.clientX;
+    const top = positionY > viewportHeight / 2 ? positionY - 400 : positionY;
+    const left = positionX > viewportWidth / 2 ? positionX - 450 : positionX;
+
+    setModalPosition({ x: left, y: top });
+    setShowCreate((prev) => !prev);
+  };
   const [createDate, setCreateDate] = useState<Date>(); // 일정 생성 날짜
   const getTimeFromPosition = (y: number, height: number) => {
     const totalMinutes = (y / height) * 1440; // 1440은 하루의 총 분 수
@@ -143,7 +156,7 @@ export function DayViewCalendar({
                   0
                 )
               );
-              setShowCreate((prev) => !prev);
+              handleDayClick(event);
             }}
           >
             <DayForWeek triggerReload={triggerReload} scheduleList={partialSchedules}></DayForWeek>
@@ -152,6 +165,8 @@ export function DayViewCalendar({
       </WeekLayout>
       {showCreate && (
         <CreateSchedule
+          left={modalPosition.x}
+          top={modalPosition.y}
           type="PERSONAL"
           startDate={createDate || new Date()}
           close={() => setShowCreate(false)}

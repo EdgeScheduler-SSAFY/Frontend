@@ -5,6 +5,7 @@ import { FaAngleDown } from "react-icons/fa";
 import { IoIosArrowUp } from "react-icons/io";
 import { IoIosArrowDown } from "react-icons/io";
 import { format, addHours } from "date-fns";
+import ReactDOM from "react-dom";
 
 import { Togle } from "@/shared/index";
 import { Color } from "@/shared/lib/styles/color";
@@ -29,6 +30,8 @@ interface ICreateScheduleProps {
   data?: getScheduleDetailsResponse; // 일정 수정시 초기값
   isWORKING?: boolean; //  WORKING 일정 여부
   triggerReload: () => void;
+  left: number;
+  top: number;
 }
 export function CreateSchedule({
   close,
@@ -38,6 +41,8 @@ export function CreateSchedule({
   type,
   isWORKING,
   triggerReload,
+  left,
+  top,
 }: ICreateScheduleProps) {
   // 외부영역 클릭 확인을위한 ref
   const ref = useRef<HTMLDivElement>(null);
@@ -115,7 +120,9 @@ export function CreateSchedule({
       ? new Date(data?.recurrenceDetails?.expiredDate)
       : startDate
   ); // 종료 날짜
-  const [isCount, setIsCount] = useState<boolean>(!!data?.recurrenceDetails?.count || false); // 반복 횟수 여부
+  const [isCount, setIsCount] = useState<boolean>(
+    data?.recurrenceDetails?.count && !data?.recurrenceDetails?.expiredDate ? true : false
+  ); // 반복 횟수 여부
   const [count, setCount] = useState<number>(data?.recurrenceDetails?.count || 1); // 반복 횟수
   const [showRecurrence, setShowRecurrence] = useState<boolean>(false); // 반복 설정 보여주기 여부
 
@@ -279,9 +286,16 @@ export function CreateSchedule({
       parentStartDatetime: format(data.startDatetime, "yyyy-MM-dd'T'HH:mm:ss"),
     });
   };
-  return (
-    <MainLayout ref={ref} data-testid={"create schedule"}>
-      {isUpdate ? <h3>Update Schedule</h3> : <h3>Create Schedule</h3>}
+  return ReactDOM.createPortal(
+    <MainLayout
+      id="createScheduleModal"
+      ref={ref}
+      data-testid={"create schedule"}
+      left={left}
+      top={top}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {isUpdate ? <b>Update Schedule</b> : <b>Create Schedule</b>}
       <Input
         id="name"
         placeholder="Add a title"
@@ -307,7 +321,7 @@ export function CreateSchedule({
             />
           </StartCalendarDiv>
         )}
-        {!isAllDay && (
+        {!isAllDay ? (
           <SelectTime
             options={intervalTime}
             show={false}
@@ -322,6 +336,8 @@ export function CreateSchedule({
             }
             disabledLastIndex={intervalTime.length}
           ></SelectTime>
+        ) : (
+          <DisableDiv>00:00:00</DisableDiv>
         )}
         <LineDiv>-</LineDiv>
         <DateButton onClick={() => setShowEndMiniCalendar((prev) => !prev)}>
@@ -339,7 +355,7 @@ export function CreateSchedule({
             />
           </EndCalendarDiv>
         )}
-        {!isAllDay && (
+        {!isAllDay ? (
           <SelectTime
             options={intervalTime}
             show={false}
@@ -354,6 +370,8 @@ export function CreateSchedule({
             }
             disabledIndex={sameDate ? disabledIndex : -1}
           ></SelectTime>
+        ) : (
+          <DisableDiv>23:59:59</DisableDiv>
         )}
       </PeriodDiv>
       {/* 수정일때만 표시하는 oneoff */}
@@ -395,7 +413,7 @@ export function CreateSchedule({
             <Button
               width={3}
               height={1.5}
-              fontSize={0.7}
+              fontSize={12}
               onClick={() => setShowRecurrence((prev) => !prev)}
             >
               setting
@@ -417,7 +435,7 @@ export function CreateSchedule({
         )}
         {showRecurrence && (
           <RecurrenceLayout ref={ref2}>
-            <h4>Recurrence</h4>
+            <b>Recurrence</b>
             <RecurrenceRowLayout>
               <div>Recurrence every</div>
               <RecurrenceEveryLayout>
@@ -539,18 +557,13 @@ export function CreateSchedule({
             </EndsLayout>
             <ButtonLayout>
               <div></div>
-              <Button
-                width={3}
-                height={1.5}
-                fontSize={0.7}
-                onClick={() => setShowRecurrence(false)}
-              >
+              <Button width={3} height={1.5} fontSize={12} onClick={() => setShowRecurrence(false)}>
                 save
               </Button>
               <Button
                 width={3}
                 height={1.5}
-                fontSize={0.7}
+                fontSize={12}
                 onClick={() => {
                   setShowRecurrence(false);
                   setIsCount(false);
@@ -645,30 +658,32 @@ export function CreateSchedule({
           cancel
         </Button>
       </ButtonLayout>
-    </MainLayout>
+    </MainLayout>,
+    document.getElementById("clickModal") as HTMLElement
   );
 }
 
-const MainLayout = styled.div`
+const MainLayout = styled.div<{ left: number; top: number }>`
   position: fixed;
-  top: 10px;
+  top: ${(props) => props.top}px;
+  left: ${(props) => props.left}px;
   background-color: white;
   width: 450px;
-  z-index: 100;
+  z-index: 400;
   color: black;
   border-radius: 5px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   padding: 20px;
   display: grid;
   justify-items: left;
-  row-gap: 10px;
+  row-gap: 5px;
   font-size: small;
 `;
 const TogleDiv = styled.div`
   display: grid;
   grid-template-columns: 80px 1fr 1fr;
   align-items: center;
-  height: 40px;
+  height: 20px;
   text-align: left;
 `;
 const ColorDiv = styled.div`
@@ -723,12 +738,11 @@ const RecurrenceLayout = styled.div`
   width: 350px;
   padding: 20px;
   border-radius: 5px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   background-color: #fff;
   z-index: 100;
   right: 0;
   gap: 5px;
-  row-gap: 10px;
 `;
 const RecurrenceRowLayout = styled.div`
   display: grid;
@@ -738,7 +752,10 @@ const RecurrenceRowLayout = styled.div`
 const RecurrenceRowLayout2 = styled.div`
   display: grid;
   grid-template-columns: 1fr max-content;
+  height: 20px;
   align-items: center;
+  position: relative;
+  bottom: 10px;
 `;
 const DayLayout = styled.div`
   display: grid;
@@ -748,13 +765,12 @@ const DayLayout = styled.div`
 const EndsLayout = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-
   align-items: center;
 `;
 const RadioLayout = styled.div`
   display: grid;
   grid-template-rows: 20px 20px 20px;
-  gap: 10px;
+  gap: 5px;
 `;
 const RadioDiv = styled.div`
   display: grid;
@@ -852,4 +868,18 @@ const LineDiv = styled.div`
   align-items: center;
   justify-content: center;
   color: ${Color("black")};
+`;
+
+const DisableDiv = styled.div`
+  width: 6.5rem;
+  border: solid 1px ${Color("black200")};
+  border-radius: 3px;
+  box-sizing: border-box;
+  font-size: 14px;
+  cursor: not-allowed;
+  background-color: #fff;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;

@@ -27,12 +27,25 @@ export function PartialDaySchedule({
 }: IPartialDayScheduleProps) {
   // 일부시간 일정 상세보기 상태
   const [showDetails, setShowDetails] = useState<boolean>(false);
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 }); // 모달 위치
+  const handleDayClick = (event: React.MouseEvent) => {
+    //클릭한곳의 위치를 바탕으로 모달 위치 정함
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const positionY = event.clientY;
+    const positionX = event.clientX;
+    const top = positionY > viewportHeight / 2 ? positionY - 200 : positionY;
+    const left = positionX > viewportWidth / 2 ? positionX - 450 : positionX;
+
+    setModalPosition({ x: left, y: top });
+    setShowDetails((prev) => !prev);
+  };
   return (
     // 일부시간 컴포넌트
     <Layout
       color="lightblue"
       onClick={(e) => {
-        setShowDetails(!showDetails);
+        handleDayClick(e);
         e.stopPropagation();
       }}
     >
@@ -43,6 +56,8 @@ export function PartialDaySchedule({
       </Text>
       {showDetails && (
         <DetailSchedule
+          left={modalPosition.x}
+          top={modalPosition.y}
           triggerReload={triggerReload}
           endDatetime={endDatetime}
           startDatetime={startDatetime}

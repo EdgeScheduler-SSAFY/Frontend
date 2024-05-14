@@ -26,6 +26,18 @@ export function AllDaySchedule({
   triggerReload,
 }: IAllDayScheduleProps) {
   const [showDetails, setShowDetails] = useState<boolean>(false);
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 }); // 모달 위치
+  const handleDayClick = (event: React.MouseEvent) => {
+    //클릭한곳의 위치를 바탕으로 모달 위치 정함
+    const viewportWidth = window.innerWidth;
+    const positionY = event.clientY;
+    const positionX = event.clientX;
+    const top = positionY;
+    const left = positionX > viewportWidth / 2 ? positionX - 450 : positionX;
+
+    setModalPosition({ x: left, y: top });
+    setShowDetails((prev) => !prev);
+  };
   const ref = useRef<HTMLDivElement>(null);
   // 외부영역 클릭시 더보기 일정 닫기
   useEffect(() => {
@@ -44,12 +56,14 @@ export function AllDaySchedule({
 
   return (
     <MainLayout onClick={(e) => e.stopPropagation()}>
-      <Layout width={width} color={color} onClick={() => setShowDetails((prev) => !prev)}>
+      <Layout width={width} color={color} onClick={handleDayClick}>
         <TextDiv>{title}</TextDiv>
       </Layout>
       {/* 상세보기 */}
       {showDetails && (
         <DetailSchedule
+          left={modalPosition.x}
+          top={modalPosition.y}
           scheduleId={scheduleId}
           close={() => setShowDetails(false)}
           startDatetime={startDatetime}
