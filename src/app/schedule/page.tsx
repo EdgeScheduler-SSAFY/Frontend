@@ -1,310 +1,102 @@
 "use client";
 import styled from "styled-components";
 import { CalendarHeader, MonthViewCalendar, WeekViewCalendar } from "@/widgets/schedule/index";
-import { use, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { startOfMonth, startOfWeek, endOfMonth, endOfWeek, format } from "date-fns";
 import { DayViewCalendar } from "@/widgets/schedule/index";
-import { fetchWithInterceptor } from "@/shared/index";
+import { getSchedulesByDate } from "@/features/schedule/index";
+import { schedule } from "@/widgets/schedule/model/type";
 
 export default function Schedule() {
-  const [view, setView] = useState("month");
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const test = async () => {
-    console.log("test");
-    await fetchWithInterceptor(
-      "/schedule-service/schedules/period?startDatetime=2024-05-01T00:00:00&endDatetime=2024-05-31T23:59:59",
-      {
-        method: "GET",
-        // headers: {
-        //   "Content-Type": "application/json",
-        //   Authrization: "Bearer AccessToken",
-        // },
-      }
-    )
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        console.log(data);
-      });
-  };
-  useEffect(() => {
-    const currentTime = new Date();
-    const expiresAt: Date = new Date(
-      currentTime.getTime() + parseInt(sessionStorage.getItem("expiresIn") || "10") - 10 * 60 * 1000
-    );
-    sessionStorage.setItem("expiresAt", expiresAt.toISOString());
-    sessionStorage.setItem("now", currentTime.toISOString());
-  }, []);
-  const scheduleList = [
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-05T02:00:00"),
-      endDateTime: new Date("2024-05-05T12:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-05T05:25:00"),
-      endDateTime: new Date("2024-05-05T12:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-05T05:25:00"),
-      endDateTime: new Date("2024-05-05T07:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-05T01:25:00"),
-      endDateTime: new Date("2024-05-05T07:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-05T16:25:00"),
-      endDateTime: new Date("2024-05-05T23:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-05T19:25:00"),
-      endDateTime: new Date("2024-05-05T20:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-05T20:25:00"),
-      endDateTime: new Date("2024-05-05T23:30:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-05T08:25:00"),
-      endDateTime: new Date("2024-05-05T23:30:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "partially",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-06T09:00:00"),
-      endDateTime: new Date("2024-05-06T12:00:00"),
-      isPublic: true,
-    },
+  const [view, setView] = useState("month"); //뷰 상태
+  const [selectedDate, setSelectedDate] = useState(new Date()); //선택된 날짜 초기값 오늘
+  const [selectDateProps, setSelectDateProps] = useState<Date>(selectedDate); //넘겨주는 날짜
+  const [scheduleList, setScheduleList] = useState<schedule[]>([]); // 스케줄 목록
+  const [isLoading, setIsLoading] = useState(true); //로딩 상태
+  const [trigger, setTrigger] = useState(false); //
 
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "3day7",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-05T09:00:00"),
-      endDateTime: new Date("2024-05-07T14:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "3day8",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-05T09:00:00"),
-      endDateTime: new Date("2024-05-08T14:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "3day1",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-20T09:00:00"),
-      endDateTime: new Date("2024-05-21T14:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "3day10",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-05T09:00:00"),
-      endDateTime: new Date("2024-05-10T14:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "more check all dayyyyyyyyyyyyyyyyy",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-10T00:00:00"),
-      endDateTime: new Date("2024-05-10T23:59:59"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "more checkkkkkkkkkkkkkkkkkkk",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-10T00:00:00"),
-      endDateTime: new Date("2024-05-10T23:59:59"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "more check",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-10T00:00:00"),
-      endDateTime: new Date("2024-05-10T23:59:59"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "more check",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-10T00:00:00"),
-      endDateTime: new Date("2024-05-10T23:59:59"),
-      isPublic: true,
-    },
-  ];
-  const scheduleList2 = [
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-06T02:00:00"),
-      endDateTime: new Date("2024-05-06T12:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-06T02:00:00"),
-      endDateTime: new Date("2024-05-06T12:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-06T02:00:00"),
-      endDateTime: new Date("2024-05-06T12:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-06T00:00:00"),
-      endDateTime: new Date("2024-05-06T23:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-06T00:00:00"),
-      endDateTime: new Date("2024-05-06T23:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-06T00:00:00"),
-      endDateTime: new Date("2024-05-06T23:00:00"),
-      isPublic: true,
-    },
-    {
-      scheduleId: 1,
-      organizerId: 1,
-      name: "allday",
-      type: "WORKING",
-      color: 1,
-      startDateTime: new Date("2024-05-06T00:00:00"),
-      endDateTime: new Date("2024-05-06T23:00:00"),
-      isPublic: true,
-    },
-  ];
+  useEffect(() => {
+    setIsLoading(true); //로딩중
+    let startDatetime = new Date(selectedDate);
+    let endDatetime = new Date(selectedDate);
+    //뷰에 따라 날짜 설정
+    if (view === "month") {
+      startDatetime = startOfWeek(startOfMonth(selectedDate));
+      endDatetime = endOfWeek(endOfMonth(selectedDate));
+    }
+    if (view === "week") {
+      startDatetime = startOfWeek(selectedDate);
+      endDatetime = endOfWeek(selectedDate);
+    }
+    if (view === "day") {
+      startDatetime = new Date(selectedDate);
+      endDatetime = new Date(selectedDate);
+      startDatetime.setHours(0, 0, 0);
+      endDatetime.setHours(23, 59, 59); // 끝시간
+    }
+    //api 호출
+    const fetchData = async () => {
+      try {
+        const response = await getSchedulesByDate({
+          startDatetime: format(startDatetime, "yyyy-MM-dd'T'HH:mm:ss"),
+          endDatetime: format(endDatetime, "yyyy-MM-dd'T'HH:mm:ss"),
+        });
+        if (Array.isArray(response.scheduleList)) {
+          const schedules = response.scheduleList.map((schedule: schedule) => ({
+            ...schedule,
+            startDatetime: new Date(schedule.startDatetime),
+            endDatetime: new Date(schedule.endDatetime),
+          }));
+          setScheduleList(schedules);
+        } else {
+          console.log("Received data is not an array:", response.scheduleList);
+          setScheduleList([]);
+        }
+        setSelectDateProps(selectedDate);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+        setScheduleList([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [view, selectedDate, trigger]);
+
   return (
     <MainLayout>
-      <button onClick={() => test()}>test</button>
+      {/* 캘린더 헤더 */}
       <CalendarHeader
         selectDate={setSelectedDate}
         changeDate={setSelectedDate}
-        selectedDate={selectedDate}
+        selectedDate={selectDateProps}
         view={view}
         changeView={setView}
       ></CalendarHeader>
-      {view === "month" && (
+      {/* 뷰에따라 캘린더 렌더링 */}
+      {!isLoading && view === "month" && (
         <MonthViewCalendar
           scheduleList={scheduleList}
-          selectedDate={selectedDate}
+          selectedDate={selectDateProps}
+          triggerReload={() => setTrigger((prev) => !prev)}
         ></MonthViewCalendar>
       )}
-      {view === "week" && (
+      {!isLoading && view === "week" && (
         <WeekViewCalendar
           scheduleList={scheduleList}
-          selectedDate={selectedDate}
+          selectedDate={selectDateProps}
+          triggerReload={() => setTrigger((prev) => !prev)}
         ></WeekViewCalendar>
       )}
-      {view === "day" && (
-        <DayViewCalendar schedules={scheduleList2} selectedDate={selectedDate}></DayViewCalendar>
+      {!isLoading && view === "day" && (
+        <DayViewCalendar
+          scheduleList={scheduleList}
+          selectedDate={selectDateProps}
+          triggerReload={() => setTrigger((prev) => !prev)}
+        ></DayViewCalendar>
       )}
+      {isLoading && <div></div>}
     </MainLayout>
   );
 }

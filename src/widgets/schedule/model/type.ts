@@ -4,8 +4,14 @@ export interface schedule {
   name: string;
   type: string;
   color: number;
-  startDateTime: Date;
-  endDateTime: Date;
+  startDatetime: Date;
+  endDatetime: Date;
+  ispublic: boolean;
+  meeetingDetail: {
+    isrequired: boolean;
+    status: string;
+    reason: string;
+  };
 }
 
 export interface schedules {
