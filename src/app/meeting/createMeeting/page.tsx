@@ -28,15 +28,21 @@ export default function CreateMeeting() {
   const router = useRouter();
   const { setStartDatetime, setEndDatetime, setRunningTime, setMemberList } =
     useMeetStore((state) => state);
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
+    const date = String(now.getDate()).padStart(2, '0');
+    const todayString = `${year}-${month}-${date}T00:00:00`;
+
   const [meetingData, setMeetingData] = useState<MeetingData>({
     name: "",
     description: "",
     type: "MEETING",
     color: 4,
-    startDatetime: "2024-05-10T04:15:00",
-    endDatetime: "2024-05-10T04:15:00",
+    startDatetime: todayString,
+    endDatetime: todayString,
     runningTime: 15,
-    period: { start: `2024-05-10T00:00:00`, end: `2024-05-10T00:00:00` },
+    period: { start: `${todayString}`, end: `${todayString}` },
     isPublic: true,
     isRecurrence: false,
     memberList: [],
@@ -164,7 +170,7 @@ export default function CreateMeeting() {
 
   // 사용자 버튼 클릭 이벤트
   const userButtonClickHandle = (clickedMember: {user:userList, isRequired:boolean}) => {
-    console.log("userButtonClickHandle called with userId:", clickedMember.user.id);
+    // console.log("userButtonClickHandle called with userId:", clickedMember.user.id);
     const clickedUser = userLists.find((user) => user.id === clickedMember.user.id);
     // 이미 참가자 목록에 있는 사용자인지 확인
     const isParticipant = meetingData.memberList.some(
