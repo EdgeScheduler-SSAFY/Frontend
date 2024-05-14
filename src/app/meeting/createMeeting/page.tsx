@@ -163,33 +163,33 @@ export default function CreateMeeting() {
   };
 
   // 사용자 버튼 클릭 이벤트
-  const userButtonClickHandle = (userId: number) => {
-    console.log("userButtonClickHandle called with userId:", userId);
-    const clickedUser = userLists.find((user) => user.id === userId);
+  const userButtonClickHandle = (clickedMember: {user:userList, isRequired:boolean}) => {
+    console.log("userButtonClickHandle called with userId:", clickedMember.user.id);
+    const clickedUser = userLists.find((user) => user.id === clickedMember.user.id);
     // 이미 참가자 목록에 있는 사용자인지 확인
     const isParticipant = meetingData.memberList.some(
-      (user) => user.memberId === userId
+      (member) => member.user.id === clickedMember.user.id
     );
 
     // 참가자 목록에 추가된 사용자라면 제거, 추가되지 않은 사용자라면 추가
     if (clickedUser && isParticipant) {
       setMeetingData((prev) => ({
         ...prev,
-        memberList: prev.memberList.filter((user) => user.memberId !== userId),
+        memberList: prev.memberList.filter((member) => member.user.id !== clickedMember.user.id),
       }));
     } else {
       setMeetingData((prev) => ({
         ...prev,
         memberList: [
           ...prev.memberList,
-          { memberId: userId, isRequired: false },
+          clickedMember,
         ],
       }));
     }
 
     setClickedUsers((prev) => ({
       ...prev,
-      [userId]: !prev[userId],
+      [clickedMember.user.id]: !prev[clickedMember.user.id],
     }));
 
     setSearchTerm("");
@@ -201,7 +201,7 @@ export default function CreateMeeting() {
     setMeetingData((prev) => ({
       ...prev,
       memberList: prev.memberList.filter(
-        (member) => member.memberId !== userId
+        (member) => member.user.id !== userId
       ),
     }));
 
@@ -219,7 +219,7 @@ export default function CreateMeeting() {
     e.stopPropagation(); // 이벤트 버블링 중단
     setMeetingData((prev) => {
       const updatedMemberList = prev.memberList.map((member) => {
-        if (member.memberId === userId) {
+        if (member.user.id === userId) {
           return { ...member, isRequired: !member.isRequired };
         }
         return member;
@@ -240,7 +240,7 @@ export default function CreateMeeting() {
   };
 
   useEffect(() => {
-    console.log("searchTerm:", searchTerm);
+    // console.log("searchTerm:", searchTerm);
     // console.log("MeetingData:", meetingData);
   }, [meetingData, searchTerm]);
 
@@ -248,6 +248,7 @@ export default function CreateMeeting() {
     fetchWithInterceptor("https://user-service.edgescheduler.co.kr/members")
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
         setUserLists(data);
         const developmentSet: Set<string> = new Set(
           data.map((user: userList) => user.department)
@@ -292,10 +293,10 @@ export default function CreateMeeting() {
                     filterUserList(userLists, searchTerm).map((member) => (
                       <SearchListOption
                         key={member.id}
-                        onClick={() => userButtonClickHandle(member.id)}
+                        onClick={() => userButtonClickHandle({user:member, isRequired:false})}
                       >
                         <ProfileImage
-                          src={member.profile}
+                          src="/images/profile.webp"
                           alt="프로필사진"
                           width={20}
                           height={20}
@@ -352,12 +353,12 @@ export default function CreateMeeting() {
                                   <UserButton
                                     $isClicked={clickedUsers[member.id]}
                                     onClick={() =>
-                                      userButtonClickHandle(member.id)
+                                      userButtonClickHandle({user:member, isRequired:false})
                                     }
                                     className={noto.className}
                                   >
                                     <ProfileImage
-                                      src={member.profile}
+                                      src="/images/profile.webp"
                                       alt="프로필사진"
                                       width={25}
                                       height={25}
@@ -478,19 +479,19 @@ export default function CreateMeeting() {
               <ParticipantDiv id="participant">
                 {meetingData.memberList.map((member) => {
                   const user = userLists.find(
-                    (user) => user.id === member.memberId
+                    (user) => user.id === member.user.id
                   );
                   return (
-                    <div key={member.memberId}>
+                    <div key={member.user.id}>
                       {user ? (
                         <ParticipantInfoDiv
                           onClick={() =>
-                            participantRemoveHandle(member.memberId)
+                            participantRemoveHandle(member.user.id)
                           }
                         >
                           <div>
                             <ProfileImage
-                              src={user.profile}
+                              src="/images/profile.webp"
                               alt="프로필사진"
                               width={25}
                               height={25}
@@ -504,7 +505,7 @@ export default function CreateMeeting() {
                             <OptionalButton
                               className={noto.className}
                               onClick={(e) =>
-                                optionalButtonClickHandle(e, member.memberId)
+                                optionalButtonClickHandle(e, member.user.id)
                               }
                               $isRequired={member.isRequired}
                             >
