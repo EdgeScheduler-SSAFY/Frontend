@@ -14,6 +14,7 @@ export default function Schedule() {
   const [scheduleList, setScheduleList] = useState<schedule[]>([]); // 스케줄 목록
   const [isLoading, setIsLoading] = useState(true); //로딩 상태
   const [trigger, setTrigger] = useState(false); //
+  const [isMeetingFilter, setIsMeetingFilter] = useState(false);
 
   useEffect(() => {
     setIsLoading(true); //로딩중
@@ -47,11 +48,17 @@ export default function Schedule() {
             startDatetime: new Date(schedule.startDatetime),
             endDatetime: new Date(schedule.endDatetime),
           }));
-          setScheduleList(schedules);
+          if (isMeetingFilter) {
+            setScheduleList(scheduleList.filter((schedule) => schedule.type === "MEETING"));
+          }
+          if (!isMeetingFilter) {
+            setScheduleList(schedules);
+          }
         } else {
           console.log("Received data is not an array:", response.scheduleList);
           setScheduleList([]);
         }
+
         setSelectDateProps(selectedDate);
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -62,7 +69,7 @@ export default function Schedule() {
     };
 
     fetchData();
-  }, [view, selectedDate, trigger]);
+  }, [view, selectedDate, trigger, isMeetingFilter]);
 
   return (
     <MainLayout>
@@ -70,6 +77,7 @@ export default function Schedule() {
       <CalendarHeader
         selectDate={setSelectedDate}
         changeDate={setSelectedDate}
+        setIsMeetingFilter={setIsMeetingFilter}
         selectedDate={selectDateProps}
         view={view}
         changeView={setView}

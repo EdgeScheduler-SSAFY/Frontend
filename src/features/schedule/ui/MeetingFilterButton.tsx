@@ -1,10 +1,24 @@
-import React from "react";
-//미완성
-export function MeetingFilterButton() {
+import React, { useState } from "react";
+import Button from "@/shared/ui/button";
+
+interface IMeetingFilterButtonProps {
+  onClick: (meetingFilter: boolean) => void;
+}
+
+export function MeetingFilterButton({ onClick }: IMeetingFilterButtonProps) {
+  const [filter, setFilter] = useState<boolean>(false);
+  const handleClick = () => {
+    const newFilter = !filter;
+    setFilter(newFilter);
+    onClick(newFilter);
+  };
   return (
     <div>
-      {/* shared의 버튼으로 변경예정 */}
-      <div>meet</div>
+      {filter ? (
+        <Button onClick={handleClick}>all</Button>
+      ) : (
+        <Button onClick={handleClick}>meet</Button>
+      )}
     </div>
   );
 }
