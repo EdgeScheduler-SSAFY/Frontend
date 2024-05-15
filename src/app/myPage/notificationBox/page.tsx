@@ -1,39 +1,65 @@
-'use client';
-import React, { useEffect, useState } from 'react';
+"use client";
+import React, { useEffect, useState } from "react";
 
-import AlarmBox from './ui/alarmBox';
+import Pagination from "./ui/pagination";
+import CreatedBox from "./ui/created/createdBox";
+import ResponseBox from "./ui/response/responseBox";
+import ProposalBox from "./ui/proposal/proposalBox";
+import UpdatedTimeBox from "./ui/updatedTime/updatedTimeBox";
+import CanceledBox from "./ui/canceled/canceledBox";
+import { GetNotificationData } from "./api/getNotificationData";
 
-export default function AlarmLog() {
-  const tmpAccessToken =
-    'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcxNTYxMjg3NX0.gJa7WfsFlFfagYbU4SmnQVWPPp7xuQw-gL7-lzbhVIQ';
-  const size = 5;
-  const [page, setPage] = useState<number>(0);
+const renderNotificationComponent = (notification: any) => {
+  switch (notification.type) {
+    case "MEETING_CREATED":
+      return <CreatedBox data={notification} />;
+    case "MEETING_DELETED":
+      return <CanceledBox data={notification} />;
+    case "MEETING_UPDATED_FIELDS":
+      return <CanceledBox data={notification} />;
+    case "MEETING_UPDATED_TIME":
+      return <UpdatedTimeBox data={notification} />;
+    case "ATTENDEE_RESPONSE":
+      return <ResponseBox data={notification} />;
+    case "ATTENDEE_PROPOSAL":
+      return <ProposalBox data={notification} />;
+    default:
+      return null;
+  }
+};
 
-  const getNotificationBoxData = async (page: number) => {
-    try {
-      const res = await fetch(
-        `https://gateway.edgescheduler.co.kr/notification-service/notify/notifications/page?page=${page}&size=${size}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${tmpAccessToken}`,
-          },
-        }
-      );
-      res.json().then((data) => console.log(data));
-    } catch (error) {
-      console.log(error);
-    }
-    return true;
-  };
+export default function NotificationBox() {
+  const [notificationData, setNotificationData] = useState<any>([]);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [totalElements, setTotalElements] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
 
   useEffect(() => {
-    getNotificationBoxData(page);
-  }, []);
+    const fetchData = async () => {
+      try {
+        const responseData = await GetNotificationData(page);
+        console.log(responseData);
+        setNotificationData(responseData.data);
+        setTotalPages(responseData.totalPages);
+        setTotalElements(responseData.totalElements);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, [page]);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
 
   return (
     <div>
-      <AlarmBox />
+      {notificationData &&
+        notificationData.map((notification: any) => (
+          <div key={notification.id}>{renderNotificationComponent(notification)}</div>
+        ))}
+      <Pagination totalElements={totalElements} totalPages={totalPages} currentPage={page} setPage={handlePageChange} />
     </div>
   );
 }
