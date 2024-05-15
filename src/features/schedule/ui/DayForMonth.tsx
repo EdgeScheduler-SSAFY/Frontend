@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { type dayT, CreateSchedule, MoreSchedule } from "@/features/schedule/index";
+import { format } from "date-fns";
 // 한달의 날짜별 일정 컴포넌트의 props
 interface IDayForMonthProps {
   day: dayT;
@@ -69,7 +70,7 @@ export function DayForMonth({ day, index, triggerReload }: IDayForMonthProps) {
   // 날짜별 일정 렌더링
   return (
     <DayDiv index={index} onClick={handleDayClick}>
-      <Day>{day.date.getDate()}</Day>
+      <Day>{day.date.getDate() === 1 ? format(day.date, "MMM.d") : day.date.getDate()}</Day>
       {renderSchedules(day, true)}
       <div onClick={(e) => e.stopPropagation()}>
         {/* 일정생성 */}
