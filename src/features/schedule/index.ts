@@ -10,6 +10,10 @@ export {
   type getScheduleByDateRequest,
   type updateScheduleRequest,
   type getScheduleDetailsResponse,
+  type searchAvailableAttendeesRequest,
+  type searchAvailableAttendeesResponse,
+  type member,
+  type proposalAnswerRequest,
 } from "./model/types";
 export { MeetingFilterButton } from "./ui/MeetingFilterButton";
 export { ChooseViewButtons } from "./ui/ChooseViewButtons";
@@ -28,3 +32,6 @@ export { deleteSchedule } from "./api/deleteSchedule";
 export { getSchedulesByDate } from "./api/getSchedulesByDate";
 export { updateSchedule } from "./api/updateSchedule";
 export { getScheduleDetails } from "./api/getScheduleDetails";
+export { searchAvailableAttendees } from "./api/searchAvailableAttendees";
+export { DetailProposal } from "./ui/DetailProposal";
+export { proposalAnswer } from "./api/proposalAnswer";
