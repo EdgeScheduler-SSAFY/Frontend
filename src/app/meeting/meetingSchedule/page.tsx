@@ -10,27 +10,19 @@ import RecommendTypeSetButton from "@/features/meetingSchedule/ui/RecommendTypeS
 import CancelButton from "@/features/meetingSchedule/ui/CancelButton";
 import SubmitButton from "@/features/meetingSchedule/ui/SubmitButton";
 import useMeetStore, { MeetState } from "@/store/meetStore";
-import { fetchWithInterceptor } from "@/shared";
+import { MiniCalendar, fetchWithInterceptor } from "@/shared";
+import DateFormat from "@/shared/lib/dateFormat";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export default function MeetingSchedule() {
-  const { startDatetime, endDatetime, runningtime, memberList } = useMeetStore(
-    (state: MeetState) => state
-  );
+  const { startDatetime, endDatetime, runningtime, memberList } = useMeetStore((state: MeetState) => state);
 
   console.log(startDatetime, endDatetime, runningtime, memberList);
-
+  const [showStartMiniCalendar, setShowStartMiniCalendar] = useState<boolean>(false);
   const todayDate = new Date();
   const [date, setDate] = useState<Date>(todayDate);
   const [startDate, setStartDate] = useState<string>(
-    date.getFullYear() +
-      "." +
-      (date.getMonth() + 1) +
-      "." +
-      date.getDate() +
-      "(" +
-      days[date.getDay()] +
-      ")"
+    date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate() + "(" + days[date.getDay()] + ")"
   );
   const [endDate, setEndDate] = useState<string>(startDate);
   const [selectedOption, setSelectedOption] = useState(0);
@@ -38,17 +30,30 @@ export default function MeetingSchedule() {
   const [startTime, setStartTime] = useState<string>("AM 00:00");
   const [endTime, setEndTime] = useState<string>("AM 01:00");
   const [endIndex, setEndIndex] = useState<number>(-2);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  // 시작날짜 값이 변경될 때 실행될 함수
+  const DateHandle = (selectedDate: Date) => {
+    setSelectedDate(selectedDate);
+    let tmpDate =
+    selectedDate.getFullYear() +
+    "." +
+    (selectedDate.getMonth() + 1) +
+    "." +
+    selectedDate.getDate() +
+    "(" +
+    days[selectedDate.getDay()] +
+    ")";
+    setStartDate(tmpDate);
+    setEndDate(tmpDate);
+  };
 
   const handleOptionClick = (index: number) => {
     setSelectedOption(index);
   };
   const handleGoToPastDay = () => {
-    let pastDate = new Date(date.getTime() - 24 * 60 * 60 * 1000);
-    let startOfNowDate = new Date(
-      todayDate.getFullYear(),
-      todayDate.getMonth(),
-      todayDate.getDate()
-    );
+    let pastDate = new Date(selectedDate.getTime() - 24 * 60 * 60 * 1000);
+    let startOfNowDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
     if (pastDate >= startOfNowDate) {
       let tmpDate =
         pastDate.getFullYear() +
@@ -59,14 +64,14 @@ export default function MeetingSchedule() {
         "(" +
         days[pastDate.getDay()] +
         ")";
-      setDate(pastDate);
+      setSelectedDate(pastDate);
       setStartDate(tmpDate);
       setEndDate(tmpDate);
     }
   };
 
   const handleGoToNextDay = () => {
-    let nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+    let nextDate = new Date(selectedDate.getTime() + 24 * 60 * 60 * 1000);
     let tmpDate =
       nextDate.getFullYear() +
       "." +
@@ -76,15 +81,14 @@ export default function MeetingSchedule() {
       "(" +
       days[nextDate.getDay()] +
       ")";
-    setDate(nextDate);
+    setSelectedDate(nextDate);
     setStartDate(tmpDate);
     setEndDate(tmpDate);
   };
 
   useEffect(() => {
     if (startIndex >= 0) {
-      changeDate(date, startIndex) &&
-        setStartDate(changeDate(date, startIndex));
+      changeDate(date, startIndex) && setStartDate(changeDate(date, startIndex));
       setStartTime(changeTime(startIndex));
     }
   }, [startIndex, date]);
@@ -111,14 +115,7 @@ export default function MeetingSchedule() {
       return tmpDate;
     } else {
       const tmpDate =
-        date.getFullYear() +
-        "." +
-        (date.getMonth() + 1) +
-        "." +
-        date.getDate() +
-        "(" +
-        days[date.getDay()] +
-        ")";
+        date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate() + "(" + days[date.getDay()] + ")";
       return tmpDate;
     }
   };
@@ -147,25 +144,28 @@ export default function MeetingSchedule() {
   };
 
   useEffect(() => {
-    
-    const recData = async() => {
+    const recData = async () => {
       try {
-        const res = await fetchWithInterceptor("https://gateway.edgescheduler.co.kr//schedule-service/schedules/members/calculate-time-availability", {
-      method: "POST", 
-      body: JSON.stringify({
-        organizerId: null,
-        startDatetime: startDatetime,
-        endDatetime: endDatetime,
-        runningTime: runningtime,
-        memberList: memberList
-      }),
-    });
-    const data = await res.json();
-    console.log("hi");
-    console.log(data);
-    } catch (error) {
-      console.log(error)
-    }}
+        const res = await fetchWithInterceptor(
+          "https://gateway.edgescheduler.co.kr//schedule-service/schedules/members/calculate-time-availability",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              organizerId: null,
+              startDatetime: startDatetime,
+              endDatetime: endDatetime,
+              runningTime: runningtime,
+              memberList: memberList,
+            }),
+          }
+        );
+        const data = await res.json();
+        console.log("hi");
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
     recData();
   }, []);
   return (
@@ -174,13 +174,13 @@ export default function MeetingSchedule() {
         <DateLayout>
           <DateinDateDiv>Date</DateinDateDiv>
           <TimeSelectionLayout>
-            <DateDiv data-testid="startDate">{startDate}</DateDiv>
+            <DateDiv data-testid='startDate'>{startDate}</DateDiv>
             <TimeButton>
               <div>{startTime}</div>
               <IoMdArrowDropdown />
             </TimeButton>
             <HypoonDiv>-</HypoonDiv>
-            <DateDiv data-testid="endDate">{endDate}</DateDiv>
+            <DateDiv data-testid='endDate'>{endDate}</DateDiv>
             <TimeButton>
               <div>{endTime}</div>
               <IoMdArrowDropdown />
@@ -188,23 +188,14 @@ export default function MeetingSchedule() {
           </TimeSelectionLayout>
         </DateLayout>
         <OptionLayout>
-          <RecommendTypeSetButton
-            selected={selectedOption === 0}
-            onClick={() => handleOptionClick(0)}
-          >
+          <RecommendTypeSetButton selected={selectedOption === 0} onClick={() => handleOptionClick(0)}>
             fatest
           </RecommendTypeSetButton>
-          <RecommendTypeSetButton
-            selected={selectedOption === 1}
-            onClick={() => handleOptionClick(1)}
-          >
+          <RecommendTypeSetButton selected={selectedOption === 1} onClick={() => handleOptionClick(1)}>
             minimum
             <br /> absentees
           </RecommendTypeSetButton>
-          <RecommendTypeSetButton
-            selected={selectedOption === 2}
-            onClick={() => handleOptionClick(2)}
-          >
+          <RecommendTypeSetButton selected={selectedOption === 2} onClick={() => handleOptionClick(2)}>
             excellent
             <br /> satisfaction
           </RecommendTypeSetButton>
@@ -212,26 +203,26 @@ export default function MeetingSchedule() {
       </HeaderLayout>
       <ScheduleHeaderLayout>
         <ScheduleHeaderTime>
-          <TimeChangeButton
-            onClick={handleGoToPastDay}
-            data-testid="goToPastDayButton"
-          >
+          <TimeChangeButton onClick={handleGoToPastDay} data-testid='goToPastDayButton'>
             <LuChevronLeftSquare />
           </TimeChangeButton>
-          <TimeDiv data-testid="nowDate">
-            {date.getFullYear() +
-              "." +
-              (date.getMonth() + 1) +
-              "." +
-              date.getDate() +
-              "(" +
-              days[date.getDay()] +
-              ")"}
+          <TimeDiv data-testid='nowDate'>
+            <DateButton onClick={() => setShowStartMiniCalendar((prev) => !prev)}>
+            <DateFormat selectedDate={selectedDate} />
+            </DateButton>
+            {showStartMiniCalendar && (
+              <CalendarDiv>
+                <MiniCalendar
+                  selectDate={DateHandle}
+                  selectedDate={selectedDate}
+                  close={() => setShowStartMiniCalendar(false)}
+                  view='day'
+                  $standardDate={new Date(new Date().setHours(0, 0, 0, 0))}
+                />
+              </CalendarDiv>
+            )}
           </TimeDiv>
-          <TimeChangeButton
-            onClick={handleGoToNextDay}
-            data-testid="goToNextDayButton"
-          >
+          <TimeChangeButton onClick={handleGoToNextDay} data-testid='goToNextDayButton'>
             <LuChevronRightSquare />
           </TimeChangeButton>
         </ScheduleHeaderTime>
@@ -242,9 +233,7 @@ export default function MeetingSchedule() {
             <ScheduleDiv />
             Scheduled
           </WorkingScheduleLayout>
-          <DetailDiv>
-            * Hover over the scheduled event area to view details.
-          </DetailDiv>
+          <DetailDiv>* Hover over the scheduled event area to view details.</DetailDiv>
         </ScheduleHeaderExp>
       </ScheduleHeaderLayout>
       <ScheduleComponent
@@ -342,7 +331,7 @@ const ScheduleHeaderLayout = styled.div`
 const ScheduleHeaderTime = styled.div`
   display: flex;
   gap: 2rem;
-  font-weight: bold;
+  font-weight: 500;
   font-size: 17px;
   padding-left: 3rem;
   align-items: center;
@@ -404,4 +393,23 @@ const ButtonsLayout = styled.div`
   justify-content: right;
   margin-top: 1rem;
   gap: 2rem;
+`;
+
+const CalendarDiv = styled.div`
+  position: relative;
+  top: -4rem;
+  left: -15rem;
+`;
+
+const DateButton = styled.div`
+  width: 7rem;
+  height: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  padding: 0.1rem 0.7rem;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
 `;
