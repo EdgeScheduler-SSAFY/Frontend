@@ -12,8 +12,8 @@ import SubmitButton from "@/features/meetingSchedule/ui/SubmitButton";
 import useMeetStore, { MeetState } from "@/store/meetStore";
 import { MiniCalendar, fetchWithInterceptor } from "@/shared";
 import DateFormat from "@/shared/lib/dateFormat";
-
-const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+import SelectTime from "@/shared/ui/selectTime";
+import { intervalTime, dayList } from "@/shared/lib/data";
 export default function MeetingSchedule() {
   const { startDatetime, endDatetime, runningtime, memberList } = useMeetStore((state: MeetState) => state);
 
@@ -22,7 +22,7 @@ export default function MeetingSchedule() {
   const todayDate = new Date();
   const [date, setDate] = useState<Date>(todayDate);
   const [startDate, setStartDate] = useState<string>(
-    date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate() + "(" + days[date.getDay()] + ")"
+    date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate() + "(" + dayList[date.getDay()] + ")"
   );
   const [endDate, setEndDate] = useState<string>(startDate);
   const [selectedOption, setSelectedOption] = useState(0);
@@ -31,22 +31,30 @@ export default function MeetingSchedule() {
   const [endTime, setEndTime] = useState<string>("AM 01:00");
   const [endIndex, setEndIndex] = useState<number>(-2);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
+  const [disabledIndex, setDisabledIndex] = useState<number>(0);
   // 시작날짜 값이 변경될 때 실행될 함수
   const DateHandle = (selectedDate: Date) => {
     setSelectedDate(selectedDate);
     let tmpDate =
-    selectedDate.getFullYear() +
-    "." +
-    (selectedDate.getMonth() + 1) +
-    "." +
-    selectedDate.getDate() +
-    "(" +
-    days[selectedDate.getDay()] +
-    ")";
+      selectedDate.getFullYear() +
+      "." +
+      (selectedDate.getMonth() + 1) +
+      "." +
+      selectedDate.getDate() +
+      "(" +
+      dayList[selectedDate.getDay()] +
+      ")";
     setStartDate(tmpDate);
     setEndDate(tmpDate);
   };
+
+  // 시작시간 값이 변경될 때 실행될 함수
+  const startTimeChangeHandle = (value: number | string) => {
+    setDisabledIndex(intervalTime.findIndex((option) => option.value === value));
+  };
+
+  // 끝시간 값이 변경될 때 실행될 함수
+  const endTimeChangeHandle = (value: number | string) => {};
 
   const handleOptionClick = (index: number) => {
     setSelectedOption(index);
@@ -62,7 +70,7 @@ export default function MeetingSchedule() {
         "." +
         pastDate.getDate() +
         "(" +
-        days[pastDate.getDay()] +
+        dayList[pastDate.getDay()] +
         ")";
       setSelectedDate(pastDate);
       setStartDate(tmpDate);
@@ -79,7 +87,7 @@ export default function MeetingSchedule() {
       "." +
       nextDate.getDate() +
       "(" +
-      days[nextDate.getDay()] +
+      dayList[nextDate.getDay()] +
       ")";
     setSelectedDate(nextDate);
     setStartDate(tmpDate);
@@ -89,6 +97,7 @@ export default function MeetingSchedule() {
   useEffect(() => {
     if (startIndex >= 0) {
       changeDate(date, startIndex) && setStartDate(changeDate(date, startIndex));
+      setDisabledIndex(startIndex);
       setStartTime(changeTime(startIndex));
     }
   }, [startIndex, date]);
@@ -110,12 +119,12 @@ export default function MeetingSchedule() {
         "." +
         nextDate.getDate() +
         "(" +
-        days[nextDate.getDay()] +
+        dayList[nextDate.getDay()] +
         ")";
       return tmpDate;
     } else {
       const tmpDate =
-        date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate() + "(" + days[date.getDay()] + ")";
+        date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate() + "(" + dayList[date.getDay()] + ")";
       return tmpDate;
     }
   };
@@ -175,16 +184,24 @@ export default function MeetingSchedule() {
           <DateinDateDiv>Date</DateinDateDiv>
           <TimeSelectionLayout>
             <DateDiv data-testid='startDate'>{startDate}</DateDiv>
-            <TimeButton>
-              <div>{startTime}</div>
-              <IoMdArrowDropdown />
-            </TimeButton>
+            <SelectTime
+              options={intervalTime}
+              show={false}
+              width={6.5}
+              onSelectChange={startTimeChangeHandle}
+              standardIdx={startIndex <= 0 ? 0 : startIndex}
+              disabledLastIndex={intervalTime.length - 1}
+            ></SelectTime>
             <HypoonDiv>-</HypoonDiv>
             <DateDiv data-testid='endDate'>{endDate}</DateDiv>
-            <TimeButton>
-              <div>{endTime}</div>
-              <IoMdArrowDropdown />
-            </TimeButton>
+            <SelectTime
+              options={intervalTime}
+              show={false}
+              width={6.5}
+              onSelectChange={endTimeChangeHandle}
+              standardIdx={endIndex <= 0 ? 0 : endIndex}
+              disabledIndex={disabledIndex}
+            ></SelectTime>
           </TimeSelectionLayout>
         </DateLayout>
         <OptionLayout>
@@ -208,7 +225,7 @@ export default function MeetingSchedule() {
           </TimeChangeButton>
           <TimeDiv data-testid='nowDate'>
             <DateButton onClick={() => setShowStartMiniCalendar((prev) => !prev)}>
-            <DateFormat selectedDate={selectedDate} />
+              <DateFormat selectedDate={selectedDate} />
             </DateButton>
             {showStartMiniCalendar && (
               <CalendarDiv>
@@ -277,30 +294,16 @@ const OptionLayout = styled.div`
 
 const DateDiv = styled.div`
   display: flex;
-  width: 8rem;
-
-  min-height: 2.5rem;
-  border: 1px solid gray;
-  padding-top: auto;
-  padding-bottom: auto;
-  padding-left: 5px;
-  margin-left: 10px;
-  margin-right: 10px;
-  font-size: 16px;
-  align-items: center;
-`;
-
-const TimeButton = styled.button`
-  display: flex;
-  min-height: 2.5rem;
-  border: 1px solid gray;
   width: 7rem;
-  font-size: 1rem;
-  padding-right: 8px;
+  min-height: 2rem;
+  border: solid 1px ${Color("black200")};
+  border-radius: 3px;
+  padding: 0.1rem 0.7rem;
+  margin-right: 10px;
+  font-size: 14px;
   align-items: center;
-  justify-content: space-between;
-  background-color: white;
 `;
+
 const DateinDateDiv = styled.div`
   margin-left: 10px;
   font-weight: bold;
@@ -310,6 +313,7 @@ const TimeSelectionLayout = styled.div`
   display: flex;
   flex-direction: row;
   margin-top: 0.5rem;
+  margin-left: 0.8rem;
 `;
 
 const HypoonDiv = styled.div`

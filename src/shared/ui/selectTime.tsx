@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
+import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 
 import { Color } from "../lib/styles/color";
 import { selectList } from "../lib/type";
@@ -78,6 +79,7 @@ export default function SelectTime(props: SelectProps) {
       <SelectDiv id={props.id} width={props.width}>
         <SelectedDiv width={props.width} onClick={toggleSelect}>
           <SelectedValue>{selectedValue}</SelectedValue>
+          {selectFlag ? <CustomIoMdArrowDropup /> : <CustomIoMdArrowDropdown />}
         </SelectedDiv>
         <SelectList width={props.width} $show={selectFlag}>
           {props.options.map((option, index) => (
@@ -109,6 +111,9 @@ const SelectedDiv = styled.div<{ width: number }>`
   font-size: 14px;
   cursor: pointer;
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const SelectedValue = styled.span`
@@ -151,4 +156,12 @@ const SelectOption = styled.li<{ $disabled: boolean }>`
     background-color: ${({ $disabled }) => ($disabled ? Color("black50") : Color("blue50"))};
     box-sizing: border-box;
   }
+`;
+
+const CustomIoMdArrowDropdown = styled(IoMdArrowDropdown)`
+  margin-right: 0.5rem;
+`;
+
+const CustomIoMdArrowDropup = styled(IoMdArrowDropup)`
+  margin-right: 0.5rem;
 `;
