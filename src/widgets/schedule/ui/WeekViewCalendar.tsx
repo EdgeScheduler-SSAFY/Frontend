@@ -255,7 +255,8 @@ const MainLayout = styled.div<{ more: boolean }>`
   grid-template-rows: ${(props) => (props.more ? "30px max-content" : "30px 70px")};
   width: 70vw;
   height: calc(100% - 75px);
-  margin: 10px auto;
+  margin: 0 auto;
+  padding: 0 0 10px 0;
 `;
 const CalanderLayout = styled.div`
   display: grid;

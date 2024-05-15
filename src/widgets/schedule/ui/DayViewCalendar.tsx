@@ -182,7 +182,8 @@ const MainLayout = styled.div<{ more?: boolean }>`
   grid-template-rows: ${(props) => (props.more ? "50px max-content" : "50px 65px")};
   width: 70vw;
   height: calc(100% - 75px);
-  margin: 10px auto;
+  margin: 0 auto;
+  padding: 0 0 10px 0;
 `;
 const DayDiv = styled.div`
   width: 100%;

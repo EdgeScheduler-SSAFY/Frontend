@@ -104,3 +104,23 @@ export interface getScheduleDetailsResponse {
     recurrenceDay: ("MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN")[];
   };
 }
+
+export interface searchAvailableAttendeesRequest {
+  scheduleId: number;
+  startDatetime: string;
+  endDatetime: string;
+}
+export interface searchAvailableAttendeesResponse {
+  availableMembers: member[];
+  unavailableMembers: member[];
+}
+export interface member {
+  memberId: number;
+  memberName: string;
+  isRequired: boolean;
+}
+export interface proposalAnswerRequest {
+  scheduleId: number;
+  proposalId: number;
+  isAccepted: boolean;
+}

@@ -144,9 +144,18 @@ export function CreateSchedule({
       default:
     }
   };
+  const dayOfWeek: ("MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN")[] = [
+    "SUN",
+    "MON",
+    "TUE",
+    "WED",
+    "THU",
+    "FRI",
+    "SAT",
+  ];
   const [recurrenceDay, setRecurrenceDay] = useState<
     ("MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN")[]
-  >(data?.recurrenceDetails?.recurrenceDay || []); // 반복 요일
+  >(data?.recurrenceDetails?.recurrenceDay || [dayOfWeek[startDate.getDay()]]); // 반복 요일
   const [expanded, setExpanded] = useState<boolean>(false);
   const day: ("MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN")[] = [
     "MON",
@@ -266,7 +275,7 @@ export function CreateSchedule({
       startDatetime: isAllDay ? startDatetime.split("T")[0] + "T00:00:00" : startDatetime,
       endDatetime: isAllDay ? endDatetime.split("T")[0] + "T23:45:00" : endDatetime,
       isPublic: isPublic,
-      isRecurrence: isRecurrence,
+      isRecurrence: data.recurrenceDetails ? true : isRecurrence,
       isOneOff: isOneOff,
       nameIsChanged: data.name !== name,
       descriptionIsChanged: data.description !== description,
@@ -382,6 +391,7 @@ export function CreateSchedule({
             isOn={isOneOff}
             onToggle={() => {
               setIsOneOff((prev) => !prev);
+              setIsRecurrence((prev) => !prev);
             }}
           ></Togle>
         </TogleDiv>
@@ -399,185 +409,192 @@ export function CreateSchedule({
         </TogleDiv>
       )}
       {/* 반복설정 */}
-      <TogleDiv>
-        Recurrence{" "}
-        <Togle
-          isOn={isRecurrence}
-          onToggle={() => {
-            setIsRecurrence((prev) => !prev);
-            setShowRecurrence(false);
-          }}
-        ></Togle>
-        {isRecurrence && (
-          <RecurrenceRowLayout2>
-            <Button
-              width={3}
-              height={1.5}
-              fontSize={12}
-              onClick={() => setShowRecurrence((prev) => !prev)}
-            >
-              setting
-            </Button>
-            <RecurrenceText>
-              {" "}
-              every
-              {intv +
-                " " +
-                (freq === "MONTHLY" ? "MONTH" : freq === "WEEKLY" ? "WEEK" : "DAY") +
-                " on " +
-                (freq === "MONTHLY"
-                  ? format(new Date(), "dd")
-                  : freq === "WEEKLY"
-                  ? recurrenceDay.map((d) => d).join(", ")
-                  : format(new Date(), "dd"))}
-            </RecurrenceText>
-          </RecurrenceRowLayout2>
-        )}
-        {showRecurrence && (
-          <RecurrenceLayout ref={ref2}>
-            <b>Recurrence</b>
-            <RecurrenceRowLayout>
-              <div>Recurrence every</div>
-              <RecurrenceEveryLayout>
-                {/* 반복횟수 */}
-                <div>{intv}</div>
-                <PlusMinusLayout>
-                  <PlusMinusDiv onClick={() => setIntv((prev) => prev + 1)}>
-                    <IoIosArrowUp></IoIosArrowUp>
-                  </PlusMinusDiv>
-                  <PlusMinusDiv onClick={() => setIntv((prev) => Math.max(1, prev - 1))}>
-                    <IoIosArrowDown></IoIosArrowDown>
-                  </PlusMinusDiv>
-                </PlusMinusLayout>
-                <FreqLayout onClick={() => setExpanded(!expanded)}>
-                  {/* 반복주기 */}
-                  <FreqDiv>{freq}</FreqDiv>
-                  <ArrowDiv>
-                    <FaAngleDown size={10} />
-                  </ArrowDiv>
-                  {/* 확장 시 view 선택 버튼 렌더링 */}
-                  {expanded && (
-                    <DropdownLayout>
-                      <DropdownDiv onClick={() => setFreq("MONTHLY")}>MONTHLY</DropdownDiv>
-                      <DropdownDiv onClick={() => setFreq("WEEKLY")}>WEEKLY</DropdownDiv>
-                      <DropdownDiv onClick={() => setFreq("DAILY")}>DAILY</DropdownDiv>
-                    </DropdownLayout>
-                  )}
-                </FreqLayout>
-              </RecurrenceEveryLayout>
-            </RecurrenceRowLayout>
-            {/* 반복요일 */}
-            <RecurrenceRowLayout>
-              Recurrence on
-              {freq === "WEEKLY" && (
-                <DayLayout>
-                  {day.map((d: "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN") => (
-                    <DayDiv
-                      key={d}
-                      color={recurrenceDay.includes(d) ? "lightgray" : "white"}
-                      onClick={() => handleDayClick(d)}
-                    >
-                      {d}
-                    </DayDiv>
-                  ))}
-                </DayLayout>
-              )}
-            </RecurrenceRowLayout>
-            <div>ends</div>
-            {/* 반복 종료 시점 */}
-            <EndsLayout>
-              <RadioLayout>
-                <RadioDiv>
-                  <input
-                    type="radio"
-                    value={"never"}
-                    checked={!isExpiredDate && !isCount}
-                    onChange={handleRadioChange}
-                  />
-                  <div>never</div>
-                </RadioDiv>
-                <RadioDiv>
-                  <input
-                    type="radio"
-                    value={"on"}
-                    checked={isExpiredDate}
-                    onChange={handleRadioChange}
-                  />
-                  <div>on</div>
-                </RadioDiv>
-                <RadioDiv>
-                  <input
-                    type="radio"
-                    checked={isCount}
-                    onChange={handleRadioChange}
-                    value={"after"}
-                  />
-                  <div>after</div>
-                </RadioDiv>
-              </RadioLayout>
-              {/* 반복 종료날짜 */}
-              <RadioLayout>
-                <div></div>
-                {isExpiredDate ? (
-                  <DateButton onClick={() => setShowRecurrenceMiniCalendar((prev) => !prev)}>
-                    {expiredDate.getFullYear()}.{("0" + (expiredDate.getMonth() + 1)).slice(-2)}.
-                    {("0" + expiredDate.getDate()).slice(-2)}
-                  </DateButton>
-                ) : (
-                  <div></div>
-                )}
-                {showRecurrenceMiniCalendar && (
-                  <StartCalendarDiv>
-                    <MiniCalendar
-                      selectDate={setExpiredDate}
-                      selectedDate={expiredDate}
-                      close={() => setShowRecurrenceMiniCalendar(false)}
-                      view="day"
-                      $standardDate={new Date(new Date().setHours(0, 0, 0, 0))}
-                    />
-                  </StartCalendarDiv>
-                )}
-                {/* 반복 횟수 */}
-                {isCount ? (
-                  <EndsLayout>
-                    <div>{count} occurrences</div>
-                    <PlusMinusLayout>
-                      <PlusMinusDiv onClick={() => setCount((prev) => prev + 1)}>
-                        <IoIosArrowUp></IoIosArrowUp>
-                      </PlusMinusDiv>
-                      <PlusMinusDiv onClick={() => setCount((prev) => Math.max(1, prev - 1))}>
-                        <IoIosArrowDown></IoIosArrowDown>
-                      </PlusMinusDiv>
-                    </PlusMinusLayout>
-                  </EndsLayout>
-                ) : (
-                  <div></div>
-                )}
-              </RadioLayout>
-            </EndsLayout>
-            <ButtonLayout>
-              <div></div>
-              <Button width={3} height={1.5} fontSize={12} onClick={() => setShowRecurrence(false)}>
-                save
-              </Button>
+      {!(isUpdate && !data?.recurrenceDetails) && (
+        <TogleDiv>
+          Recurrence{" "}
+          <Togle
+            isOn={isRecurrence}
+            onToggle={() => {
+              setIsRecurrence((prev) => !prev);
+              setShowRecurrence(false);
+            }}
+          ></Togle>
+          {isRecurrence && (
+            <RecurrenceRowLayout2>
               <Button
                 width={3}
                 height={1.5}
                 fontSize={12}
-                onClick={() => {
-                  setShowRecurrence(false);
-                  setIsCount(false);
-                  setIsExpiredDate(false);
-                  setCount(10);
-                  setExpiredDate(startDate);
-                }}
+                onClick={() => setShowRecurrence((prev) => !prev)}
               >
-                cancel
+                setting
               </Button>
-            </ButtonLayout>
-          </RecurrenceLayout>
-        )}
-      </TogleDiv>
+              <RecurrenceText>
+                {" "}
+                every
+                {intv +
+                  " " +
+                  (freq === "MONTHLY" ? "MONTH" : freq === "WEEKLY" ? "WEEK" : "DAY") +
+                  " on " +
+                  (freq === "MONTHLY"
+                    ? format(new Date(), "dd")
+                    : freq === "WEEKLY"
+                    ? recurrenceDay.map((d) => d).join(", ")
+                    : format(new Date(), "dd"))}
+              </RecurrenceText>
+            </RecurrenceRowLayout2>
+          )}
+          {showRecurrence && (
+            <RecurrenceLayout ref={ref2}>
+              <b>Recurrence</b>
+              <RecurrenceRowLayout>
+                <div>Recurrence every</div>
+                <RecurrenceEveryLayout>
+                  {/* 반복횟수 */}
+                  <div>{intv}</div>
+                  <PlusMinusLayout>
+                    <PlusMinusDiv onClick={() => setIntv((prev) => prev + 1)}>
+                      <IoIosArrowUp></IoIosArrowUp>
+                    </PlusMinusDiv>
+                    <PlusMinusDiv onClick={() => setIntv((prev) => Math.max(1, prev - 1))}>
+                      <IoIosArrowDown></IoIosArrowDown>
+                    </PlusMinusDiv>
+                  </PlusMinusLayout>
+                  <FreqLayout onClick={() => setExpanded(!expanded)}>
+                    {/* 반복주기 */}
+                    <FreqDiv>{freq}</FreqDiv>
+                    <ArrowDiv>
+                      <FaAngleDown size={10} />
+                    </ArrowDiv>
+                    {/* 확장 시 view 선택 버튼 렌더링 */}
+                    {expanded && (
+                      <DropdownLayout>
+                        <DropdownDiv onClick={() => setFreq("MONTHLY")}>MONTHLY</DropdownDiv>
+                        <DropdownDiv onClick={() => setFreq("WEEKLY")}>WEEKLY</DropdownDiv>
+                        <DropdownDiv onClick={() => setFreq("DAILY")}>DAILY</DropdownDiv>
+                      </DropdownLayout>
+                    )}
+                  </FreqLayout>
+                </RecurrenceEveryLayout>
+              </RecurrenceRowLayout>
+              {/* 반복요일 */}
+              <RecurrenceRowLayout>
+                Recurrence on
+                {freq === "WEEKLY" && (
+                  <DayLayout>
+                    {day.map((d: "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN") => (
+                      <DayDiv
+                        key={d}
+                        color={recurrenceDay.includes(d) ? "lightgray" : "white"}
+                        onClick={() => handleDayClick(d)}
+                      >
+                        {d}
+                      </DayDiv>
+                    ))}
+                  </DayLayout>
+                )}
+              </RecurrenceRowLayout>
+              <div>ends</div>
+              {/* 반복 종료 시점 */}
+              <EndsLayout>
+                <RadioLayout>
+                  <RadioDiv>
+                    <input
+                      type="radio"
+                      value={"never"}
+                      checked={!isExpiredDate && !isCount}
+                      onChange={handleRadioChange}
+                    />
+                    <div>never</div>
+                  </RadioDiv>
+                  <RadioDiv>
+                    <input
+                      type="radio"
+                      value={"on"}
+                      checked={isExpiredDate}
+                      onChange={handleRadioChange}
+                    />
+                    <div>on</div>
+                  </RadioDiv>
+                  <RadioDiv>
+                    <input
+                      type="radio"
+                      checked={isCount}
+                      onChange={handleRadioChange}
+                      value={"after"}
+                    />
+                    <div>after</div>
+                  </RadioDiv>
+                </RadioLayout>
+                {/* 반복 종료날짜 */}
+                <RadioLayout>
+                  <div></div>
+                  {isExpiredDate ? (
+                    <DateButton onClick={() => setShowRecurrenceMiniCalendar((prev) => !prev)}>
+                      {expiredDate.getFullYear()}.{("0" + (expiredDate.getMonth() + 1)).slice(-2)}.
+                      {("0" + expiredDate.getDate()).slice(-2)}
+                    </DateButton>
+                  ) : (
+                    <div></div>
+                  )}
+                  {showRecurrenceMiniCalendar && (
+                    <StartCalendarDiv>
+                      <MiniCalendar
+                        selectDate={setExpiredDate}
+                        selectedDate={expiredDate}
+                        close={() => setShowRecurrenceMiniCalendar(false)}
+                        view="day"
+                        $standardDate={new Date(new Date().setHours(0, 0, 0, 0))}
+                      />
+                    </StartCalendarDiv>
+                  )}
+                  {/* 반복 횟수 */}
+                  {isCount ? (
+                    <EndsLayout>
+                      <div>{count} occurrences</div>
+                      <PlusMinusLayout>
+                        <PlusMinusDiv onClick={() => setCount((prev) => prev + 1)}>
+                          <IoIosArrowUp></IoIosArrowUp>
+                        </PlusMinusDiv>
+                        <PlusMinusDiv onClick={() => setCount((prev) => Math.max(1, prev - 1))}>
+                          <IoIosArrowDown></IoIosArrowDown>
+                        </PlusMinusDiv>
+                      </PlusMinusLayout>
+                    </EndsLayout>
+                  ) : (
+                    <div></div>
+                  )}
+                </RadioLayout>
+              </EndsLayout>
+              <ButtonLayout>
+                <div></div>
+                <Button
+                  width={3}
+                  height={1.5}
+                  fontSize={12}
+                  onClick={() => setShowRecurrence(false)}
+                >
+                  save
+                </Button>
+                <Button
+                  width={3}
+                  height={1.5}
+                  fontSize={12}
+                  onClick={() => {
+                    setShowRecurrence(false);
+                    setIsCount(false);
+                    setIsExpiredDate(false);
+                    setCount(10);
+                    setExpiredDate(startDate);
+                  }}
+                >
+                  cancel
+                </Button>
+              </ButtonLayout>
+            </RecurrenceLayout>
+          )}
+        </TogleDiv>
+      )}
       {/* 공개여부 WORKING은 항상공개이기떄문에 비활성화 */}
       {!isWORKING && (
         <TogleDiv>
@@ -716,6 +733,7 @@ const DescriptionLayout = styled.div`
   border-top: 1px solid ${Color("black100")};
   padding: 5px 0;
   width: 100%;
+  height: 50px;
   display: grid;
   grid-template-columns: 30px 1fr;
 `;

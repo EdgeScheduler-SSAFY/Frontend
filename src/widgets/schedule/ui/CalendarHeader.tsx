@@ -15,6 +15,7 @@ interface ICalendarHeaderProps {
   selectedDate: Date; //선택된 날짜
   changeDate: (date: Date) => void; //날짜 변경 함수
   selectDate: (date: Date) => void; //날짜 선택 함수
+  setIsMeetingFilter: (isMeetingFilter: boolean) => void;
 }
 //캘린더 헤더 컴포넌트
 export function CalendarHeader({
@@ -23,6 +24,7 @@ export function CalendarHeader({
   selectedDate,
   changeDate,
   selectDate,
+  setIsMeetingFilter,
 }: ICalendarHeaderProps) {
   const [showMiniCalendar, setShowMiniCalendar] = useState<boolean>(false); //미니 캘린더 보여주기 여부
   const [seletedView, setSelectedView] = useState(view); //선택된 뷰
@@ -83,7 +85,7 @@ export function CalendarHeader({
         ></CalendarNavButton>
         <div></div>
         {/* 미팅 필터 버튼 */}
-        <MeetingFilterButton></MeetingFilterButton>
+        <MeetingFilterButton onClick={setIsMeetingFilter}></MeetingFilterButton>
         {/* 뷰 선택 버튼 */}
         <ChooseViewButtons
           view={seletedView}
@@ -124,7 +126,8 @@ export function CalendarHeader({
 }
 const HeaderLayout = styled.div`
   display: grid;
-  padding: 20px 100px;
+  padding: 10px 100px;
+  align-items: center;
   border-bottom: solid 1px #e0e0e0;
   grid-template-columns: 1fr 1fr 9fr 1fr 1fr 1fr;
   position: relative;

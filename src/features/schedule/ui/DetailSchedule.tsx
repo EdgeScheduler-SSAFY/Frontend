@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { GoPencil } from "react-icons/go";
-import { Color } from "@/shared/lib/styles/color";
 import ReactDOM from "react-dom";
 
+import { DetailProposal } from "@/features/schedule/index";
+import { Color } from "@/shared/lib/styles/color";
 import {
   getScheduleDetailsResponse,
   getScheduleDetails,
@@ -33,6 +34,7 @@ export function DetailSchedule({
   top,
 }: IDetailScheduleProps) {
   const [data, setData] = useState<getScheduleDetailsResponse | null>(null); //data api 가져온다.
+  const [trigger, setTrigger] = useState(false); //
   //api 호출
   useEffect(() => {
     getScheduleDetails(scheduleId).then((response) => {
@@ -41,7 +43,7 @@ export function DetailSchedule({
       const endDate = new Date(endDatetime);
       setData({ ...response, startDatetime: startDate, endDatetime: endDate });
     });
-  }, [scheduleId]);
+  }, [scheduleId, trigger]);
   // 외부영역 클릭 확인을위한 ref
   const ref = useRef<HTMLDivElement>(null);
   // 외부영역 클릭시 더보기 일정 닫기
@@ -50,7 +52,8 @@ export function DetailSchedule({
       if (
         ref.current &&
         !ref.current.contains(event.target as Node) &&
-        !document.getElementById("createScheduleModal")?.contains(event.target as Node)
+        !document.getElementById("createScheduleModal")?.contains(event.target as Node) &&
+        !document.getElementById("detailProposal")?.contains(event.target as Node)
       ) {
         close();
       }
@@ -62,28 +65,20 @@ export function DetailSchedule({
     };
   }, []);
   const [showDetail, setShowDetail] = useState(false); // 시간변경제안 상세보기
-  const [detailData, setDetailData] = useState<any>(); // 시간변경제안 상세보기 데이터
+  const [detailData, setDetailData] = useState<{
+    proposal: {
+      proposalId: number;
+      startDatetime: string;
+      endDatetime: string;
+    };
+    reason: string;
+  }>(); // 시간변경제안 상세보기 데이터
   const [showDelete, setShowDelete] = useState(false); // 삭제 확인창 보여주기 상태
   const [showUpadate, setShowUpdate] = useState(false); // 수정창 보여주기 상태
   // 수정창 보여주기
   const handleUpdate = () => {
     setShowUpdate((prev) => !prev);
   };
-  // 외부영역 클릭 확인을위한 ref
-  const ref2 = useRef<HTMLDivElement>(null);
-  // 외부영역 클릭시 더보기 일정 닫기
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref2.current && !ref2.current.contains(event.target as Node)) {
-        setShowDetail(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
   // 삭제 api 호출
   const handelDelete = async (deleteRange?: "ALL" | "ONE" | "AFTERALL") => {
     await deleteSchedule({
@@ -108,6 +103,8 @@ export function DetailSchedule({
       data-testid="detail schedule"
       left={left}
       top={top}
+      viewportHeight={window.innerHeight}
+      id="detailSchedule"
     >
       <NameLayout>
         <TextDiv>
@@ -169,7 +166,7 @@ export function DetailSchedule({
                 )}
               </ProfileLayout>
               <AteendeeNameLayout>
-                {attendee.memberId}
+                {attendee.memberName}
                 {attendee.proposal ? (
                   <SmTextDiv>{attendee.proposal.startDatetime}</SmTextDiv>
                 ) : attendee.reason ? (
@@ -179,70 +176,34 @@ export function DetailSchedule({
               {/* 제안이 있는 참가자만 보여줌 */}
               {attendee.proposal &&
                 JSON.parse(sessionStorage.getItem("user") || "").id === data.organizerId && (
-                  <button
+                  <Button
+                    width={3}
+                    height={1.5}
+                    fontSize={10}
                     onClick={() => {
                       setShowDetail((prev) => !prev);
                       setDetailData(attendee);
                     }}
                   >
                     detail
-                  </button>
+                  </Button>
                 )}
             </AttendeeLayout>
           ))}
         </AttendeesLayout>
       )}
       {/* 시간변경제안 상세보기 */}
-      {showDetail && (
-        <ProposalDetailLayout ref={ref2}>
-          <NameLayout>
-            <div>suggested time</div>
-          </NameLayout>
-          <div>{data.name}</div>
-          <DataLayout>
-            {detailData.startDatetime &&
-            detailData.endDatetime &&
-            format(detailData.startDatetime, "yyyy-MM-dd(EE)") !==
-              format(detailData.endDatetime, "yyyy-MM-dd(EE)") ? (
-              <div>
-                {format(detailData.startDatetime, "yyyy-MM-dd(EE) HH:mm a") +
-                  " ~ " +
-                  format(detailData.endDatetime, "yyyy-MM-dd(EE) HH:mm a")}
-              </div>
-            ) : (
-              <div>
-                {format(detailData.startDatetime, "yyyy-MM-dd(EE) HH:mm a") +
-                  " ~ " +
-                  format(detailData.endDatetime, "HH:mm a")}
-              </div>
-            )}
-          </DataLayout>
-          <div>reason</div>
-          <SmTextDiv>{detailData.reason}</SmTextDiv>
-          <AttendeeLayout>
-            <div>
-              <div>ACCEPTED</div>
-              {data.type === "MEETING" &&
-                data.attendeeList &&
-                data.attendeeList
-                  .filter((attendee) => attendee.status === "ACCEPTED")
-                  .map((attendee: any) => <div key={attendee.memberId}>{attendee.memberId}</div>)}
-            </div>
-            <div>
-              <div>DECLINED</div>
-              {data.type === "MEETING" &&
-                data.attendeeList &&
-                data.attendeeList
-                  .filter((attendee) => attendee.status === "DECLINED")
-                  .map((attendee: any) => <div key={attendee.memberId}>{attendee.memberId}</div>)}
-            </div>
-          </AttendeeLayout>
-          <ButtonLayout>
-            <div></div>
-            <button>accept</button>
-            <button>decline</button>
-          </ButtonLayout>
-        </ProposalDetailLayout>
+      {showDetail && detailData?.proposal && (
+        <DetailProposal
+          triggerReload={() => setTrigger((prev) => !prev)}
+          endDatetime={detailData?.proposal?.endDatetime}
+          name={data.name}
+          proposalId={detailData?.proposal?.proposalId}
+          reason={detailData?.reason}
+          scheduleId={data.scheduleId}
+          startDatetime={detailData?.proposal?.startDatetime}
+          close={() => setShowDetail(false)}
+        ></DetailProposal>
       )}
       {/* 삭제확인체크 반복의 경우 삭제방식 선택 */}
       {showDelete ? (
@@ -351,11 +312,12 @@ export function DetailSchedule({
   );
 }
 
-const MainLayout = styled.div<{ left: number; top: number }>`
-  /* position: fixed; */
+const MainLayout = styled.div<{ left: number; top: number; viewportHeight: number }>`
   position: absolute;
-  top: ${(props) => props.top}px;
-  left: ${(props) => props.left}px;
+  top: ${(props) => (props.top > props.viewportHeight / 2 ? "auto" : `${props.top}px`)};
+  bottom: ${(props) =>
+    props.top > props.viewportHeight / 2 ? `${props.viewportHeight - props.top}px` : "auto"};
+  left: ${(props) => `${props.left}px`};
   background-color: white;
   width: 350px;
   z-index: 300;
@@ -404,7 +366,6 @@ const ProfileImage = styled.img`
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background-color: blue;
 `;
 const CircleLayout = styled.div<{ color: "green" | "orange" | "black100" }>`
   width: 15px;
@@ -421,18 +382,6 @@ const SmTextDiv = styled.div`
   color: ${Color("black400")};
 `;
 
-const ProposalDetailLayout = styled.div`
-  position: absolute;
-  width: 350px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-  border-radius: 5px;
-  border: 1px solid #e0e0e0;
-  left: 0;
-  top: 0;
-  padding: 20px;
-  background-color: #fff;
-  z-index: 200;
-`;
 const ButtonLayout = styled.div`
   width: 100%;
   display: grid;
