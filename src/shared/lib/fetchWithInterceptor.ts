@@ -3,11 +3,8 @@ type RequestOptions = {
   headers?: HeadersInit;
   body?: string;
 };
-export function fetchWithInterceptor(
-  url: string,
-  options: RequestOptions = {}
-) {
-  const accessToken = sessionStorage.getItem("accessToken");
+export async function fetchWithInterceptor(url: string, options: RequestOptions = {}) {
+  let accessToken = sessionStorage.getItem("accessToken");
   if (!accessToken) {
     console.log("access token is not found");
     return Promise.reject("access token is not found");
@@ -15,7 +12,7 @@ export function fetchWithInterceptor(
   const refreshToken = sessionStorage.getItem("refreshToken");
   const expiresAt = sessionStorage.getItem("expiresAt");
   if (expiresAt && new Date(expiresAt) < new Date()) {
-    fetch("https://user-service.edgescheduler.co.kr/auth/token/refresh", {
+    await fetch("https://user-service.edgescheduler.co.kr/auth/token/refresh", {
       method: "POST",
       headers: {
         Authorization: "Bearer " + accessToken,
@@ -25,12 +22,9 @@ export function fetchWithInterceptor(
     })
       .then((response) => response.json())
       .then((data) => {
-        data["access-token"] &&
-          sessionStorage.setItem("accessToken", data["access-token"]);
-        data["refresh-token"] &&
-          sessionStorage.setItem("refreshToken", data["refresh-token"]);
-        data["expires_in"] &&
-          sessionStorage.setItem("expiresIn", data["expires_in"]);
+        data["access-token"] && sessionStorage.setItem("accessToken", data["access-token"]);
+        data["refresh-token"] && sessionStorage.setItem("refreshToken", data["refresh-token"]);
+        data["expires_in"] && sessionStorage.setItem("expiresIn", data["expires_in"]);
         const expiresIn = sessionStorage.getItem("expiresIn");
         if (expiresIn) {
           const currentTime = new Date();
@@ -40,6 +34,7 @@ export function fetchWithInterceptor(
           sessionStorage.setItem("expiresAt", expiresAt.toISOString());
         }
       });
+    accessToken = sessionStorage.getItem("accessToken");
   }
   // 기본 헤더 설정
   const defaultHeaders = {
