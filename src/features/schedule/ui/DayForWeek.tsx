@@ -17,14 +17,12 @@ export function DayForWeek({ scheduleList, triggerReload }: IDayForWeekProps) {
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 }); // 모달 위치
   const handleDayClick = (event: React.MouseEvent) => {
     //클릭한곳의 위치를 바탕으로 모달 위치 정함
-    const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
     const positionY = event.clientY;
     const positionX = event.clientX;
-    const top = positionY > viewportHeight / 2 ? positionY - 200 : positionY;
     const left = positionX > viewportWidth / 2 ? positionX - 450 : positionX;
 
-    setModalPosition({ x: left, y: top });
+    setModalPosition({ x: left, y: positionY });
     setShowDetails((prev) => !prev);
   };
   const [scheduleId, setScheduleId] = useState<number>(0);
