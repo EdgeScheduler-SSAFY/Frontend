@@ -66,7 +66,7 @@ export interface updateScheduleRequest {
     count?: number;
     recurrenceDay?: ("MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN")[];
   };
-  attedeeList?: {
+  attendeeList?: {
     memberId: number;
     isRequired: boolean;
   }[];
