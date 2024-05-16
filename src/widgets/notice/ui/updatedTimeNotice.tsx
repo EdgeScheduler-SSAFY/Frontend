@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { getDay } from "date-fns";
@@ -6,9 +6,9 @@ import { MdClose } from "react-icons/md";
 
 import { Color } from "@/shared/lib/styles/color";
 import { ProposalButton } from "@/shared/ui/proposalButton";
-import ProposalModal from "@/shared/ui/modalLayout";
+import ModalLayout from "@/shared/ui/modalLayout";
 import { dayList, MonthList } from "@/shared/lib/data";
-import ModalContent from "@/shared/ui/proposalModal";
+import ProposalModal from "@/shared/ui/proposalModal";
 import { PostMeetingAccepted } from "@/shared/api/postMeetingAccepted";
 import ConversionTimeMini from "@/features/noticeList/model/conversionTimeMini";
 
@@ -55,7 +55,7 @@ export default function UpdatedTimeNotice({ eventData, onClose }: { eventData: a
         <InfoDiv>
           <TitleDiv>{eventData.scheduleName}</TitleDiv>
           <TimeDiv>
-          <ConversionTimeMini start={eventData.updatedStartTime} end={eventData.updatedEndTime} />
+            <ConversionTimeMini start={eventData.updatedStartTime} end={eventData.updatedEndTime} />
           </TimeDiv>
           <ProposalButton
             buttonClicked={buttonClicked}
@@ -67,19 +67,19 @@ export default function UpdatedTimeNotice({ eventData, onClose }: { eventData: a
           />
         </InfoDiv>
       </NoticeContent>
-      <ProposalModal
+      <ModalLayout
         open={isModalOpen}
         onClose={() => {
           setIsModalOpen((prev) => !prev);
         }}
       >
-        <ModalContent
+        <ProposalModal
           eventData={eventData}
           onClose={() => {
             setIsModalOpen((prev) => !prev);
           }}
         />
-      </ProposalModal>
+      </ModalLayout>
     </UpdatedTimeNoticeLayout>
   );
 }
