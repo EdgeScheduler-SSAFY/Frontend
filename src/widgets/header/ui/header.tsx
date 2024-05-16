@@ -15,8 +15,8 @@ import useNoticeStore from "@/store/noticeStore";
 
 export function Header() {
   const [showNoticeList, setShowNoticeList] = useState<boolean>(false);
-  const noticeCount = useNoticeStore(state => state.noticeCount); 
-  const setNoticeCount = useNoticeStore(state => state.setNoticeCount);
+  const noticeCount = useNoticeStore((state) => state.noticeCount);
+  const setNoticeCount = useNoticeStore((state) => state.setNoticeCount);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -131,13 +131,17 @@ const CustomMdOutlineNotifications = styled(MdOutlineNotifications)`
 `;
 
 const NoticeCountDiv = styled.div`
+  width: 1rem;
+  height: 1rem;
   border-radius: 50%;
-  padding: 0.1rem 0.15rem;
   background-color: ${Color("orange")};
   color: ${Color("white")};
   font-size: 9px;
-  font-weight: 600;
+  font-weight: 500;
   position: absolute;
   top: 0.7rem;
   right: 2.9rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
