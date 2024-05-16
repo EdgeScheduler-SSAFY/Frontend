@@ -65,6 +65,7 @@ export default function MeetingSchedule() {
       days[date.getDay()] +
       ")"
   ); // 시작 날짜
+
   const router = useRouter();
   const [schedulesAndAvailabilities, setSchedulesAndAvailabilities] = useState<
     SchedulesAndAvailabilitiesProps[]
@@ -75,7 +76,13 @@ export default function MeetingSchedule() {
   const [selectedOption, setSelectedOption] = useState(0);
   const [startTime, setStartTime] = useState<string>("AM 00:00");
   const [endTime, setEndTime] = useState<string>("AM 01:00");
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const start = new Date(startDatetime);
+  const dateWithNoTime = new Date(
+    start.getFullYear(),
+    start.getMonth(),
+    start.getDate()
+  );
+  const [selectedDate, setSelectedDate] = useState<Date>(dateWithNoTime);
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
   // 시작날짜 값이 변경될 때 실행될 함수
   const DateHandle = (selectedDate: Date) => {
@@ -98,7 +105,7 @@ export default function MeetingSchedule() {
       (selectedDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
     );
     setDayCount(diff);
-  };
+  }; //달력에서 고를때
 
   // 시작시간 값이 변경될 때 실행될 함수
   const startTimeChangeHandle = (value: number | string) => {
@@ -142,12 +149,8 @@ export default function MeetingSchedule() {
   };
 
   const handleGoToNextDay = () => {
-    let nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000);
-    let endOfNowDate = new Date(
-      finalDate.getFullYear(),
-      finalDate.getMonth(),
-      finalDate.getDate()
-    );
+    let nextDate = new Date(selectedDate.getTime() + 24 * 60 * 60 * 1000);
+    let endOfNowDate = new Date(finalDate);
     if (nextDate <= endOfNowDate) {
       let tmpDate =
         nextDate.getFullYear() +
@@ -221,6 +224,14 @@ export default function MeetingSchedule() {
       setEndTime(changeTime(zuEndIndex));
     }
   }, [zuEndIndex, selectedDate]);
+
+  useEffect(() => {
+    console.log("dayCount", dayCount);
+  }, [dayCount]);
+
+  useEffect(() => {
+    setDayCount(0);
+  }, [setDayCount]);
 
   const changeDate = (date: Date, timeIndex: number) => {
     if (timeIndex > 95) {
@@ -452,7 +463,7 @@ export default function MeetingSchedule() {
                   selectedDate={selectedDate}
                   close={() => setShowStartMiniCalendar(false)}
                   view="day"
-                  $standardDate={new Date(new Date().setHours(0, 0, 0, 0))}
+                  $standardDate={dateWithNoTime}
                   $endDate={new Date(endDatetime)}
                 />
               </CalendarDiv>
