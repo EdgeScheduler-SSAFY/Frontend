@@ -6,12 +6,12 @@ import { PaginationProps } from "@/shared/lib/type";
 import { Color } from "@/shared/lib/styles/color";
 
 export default function Pagination(PaginationData: PaginationProps) {
-  const [start, setStart] = useState<number>(1);
+  const [start, setStart] = useState<number>(0);
   const isSelected = (page: number) => page === PaginationData.currentPage;
 
   const pageNumbers = [];
-  for (let i = start; i <= Math.min(start + 4, PaginationData.totalPages); i++) {
-    pageNumbers.push(i);
+  for (let i = start; i <= Math.min(start + 4, PaginationData.totalPages - 1); i++) {
+    pageNumbers.push(i + 1);
   }
 
   const prevPage = () => {
@@ -30,9 +30,13 @@ export default function Pagination(PaginationData: PaginationProps) {
 
   return (
     <PaginationDiv>
-      <NavButton onClick={prevPage} disabled={start === 1}>{`< Prev`}</NavButton>
+      <NavButton onClick={prevPage} disabled={start === 0}>{`< Prev`}</NavButton>
       {pageNumbers.map((number) => (
-        <PageButton key={number} onClick={() => PaginationData.setPage(number)} $isSelected={isSelected(number)}>
+        <PageButton
+          key={number}
+          onClick={() => PaginationData.setPage(number - 1)}
+          $isSelected={isSelected(number - 1)}
+        >
           {number}
         </PageButton>
       ))}
