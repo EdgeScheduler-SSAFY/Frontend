@@ -68,10 +68,10 @@ export const runningTime: selectList[] = [
 ];
 
 export const intervalTime = [
-  { value: "00:00:00", option: "AM 12:00" },
-  { value: "00:15:00", option: "AM 12:15" },
-  { value: "00:30:00", option: "AM 12:30" },
-  { value: "00:45:00", option: "AM 12:45" },
+  { value: "00:00:00", option: "AM 00:00" },
+  { value: "00:15:00", option: "AM 00:15" },
+  { value: "00:30:00", option: "AM 00:30" },
+  { value: "00:45:00", option: "AM 00:45" },
   { value: "01:00:00", option: "AM 01:00" },
   { value: "01:15:00", option: "AM 01:15" },
   { value: "01:30:00", option: "AM 01:30" },

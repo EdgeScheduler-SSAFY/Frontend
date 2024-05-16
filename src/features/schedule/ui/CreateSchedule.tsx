@@ -388,7 +388,7 @@ export function CreateSchedule({
         <TogleDiv>
           is one off
           <Togle
-            isOn={isOneOff}
+            $isOn={isOneOff}
             onToggle={() => {
               setIsOneOff((prev) => !prev);
               setIsRecurrence((prev) => !prev);
