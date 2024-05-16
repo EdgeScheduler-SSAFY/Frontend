@@ -193,7 +193,7 @@ export function CreateSchedule({
           ? 2
           : 3,
       startDatetime: isAllDay ? startDatetime.split("T")[0] + "T00:00:00" : startDatetime, //all day 일정이면 00:00:00으로 설정
-      endDatetime: isAllDay ? endDatetime.split("T")[0] + "T23:45:00" : endDatetime, // all day 일정이면 23:45:00으로 설정
+      endDatetime: isAllDay ? endDatetime.split("T")[0] + "T23:59:59" : endDatetime, // all day 일정이면 23:45:00으로 설정
       isPublic: isWORKING ? true : isPublic,
       isRecurrence: isRecurrence,
       recurrence: isRecurrence
@@ -253,7 +253,7 @@ export function CreateSchedule({
     setEndDatetime(endDate + "T" + value);
   };
 
-  const [isOneOff, setIsOneOff] = useState<boolean>(true); // 반복 일정의 수정시 일회성 여부
+  const [isOneOff, setIsOneOff] = useState<boolean>(data?.recurrenceDetails ? true : false); // 반복 일정의 수정시 일회성 여부
 
   //일정 수정 api 호출
   const handleupdateSchedule = async () => {
@@ -273,10 +273,10 @@ export function CreateSchedule({
           ? 2
           : 3,
       startDatetime: isAllDay ? startDatetime.split("T")[0] + "T00:00:00" : startDatetime,
-      endDatetime: isAllDay ? endDatetime.split("T")[0] + "T23:45:00" : endDatetime,
+      endDatetime: isAllDay ? endDatetime.split("T")[0] + "T23:59:59" : endDatetime,
       isPublic: isPublic,
       isRecurrence: data.recurrenceDetails ? true : isRecurrence,
-      isOneOff: isOneOff,
+      isOneOff: data.recurrenceDetails ? true : isOneOff,
       nameIsChanged: data.name !== name,
       descriptionIsChanged: data.description !== description,
       timeIsChanged:
@@ -389,7 +389,7 @@ export function CreateSchedule({
         )}
       </PeriodDiv>
       {/* 수정일때만 표시하는 oneoff */}
-      {isUpdate && (
+      {isUpdate && data?.recurrenceDetails && (
         <TogleDiv>
           is one off
           <Togle
