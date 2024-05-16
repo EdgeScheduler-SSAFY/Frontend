@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import styled from "styled-components";
@@ -15,9 +15,9 @@ import useNoticeStore from "@/store/noticeStore";
 
 export function Header() {
   const [showNoticeList, setShowNoticeList] = useState<boolean>(false);
-  const noticeCount = useNoticeStore(state => state.noticeCount); 
-  const setNoticeCount = useNoticeStore(state => state.setNoticeCount);
-
+  const noticeCount = useNoticeStore((state) => state.noticeCount);
+  const setNoticeCount = useNoticeStore((state) => state.setNoticeCount);
+  const currentPath = usePathname();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -57,19 +57,27 @@ export function Header() {
     <HeaderNav>
       <NewNotice />
       <MainLogo>
-        <StyledLink href='/'>
-          <Image src='/images/edgeScheduler.png' alt='edgeSchedulerLogo' height={50} width={50} />
-          <LogoName color='blue'>Edge&nbsp;</LogoName>
-          <LogoName color='green'>Sch</LogoName>
-          <LogoName color='orange'>edu</LogoName>
-          <LogoName color='yellow'>ler</LogoName>
+        <StyledLink href="/" active={false}>
+          <Image src="/images/edgeScheduler.png" alt="edgeSchedulerLogo" height={50} width={50} />
+          <LogoName color="blue">Edge&nbsp;</LogoName>
+          <LogoName color="green">Sch</LogoName>
+          <LogoName color="orange">edu</LogoName>
+          <LogoName color="yellow">ler</LogoName>
         </StyledLink>
       </MainLogo>
       <LinkDiv>
-        <StyledLink href='/schedule'>schedule</StyledLink>
-        <StyledLink href='/meeting'>create meeting</StyledLink>
-        <StyledLink href='/myPage/notificationBox'>my page</StyledLink>
-        <StyledLink href='/login'>sign in</StyledLink>
+        <StyledLink href="/schedule" active={currentPath === "/schedule"}>
+          schedule
+        </StyledLink>
+        <StyledLink href="/meeting" active={/meeting/.test(currentPath as string)}>
+          create meeting
+        </StyledLink>
+        <StyledLink href="/myPage/notificationBox" active={/myPage/.test(currentPath as string)}>
+          my page
+        </StyledLink>
+        <StyledLink href="/login" active={currentPath === "/login"}>
+          sign in
+        </StyledLink>
       </LinkDiv>
       <CustomMdOutlineNotifications size={25} onClick={noticeListHandle} />
       {noticeCount > 0 && <NoticeCountDiv>{noticeCount}</NoticeCountDiv>}
@@ -106,15 +114,15 @@ const LinkDiv = styled.div`
   justify-content: space-evenly;
 `;
 
-const StyledLink = styled(Link)`
-  color: ${Color("black")};
+const StyledLink = styled(Link)<{ active: boolean }>`
+  color: ${(props) => (props.active ? Color("blue") : Color("black"))};
   display: flex;
   text-decoration: none;
   align-items: center;
   transition: all 0.2s ease-in-out;
-  &:visited {
+  /* &:visited {
     color: ${Color("black")};
-  }
+  } */
   &:hover {
     cursor: pointer;
     color: ${Color("blue")};
