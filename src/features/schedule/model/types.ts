@@ -94,6 +94,10 @@ export interface getScheduleDetailsResponse {
         startDatetime: string;
         endDatetime: string;
       };
+      profile: string;
+      zoneId: string;
+      department: string;
+      region: string;
     }
   ];
   recurrenceDetails: {

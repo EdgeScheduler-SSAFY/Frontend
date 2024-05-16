@@ -123,7 +123,7 @@ export function CreateSchedule({
   const [isCount, setIsCount] = useState<boolean>(
     data?.recurrenceDetails?.count && !data?.recurrenceDetails?.expiredDate ? true : false
   ); // 반복 횟수 여부
-  const [count, setCount] = useState<number>(data?.recurrenceDetails?.count || 1); // 반복 횟수
+  const [count, setCount] = useState<number>(1); // 반복 횟수
   const [showRecurrence, setShowRecurrence] = useState<boolean>(false); // 반복 설정 보여주기 여부
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -281,7 +281,12 @@ export function CreateSchedule({
       descriptionIsChanged: data.description !== description,
       timeIsChanged:
         format(data.startDatetime, "yyyy-MM-dd'T'HH:mm:ss") !== startDatetime ||
-        format(data.endDatetime, "yyyy-MM-dd'T'HH:mm:ss") !== endDatetime,
+        format(data.endDatetime, "yyyy-MM-dd'T'HH:mm:ss") !== endDatetime ||
+        data.recurrenceDetails?.freq !== freq ||
+        data.recurrenceDetails?.intv !== intv ||
+        data.recurrenceDetails?.recurrenceDay !== recurrenceDay ||
+        data.recurrenceDetails?.expiredDate !== format(expiredDate, "yyyy-MM-dd'T'HH:mm:ss") ||
+        data.recurrenceDetails?.count !== count,
       recurrence: isRecurrence
         ? {
             freq: freq,
