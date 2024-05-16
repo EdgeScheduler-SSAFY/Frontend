@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import { format, set } from "date-fns";
+import { format, differenceInMinutes } from "date-fns";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { GoPencil } from "react-icons/go";
 import ReactDOM from "react-dom";
@@ -14,6 +14,11 @@ import {
   CreateSchedule,
 } from "@/features/schedule/index";
 import Button from "@/shared/ui//button";
+import { fetchWithInterceptor } from "@/shared";
+import ProposalModal from "@/shared/ui/proposalModal";
+import ModalContent from "@/shared/ui/modalContent";
+
+import useMeetStore, { MeetState } from "@/store/meetStore";
 
 interface IDetailScheduleProps {
   close: () => void;
@@ -35,6 +40,7 @@ export function DetailSchedule({
 }: IDetailScheduleProps) {
   const [data, setData] = useState<getScheduleDetailsResponse | null>(null); //data api 가져온다.
   const [trigger, setTrigger] = useState(false); //
+  const [buttonClicked, setButtonClicked] = useState<string>("");
   //api 호출
   useEffect(() => {
     getScheduleDetails(scheduleId).then((response) => {
@@ -42,6 +48,13 @@ export function DetailSchedule({
       const startDate = new Date(startDatetime);
       const endDate = new Date(endDatetime);
       setData({ ...response, startDatetime: startDate, endDatetime: endDate });
+      setButtonClicked(
+        response.myStatus === "ACCEPTED"
+          ? "attend"
+          : response.myStatus === "DECLINED"
+          ? "absence"
+          : ""
+      );
     });
   }, [scheduleId, trigger]);
   // 외부영역 클릭 확인을위한 ref
@@ -53,7 +66,8 @@ export function DetailSchedule({
         ref.current &&
         !ref.current.contains(event.target as Node) &&
         !document.getElementById("createScheduleModal")?.contains(event.target as Node) &&
-        !document.getElementById("detailProposal")?.contains(event.target as Node)
+        !document.getElementById("detailProposal")?.contains(event.target as Node) &&
+        !document.getElementById("proposalModal")?.contains(event.target as Node)
       ) {
         close();
       }
@@ -75,8 +89,48 @@ export function DetailSchedule({
   }>(); // 시간변경제안 상세보기 데이터
   const [showDelete, setShowDelete] = useState(false); // 삭제 확인창 보여주기 상태
   const [showUpadate, setShowUpdate] = useState(false); // 수정창 보여주기 상태
+  const {
+    setMeetName,
+    setStartDatetime,
+    setEndDatetime,
+    setRunningTime,
+    setMemberList,
+    setDescription,
+  } = useMeetStore((state: MeetState) => state);
+  const nextHandle = async () => {
+    await Promise.all([
+      setMeetName(data?.name || ""),
+      setDescription(data?.description || ""),
+      setStartDatetime(
+        data?.startDatetime ? format(data.startDatetime, "yyyy-MM-dd'T'HH:mm:ss") : ""
+      ),
+      setEndDatetime(data?.endDatetime ? format(data.endDatetime, "yyyy-MM-dd'T'HH:mm:ss") : ""),
+      setRunningTime(
+        data?.startDatetime && data?.endDatetime
+          ? differenceInMinutes(data.startDatetime, data.endDatetime)
+          : 15
+      ),
+      setMemberList(
+        (data?.attendeeList || []).map((attendee) => ({
+          user: {
+            id: attendee.memberId,
+            name: attendee.memberName,
+            profile: attendee.profile,
+            zoneId: attendee.zoneId,
+            department: attendee.department,
+            region: attendee.region,
+          },
+          isRequired: attendee.isRequired,
+        }))
+      ),
+    ]);
+  };
   // 수정창 보여주기
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
+    if (data?.type === "MEETING") {
+      await nextHandle();
+      return;
+    }
     setShowUpdate((prev) => !prev);
   };
   // 삭제 api 호출
@@ -91,223 +145,305 @@ export function DetailSchedule({
     });
     close();
   };
+  const addMeetingAccepted = async (scheduleId: number) => {
+    try {
+      await fetchWithInterceptor(
+        `https://gateway.edgescheduler.co.kr/schedule-service/schedules/${scheduleId}/members/attendance`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            status: "ACCEPTED",
+          }),
+        }
+      );
+      console.log("success");
+    } catch (error) {
+      console.log(error);
+    }
+    return true;
+  };
+  //수락거절
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const onClick = (status: string, scheduleId: number) => {
+    setButtonClicked(status);
+    if (status === "attend") {
+      addMeetingAccepted(scheduleId);
+    } else if (status === "absence") {
+      setIsModalOpen(true);
+    }
+  };
   // 데이터가 없으면 null
   if (!data) {
     return null;
   }
-
   return ReactDOM.createPortal(
-    <MainLayout
-      onClick={(e) => e.stopPropagation()}
-      ref={ref}
-      data-testid="detail schedule"
-      left={left}
-      top={top}
-      viewportHeight={window.innerHeight}
-      id="detailSchedule"
+    <BackLayout
+      onClick={(e) => {
+        close();
+        e.stopPropagation();
+      }}
     >
-      <NameLayout>
-        <TextDiv>
-          {/* 일정 이름 */}
-          <h3>{data.name}</h3>
-        </TextDiv>
-        <div></div>
-        {/* MEETING의 경우 주최자만 수정 삭제 가능하기때문에 보여주지 않는다. */}
-        {(data.type === "PERSONAL" ||
-          data.type === "WORKING" ||
-          (data.type === "MEETING" &&
-            JSON.parse(sessionStorage.getItem("user") || "").id === data.organizerId)) && (
-          <IconLayout>
+      <MainLayout
+        onClick={(e) => e.stopPropagation()}
+        data-testid="detail schedule"
+        left={left}
+        top={top}
+        viewportHeight={window.innerHeight}
+        id="detailSchedule"
+      >
+        <NameLayout>
+          <TextDiv>
+            {/* 일정 이름 */}
+            <h3>{data.name}</h3>
+          </TextDiv>
+          <div></div>
+          {/* MEETING의 경우 주최자만 수정 삭제 가능하기때문에 보여주지 않는다. */}
+          {(data.type === "PERSONAL" ||
+            data.type === "WORKING" ||
+            (data.type === "MEETING" &&
+              JSON.parse(sessionStorage.getItem("user") || "").id === data.organizerId)) && (
+            <IconLayout>
+              <div>
+                <GoPencil size={20} onClick={() => handleUpdate()}></GoPencil>
+              </div>
+              <div></div>
+              <div onClick={() => setShowDelete((prev) => !prev)}>
+                <FaRegTrashAlt size={20}></FaRegTrashAlt>
+              </div>
+            </IconLayout>
+          )}
+        </NameLayout>
+        {/* 일정 시간 */}
+        <DataLayout>
+          {data.startDatetime &&
+          data.endDatetime &&
+          format(data.startDatetime, "yyyy-MM-dd(EE)") !==
+            format(data.endDatetime, "yyyy-MM-dd(EE)") ? (
             <div>
-              <GoPencil size={20} onClick={() => handleUpdate()}></GoPencil>
+              {format(data.startDatetime, "yyyy-MM-dd(EE) HH:mm") +
+                " ~ " +
+                format(data.endDatetime, "yyyy-MM-dd(EE) HH:mm")}
             </div>
-            <div></div>
-            <div onClick={() => setShowDelete((prev) => !prev)}>
-              <FaRegTrashAlt size={20}></FaRegTrashAlt>
+          ) : (
+            <div>
+              {format(data.startDatetime, "yyyy-MM-dd(EE) HH:mm") +
+                " ~ " +
+                format(data.endDatetime, "HH:mm")}
             </div>
-          </IconLayout>
+          )}
+        </DataLayout>
+        {/* 일정 설명 */}
+        <DataLayout>{data.description && <div>{data.description}</div>}</DataLayout>
+        {data.type === "MEETING" && <DataLayout>attendee</DataLayout>}
+        {/* 회의참석자만 보여줌 */}
+        {data.type === "MEETING" &&
+          JSON.parse(sessionStorage.getItem("user") || "").id !== data.organizerId && (
+            <ButtonDiv>
+              <Button
+                id="attend"
+                color="black"
+                $bgColor={buttonClicked === "attend" ? "green" : "black50"}
+                $hoverColor="black100"
+                onClick={() => {
+                  onClick("attend", scheduleId);
+                }}
+                width={5}
+                height={2}
+                fontSize={12}
+              >
+                attend
+              </Button>
+              <Button
+                id="absence"
+                color="black"
+                $bgColor={buttonClicked === "absence" ? "orange" : "black50"}
+                $hoverColor="black100"
+                onClick={async () => {
+                  await onClick("absence", scheduleId);
+                  // close();
+                }}
+                width={5}
+                height={2}
+                fontSize={12}
+              >
+                absence
+              </Button>
+            </ButtonDiv>
+          )}
+        <ProposalModal
+          open={isModalOpen}
+          onClose={() => {
+            setIsModalOpen((prev) => !prev);
+          }}
+        >
+          <ModalContent
+            eventData={{
+              scheduleId: scheduleId,
+              scheduleName: data.name,
+              startTime: format(data.startDatetime, "yyyy-MM-dd'T'HH:mm:ss"),
+              endTime: format(data.endDatetime, "yyyy-MM-dd'T'HH:mm:ss"),
+            }}
+            onClose={() => {
+              setIsModalOpen((prev) => !prev);
+              setTrigger((prev) => !prev);
+            }}
+          />
+        </ProposalModal>
+        {/* 회의인 경우에만 보여주는참석자 */}
+        {data.type === "MEETING" && (
+          <AttendeesLayout>
+            {data.attendeeList.map((attendee: any) => (
+              <AttendeeLayout key={attendee.memberId}>
+                <ProfileLayout>
+                  <ProfileImage src="" alt="" />
+                  {attendee.status === "ACCEPTED" ? (
+                    <CircleLayout color="green" />
+                  ) : attendee.status === "DECLINED" ? (
+                    <CircleLayout color="orange" />
+                  ) : (
+                    <CircleLayout color="black100" />
+                  )}
+                </ProfileLayout>
+                <AteendeeNameLayout>
+                  {attendee.memberName}
+                  {attendee.reason ? <SmTextDiv>{attendee.reason}</SmTextDiv> : null}
+                </AteendeeNameLayout>
+                {/* 제안이 있는 참가자만 보여줌 */}
+                {attendee.proposal &&
+                  JSON.parse(sessionStorage.getItem("user") || "").id === data.organizerId && (
+                    <Button
+                      width={3}
+                      height={1.5}
+                      fontSize={10}
+                      onClick={() => {
+                        setShowDetail((prev) => !prev);
+                        setDetailData(attendee);
+                      }}
+                    >
+                      detail
+                    </Button>
+                  )}
+              </AttendeeLayout>
+            ))}
+          </AttendeesLayout>
         )}
-      </NameLayout>
-      {/* 일정 시간 */}
-      <DataLayout>
-        {data.startDatetime &&
-        data.endDatetime &&
-        format(data.startDatetime, "yyyy-MM-dd(EE)") !==
-          format(data.endDatetime, "yyyy-MM-dd(EE)") ? (
-          <div>
-            {format(data.startDatetime, "yyyy-MM-dd(EE) HH:mm") +
-              " ~ " +
-              format(data.endDatetime, "yyyy-MM-dd(EE) HH:mm")}
-          </div>
-        ) : (
-          <div>
-            {format(data.startDatetime, "yyyy-MM-dd(EE) HH:mm") +
-              " ~ " +
-              format(data.endDatetime, "HH:mm")}
-          </div>
+        {/* 시간변경제안 상세보기 */}
+        {showDetail && detailData?.proposal && (
+          <DetailProposal
+            triggerReload={() => setTrigger((prev) => !prev)}
+            endDatetime={detailData?.proposal?.endDatetime}
+            name={data.name}
+            proposalId={detailData?.proposal?.proposalId}
+            reason={detailData?.reason}
+            scheduleId={data.scheduleId}
+            startDatetime={detailData?.proposal?.startDatetime}
+            close={() => setShowDetail(false)}
+          ></DetailProposal>
         )}
-      </DataLayout>
-      {/* 일정 설명 */}
-      <DataLayout>{data.description && <div>{data.description}</div>}</DataLayout>
-      {/* 회의인 경우에만 보여주는참석자 */}
-      {data.type === "MEETING" && <DataLayout>attendee</DataLayout>}
-      {data.type === "MEETING" && (
-        <AttendeesLayout>
-          {data.attendeeList.map((attendee: any) => (
-            <AttendeeLayout key={attendee.memberId}>
-              <ProfileLayout>
-                <ProfileImage src="" alt="" />
-                {attendee.status === "ACCEPTED" ? (
-                  <CircleLayout color="green" />
-                ) : attendee.status === "DECLINED" ? (
-                  <CircleLayout color="orange" />
-                ) : (
-                  <CircleLayout color="black100" />
-                )}
-              </ProfileLayout>
-              <AteendeeNameLayout>
-                {attendee.memberName}
-                {attendee.proposal ? (
-                  <SmTextDiv>{attendee.proposal.startDatetime}</SmTextDiv>
-                ) : attendee.reason ? (
-                  <SmTextDiv>{attendee.reason}</SmTextDiv>
-                ) : null}
-              </AteendeeNameLayout>
-              {/* 제안이 있는 참가자만 보여줌 */}
-              {attendee.proposal &&
-                JSON.parse(sessionStorage.getItem("user") || "").id === data.organizerId && (
-                  <Button
-                    width={3}
-                    height={1.5}
-                    fontSize={10}
-                    onClick={() => {
-                      setShowDetail((prev) => !prev);
-                      setDetailData(attendee);
-                    }}
-                  >
-                    detail
-                  </Button>
-                )}
-            </AttendeeLayout>
-          ))}
-        </AttendeesLayout>
-      )}
-      {/* 시간변경제안 상세보기 */}
-      {showDetail && detailData?.proposal && (
-        <DetailProposal
-          triggerReload={() => setTrigger((prev) => !prev)}
-          endDatetime={detailData?.proposal?.endDatetime}
-          name={data.name}
-          proposalId={detailData?.proposal?.proposalId}
-          reason={detailData?.reason}
-          scheduleId={data.scheduleId}
-          startDatetime={detailData?.proposal?.startDatetime}
-          close={() => setShowDetail(false)}
-        ></DetailProposal>
-      )}
-      {/* 삭제확인체크 반복의 경우 삭제방식 선택 */}
-      {showDelete ? (
-        data.recurrenceDetails ? (
-          <div>
-            delete ?
-            <Button
-              width={3}
-              height={2}
-              fontSize={10}
-              $bgColor="orange"
-              $hoverColor="orange400"
-              onClick={async () => {
-                await handelDelete("ONE");
-                triggerReload();
-                close();
-              }}
-            >
-              one
-            </Button>
-            <Button
-              width={3}
-              height={2}
-              fontSize={10}
-              $bgColor="orange"
-              $hoverColor="orange400"
-              onClick={async () => {
-                await handelDelete("ALL");
-                triggerReload();
-                close();
-              }}
-            >
-              all
-            </Button>
-            <Button
-              width={3}
-              height={2}
-              fontSize={10}
-              $bgColor="orange"
-              $hoverColor="orange400"
-              onClick={async () => {
-                await handelDelete("AFTERALL");
-                triggerReload();
-                close();
-              }}
-            >
-              after all
-            </Button>
-            <Button
-              width={3}
-              height={2}
-              fontSize={10}
-              $bgColor="orange"
-              $hoverColor="orange400"
-              onClick={() => setShowDelete(false)}
-            >
-              cancle
-            </Button>
-          </div>
-        ) : (
-          <div>
-            sure?{" "}
-            <Button
-              width={3}
-              height={2}
-              fontSize={10}
-              $bgColor="orange"
-              $hoverColor="orange400"
-              onClick={async () => {
-                await handelDelete("ONE");
-                triggerReload();
-                close();
-              }}
-            >
-              yes
-            </Button>
-            <Button
-              width={3}
-              height={2}
-              fontSize={10}
-              $bgColor="orange"
-              $hoverColor="orange400"
-              onClick={() => setShowDelete(false)}
-            >
-              no
-            </Button>
-          </div>
-        )
-      ) : null}
-      {/* 수정창 */}
-      {showUpadate && (
-        <CreateSchedule
-          left={window.innerWidth / 2 - 200}
-          top={window.innerHeight / 2 - 225}
-          triggerReload={triggerReload}
-          isWORKING={data.type === "WORKING" ? true : false}
-          startDate={new Date(data.startDatetime)}
-          close={() => setShowUpdate(false)}
-          type={data.type}
-          isUpdate={true}
-          data={data}
-        ></CreateSchedule>
-      )}
-    </MainLayout>,
+        {/* 삭제확인체크 반복의 경우 삭제방식 선택 */}
+        {showDelete ? (
+          data.recurrenceDetails ? (
+            <div>
+              delete ?
+              <Button
+                width={3}
+                height={2}
+                fontSize={10}
+                $bgColor="orange"
+                $hoverColor="orange400"
+                onClick={async () => {
+                  await handelDelete("ONE");
+                  triggerReload();
+                  close();
+                }}
+              >
+                one
+              </Button>
+              <Button
+                width={3}
+                height={2}
+                fontSize={10}
+                $bgColor="orange"
+                $hoverColor="orange400"
+                onClick={async () => {
+                  await handelDelete("ALL");
+                  triggerReload();
+                  close();
+                }}
+              >
+                all
+              </Button>
+              <Button
+                width={3}
+                height={2}
+                fontSize={10}
+                $bgColor="orange"
+                $hoverColor="orange400"
+                onClick={async () => {
+                  await handelDelete("AFTERALL");
+                  triggerReload();
+                  close();
+                }}
+              >
+                after all
+              </Button>
+              <Button
+                width={3}
+                height={2}
+                fontSize={10}
+                $bgColor="orange"
+                $hoverColor="orange400"
+                onClick={() => setShowDelete(false)}
+              >
+                cancle
+              </Button>
+            </div>
+          ) : (
+            <div>
+              sure?{" "}
+              <Button
+                width={3}
+                height={2}
+                fontSize={10}
+                $bgColor="orange"
+                $hoverColor="orange400"
+                onClick={async () => {
+                  await handelDelete("ONE");
+                  triggerReload();
+                  close();
+                }}
+              >
+                yes
+              </Button>
+              <Button
+                width={3}
+                height={2}
+                fontSize={10}
+                $bgColor="orange"
+                $hoverColor="orange400"
+                onClick={() => setShowDelete(false)}
+              >
+                no
+              </Button>
+            </div>
+          )
+        ) : null}
+        {/* 수정창 */}
+        {showUpadate && (
+          <CreateSchedule
+            left={window.innerWidth / 2 - 200}
+            top={window.innerHeight / 2 - 225}
+            triggerReload={triggerReload}
+            isWORKING={data.type === "WORKING" ? true : false}
+            startDate={new Date(data.startDatetime)}
+            close={() => setShowUpdate(false)}
+            type={data.type}
+            isUpdate={true}
+            data={data}
+          ></CreateSchedule>
+        )}
+      </MainLayout>
+    </BackLayout>,
     document.getElementById("clickModal") as HTMLElement
   );
 }
@@ -320,7 +456,7 @@ const MainLayout = styled.div<{ left: number; top: number; viewportHeight: numbe
   left: ${(props) => `${props.left}px`};
   background-color: white;
   width: 350px;
-  z-index: 300;
+  z-index: 301;
   color: black;
   border-radius: 5px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
@@ -389,4 +525,17 @@ const ButtonLayout = styled.div`
   justify-content: right;
   grid-column-gap: 5px;
   margin-top: 10px;
+`;
+const ButtonDiv = styled.div`
+  display: flex;
+  justify-content: end;
+`;
+const BackLayout = styled.div`
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  background-color: rgba(0, 0, 0, 0);
 `;
