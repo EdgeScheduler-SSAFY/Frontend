@@ -48,17 +48,14 @@ export default function Schedule() {
             startDatetime: new Date(schedule.startDatetime),
             endDatetime: new Date(schedule.endDatetime),
           }));
+          setScheduleList(schedules);
           if (isMeetingFilter) {
-            setScheduleList(scheduleList.filter((schedule) => schedule.type === "MEETING"));
-          }
-          if (!isMeetingFilter) {
-            setScheduleList(schedules);
+            setScheduleList(schedules.filter((schedule: schedule) => schedule.type === "MEETING"));
           }
         } else {
           console.log("Received data is not an array:", response.scheduleList);
           setScheduleList([]);
         }
-
         setSelectDateProps(selectedDate);
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -111,4 +108,5 @@ export default function Schedule() {
 
 const MainLayout = styled.div`
   height: calc(100% - 50px);
+  /* overflow: auto; */
 `;

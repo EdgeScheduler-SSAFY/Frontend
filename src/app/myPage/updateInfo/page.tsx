@@ -54,5 +54,5 @@ export default function UpdateInfo() {
   );
 }
 const MainLayout = styled.div`
-  height: 1500px;
+  height: calc(100vh - 100px);
 `;

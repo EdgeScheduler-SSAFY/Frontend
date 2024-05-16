@@ -94,7 +94,7 @@ export function DetailProposal({
         <AttendeeLayout>
           <div>
             <ProfilesLayout>
-              {attendeeList.availableMembers.map((attendee) => (
+              {attendeeList.availableMembers?.map((attendee) => (
                 <ProfileLayout key={attendee.memberId}>
                   <ProfileImage src="" alt="" />
                   <AteendeeNameLayout>
@@ -107,7 +107,7 @@ export function DetailProposal({
           </div>
           <div>
             <ProfilesLayout>
-              {attendeeList.unavailableMembers.map((attendee: any) => (
+              {attendeeList.unavailableMembers?.map((attendee: any) => (
                 <ProfileLayout key={attendee.memberId}>
                   <ProfileImage src="" alt="" />
                   <AteendeeNameLayout>
