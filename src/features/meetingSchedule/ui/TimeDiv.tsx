@@ -3,6 +3,22 @@ import { timeDivProps } from "@/shared/lib/type";
 import React from "react";
 import styled from "styled-components";
 
+const Tooltip = styled.div`
+  position: absolute;
+  z-index: 1;
+  color: black;
+  text-align: center;
+  top: 20px;
+  width: 200px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+  visibility: hidden;
+`;
+
 const StyledDiv = styled.div<timeDivProps>`
   box-sizing: border-box;
   width: 1rem;
@@ -36,6 +52,12 @@ const StyledDiv = styled.div<timeDivProps>`
       }
     }
   }};
+  position: relative;
+
+  &:hover ${Tooltip} {
+    visibility: visible;
+    opacity: 1;
+  }
 `;
 
 const TimeDiv: React.FC<timeDivProps> = ({
@@ -44,6 +66,8 @@ const TimeDiv: React.FC<timeDivProps> = ({
   $personindex,
   $startindex,
   $endindex,
+  $isScheduled,
+  $scheduleName,
 }) => {
   return (
     <StyledDiv
@@ -52,7 +76,11 @@ const TimeDiv: React.FC<timeDivProps> = ({
       $startindex={$startindex}
       $endindex={$endindex}
       $type={$type}
-    ></StyledDiv>
+      $isScheduled={$isScheduled}
+      $scheduleName={$scheduleName}
+    >
+      {$isScheduled && <Tooltip>{$scheduleName}</Tooltip>}
+    </StyledDiv>
   );
 };
 
