@@ -11,19 +11,19 @@ import Input from "@/shared/ui/input";
 import SelectTime from "@/shared/ui/selectTime";
 import { Color } from "@/shared/lib/styles/color";
 import { ColorName } from "@/shared/lib/type/types";
-import { Togle, fetchWithInterceptor } from "..";
+import { Togle, fetchWithInterceptor} from "@/shared/index";
 
 export default function ProposalModal({ eventData, onClose }: { eventData: any; onClose: () => void }) {
-  const runningTime = eventData.runningTime / 15; // 임시
-  const accessToken = sessionStorage.getItem("accessToken");
+  console.log(eventData);
+  const runningTime = eventData.runningTime / 15;
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
 
   const [isSuggestTime, setIsSuggestTime] = useState<boolean>(false); // 종일 여부
   const [declinedData, setDeclinedData] = useState<DeclineMeetingData>({
     status: "DECLINED",
     reason: "",
-    startDatetime: eventData.startTime,
-    endDatetime: eventData.endTime,
+    startDatetime: eventData.startTime || eventData.updatedStartTime,
+    endDatetime: eventData.endTime || eventData.updatedEndTime,
   });
 
   const [retreiveData, setRetreiveData] = useState<RetrieveData>({
@@ -75,14 +75,13 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
 
   const addMeetingDeclined = async (scheduleId: number) => {
     try {
-      await fetch(`https://gateway.edgescheduler.co.kr/schedule-service/schedules/1/members/attendance`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(declinedData),
-      });
+      await fetchWithInterceptor(
+        `https://gateway.edgescheduler.co.kr/schedule-service/schedules/1/members/attendance`,
+        {
+          method: "POST",
+          body: JSON.stringify(declinedData),
+        }
+      );
       onClose();
     } catch (error) {
       console.log(error);
@@ -92,14 +91,10 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
 
   const searchAvailableAttendds = async () => {
     try {
-      const res = await fetch(
+      const res = await fetchWithInterceptor(
         `https://gateway.edgescheduler.co.kr/schedule-service/schedules/calculate-time-availability-with-proposal`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
           body: JSON.stringify(retreiveData),
         }
       );
@@ -140,7 +135,7 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
           <TimeSuggestDiv>
             <Input
               id='startDate'
-              width={6}
+              width={5}
               type='date'
               value={declinedData.startDatetime.split("T")[0]}
               onChange={(e) => startDateHandle(e)}
@@ -148,7 +143,7 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
             <SelectTime
               options={intervalTime}
               show={false}
-              width={6}
+              width={7}
               onSelectChange={startTimeChangeHandle}
               standardIdx={0}
               disabledLastIndex={intervalTime.length - runningTime}
@@ -169,9 +164,12 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
               <ParticipantListDiv>
                 {availableMember &&
                   availableMember.map((member) => (
-                    <EachMemberDiv key={member.memberId} $isRequired={member.isRequired}>
-                      <ProfileImage src='/images/profile.webp' alt='프로필사진' width={20} height={20} />
+                    <EachMemberDiv key={member.memberId}>
+                      <ProfileImage src='/images/profile.webp' alt='프로필사진' width={30} height={30} />
+                      <MemberNameLayout>
                       {member.memberName}
+                      {member.isRequired && <RequiredDiv>required</RequiredDiv>}
+                      </MemberNameLayout>
                     </EachMemberDiv>
                   ))}
               </ParticipantListDiv>
@@ -184,7 +182,7 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
               <ParticipantListDiv>
                 {unAvailableMember &&
                   unAvailableMember.map((member) => (
-                    <EachMemberDiv key={member.memberId} $isRequired={member.isRequired}>
+                    <EachMemberDiv key={member.memberId}>
                       {member.memberName}
                     </EachMemberDiv>
                   ))}
@@ -277,7 +275,7 @@ const ButtonDiv = styled.div`
 `;
 
 const EndDateDiv = styled.div`
-  width: 6rem;
+  width: 5rem;
   height: 2rem;
   border: solid 1px ${Color("black200")};
   padding: 0.1rem 0.7rem;
@@ -288,6 +286,7 @@ const EndDateDiv = styled.div`
   font-weight: 400;
   letter-spacing: 0.5px;
 `;
+
 const EndTimeDiv = styled.div`
   width: 4.5rem;
   height: 2rem;
@@ -314,17 +313,25 @@ const SearchBtn = styled.button`
   }
 `;
 
-const EachMemberDiv = styled.div<{ $isRequired: boolean }>`
+const EachMemberDiv = styled.div`
   font-size: 13px;
   margin: 0.25rem 0;
-  background-color: ${(props) => (props.$isRequired ? Color("yellow100") : Color("black50"))};
   border-radius: 5px;
   padding: 0.1rem 0.5rem;
   display: flex;
   align-items: center;
+  background-color: ${Color("black10")};
 `;
 
 const ProfileImage = styled(Image)`
   border-radius: 50%;
   margin-right: 0.3rem;
 `;
+
+const MemberNameLayout = styled.div`
+  display: flex;
+  flex-direction: column;`;
+
+const RequiredDiv = styled.div`
+  color: ${Color("blue")};
+  `;
