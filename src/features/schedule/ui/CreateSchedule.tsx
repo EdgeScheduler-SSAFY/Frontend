@@ -401,7 +401,7 @@ export function CreateSchedule({
         <TogleDiv>
           allday
           <Togle
-            isOn={isAllDay}
+            $isOn={isAllDay}
             onToggle={() => {
               setIsAllDay((prev) => !prev);
             }}
@@ -413,7 +413,7 @@ export function CreateSchedule({
         <TogleDiv>
           Recurrence{" "}
           <Togle
-            isOn={isRecurrence}
+            $isOn={isRecurrence}
             onToggle={() => {
               setIsRecurrence((prev) => !prev);
               setShowRecurrence(false);
@@ -600,7 +600,7 @@ export function CreateSchedule({
         <TogleDiv>
           Public{" "}
           <Togle
-            isOn={isPublic}
+            $isOn={isPublic}
             onToggle={() => {
               setIsPublic((prev) => !prev);
             }}
