@@ -17,7 +17,7 @@ export function updateSchedule({
   descriptionIsChanged,
   timeIsChanged,
   recurrence,
-  attedeeList,
+  attendeeList,
   parentEndDatetime,
   parentStartDatetime,
 }: updateScheduleRequest) {
@@ -36,7 +36,7 @@ export function updateSchedule({
     descriptionIsChanged: descriptionIsChanged,
     timeIsChanged: timeIsChanged,
     recurrence: recurrence,
-    attedeeList: attedeeList,
+    attendeeList: attendeeList,
     parentEndDatetime: parentEndDatetime,
     parentStartDatetime: parentStartDatetime,
   };
