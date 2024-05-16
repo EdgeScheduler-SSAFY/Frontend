@@ -21,7 +21,8 @@ export function MoreSchedule({ schdules, count, date }: IMoreScheduleProps) {
         !ref.current.contains(event.target as Node) &&
         !document.getElementById("createScheduleModal")?.contains(event.target as Node) &&
         !document.getElementById("detailProposal")?.contains(event.target as Node) &&
-        !document.getElementById("detailSchedule")?.contains(event.target as Node)
+        !document.getElementById("detailSchedule")?.contains(event.target as Node) &&
+        !document.getElementById("proposalModal")?.contains(event.target as Node)
       ) {
         setShowMore(false);
       }
