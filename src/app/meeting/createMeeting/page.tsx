@@ -83,6 +83,8 @@ export default function CreateMeeting() {
   const [showEndMiniCalendar, setShowEndMiniCalendar] = useState<boolean>(false);
   const [selectedStartDate, setSelectedStartDate] = useState(new Date());
   const [selectedEndDate, setSelectedEndDate] = useState(new Date());
+  const [disabledIndex, setDisabledIndex] = useState<number>(0);
+  const [sameDate, setSameDate] = useState<boolean>(true);
 
   useEffect(() => {
     const userItem = sessionStorage.getItem("user");
@@ -163,6 +165,7 @@ export default function CreateMeeting() {
       ...meetingData,
       period: { ...meetingData.period, start: `${startDate}T${value}` },
     });
+    setDisabledIndex(intervalTime.findIndex((option) => option.value === value));
   };
 
   // 끝날짜 값이 변경될 때 실행될 함수
@@ -181,6 +184,7 @@ export default function CreateMeeting() {
     });
 
     // 두 날짜가 같은지 확인
+    setSameDate(selectedDate.getDate() === selectedStartDate.getDate());
   };
 
   // 끝시간 값이 변경될 때 실행될 함수
@@ -322,12 +326,7 @@ export default function CreateMeeting() {
                     filterUserList(userLists, searchTerm).map((member) => (
                       <SearchListOption
                         key={member.id}
-                        onClick={() =>
-                          userButtonClickHandle({
-                            user: member,
-                            isRequired: false,
-                          })
-                        }
+                        onClick={() => userButtonClickHandle({ user: member, isRequired: false })}
                       >
                         <ProfileImage
                           src="/images/profile.webp"
@@ -379,10 +378,7 @@ export default function CreateMeeting() {
                                   <UserButton
                                     $isClicked={clickedUsers[member.id]}
                                     onClick={() =>
-                                      userButtonClickHandle({
-                                        user: member,
-                                        isRequired: false,
-                                      })
+                                      userButtonClickHandle({ user: member, isRequired: false })
                                     }
                                     className={noto.className}
                                   >
@@ -453,7 +449,7 @@ export default function CreateMeeting() {
                   width={6.5}
                   onSelectChange={startTimeChangeHandle}
                   standardIdx={0}
-                  disabledIndex={-1}
+                  disabledLastIndex={sameDate ? intervalTime.length - 1 : intervalTime.length}
                 ></SelectTime>
                 <LineDiv>-</LineDiv>
                 <DateButton onClick={() => setShowEndMiniCalendar((prev) => !prev)}>
@@ -477,8 +473,8 @@ export default function CreateMeeting() {
                   show={false}
                   width={6.5}
                   onSelectChange={endTimeChangeHandle}
-                  standardIdx={0}
-                  disabledIndex={-1}
+                  standardIdx={disabledIndex + 1}
+                  disabledIndex={sameDate ? disabledIndex : -1}
                 ></SelectTime>
               </PeriodDiv>
             </div>

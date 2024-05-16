@@ -1,60 +1,69 @@
+"use client";
 import React, { useState } from "react";
 import styled from "styled-components";
 import Image from "next/image";
 
 import { Color } from "@/shared/lib/styles/color";
 import Button from "@/shared/ui/button";
-export default function AlarmLog() {
-  const [buttonClicked, setButtonClicked] = useState<string>("");
+import ModalLayout from "@/shared/ui/modalLayout";
+import SuggestedModal from "@/shared/ui/suggestedModal";
+import ConversionDate from "../../model/conversionDate";
 
+export default function NoticeInfo({ data }: any) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const onClick = (id: string) => {
-    setButtonClicked(id);
+  // 버튼 클릭 시 상태 변경 함수
+  const onClick = (scheduleId: number) => {
+    setIsModalOpen(true);
   };
 
+  console.log(data);
   return (
     <AlarmInfoDiv>
       <AlarmCategoryDiv>
         <div>
           <ProfileImage src='/images/profile.webp' alt='프로필사진' width={18} height={18} />
-          조현수
-        </div>&nbsp;
-        <AlarmTextDiv>sent a request&nbsp;</AlarmTextDiv>
-        <div>to attend the meeting.</div>
+          {data.attendeeName}
+        </div>
+        &nbsp;
+        <AlarmTextDiv>suggested&nbsp;</AlarmTextDiv>
+        <div>a new time for this event.</div>
       </AlarmCategoryDiv>
       <DividingLine />
       <AlarmButtonDiv>
         <AlarmDetailDiv>
           <TitleDiv>
             <SubjectDiv>Title&nbsp;:&nbsp;</SubjectDiv>
-            <div>글로벌 회의 일정 잡기</div>
+            <div>{data.scheduleName}</div>
           </TitleDiv>
           <DateDiv>
-            <SubjectDiv>Date&nbsp;:&nbsp;</SubjectDiv>
-            <div>2024.05.07(Tue) PM 03:00-04:00</div>
+            <SubjectDiv>Current&nbsp;:&nbsp;</SubjectDiv>
+            {/* <ConversionDate start={data.previousStartTime} end={data.previousEndTime}/> */}
+          </DateDiv>
+          <DateDiv>
+            <SubjectDiv>Suggested&nbsp;:&nbsp;</SubjectDiv>
+            <ConversionDate start={data.proposedStartTime} end={data.proposedEndTime}/>
           </DateDiv>
         </AlarmDetailDiv>
         <ButtonDiv>
-          <Button
-            id='attend'
-            color='black'
-            $bgColor={buttonClicked === "attend" ? "black100" : "black50"}
-            $hoverColor='black100'
-            onClick={() => onClick("attend")}
-          >
-            attend
-          </Button>
-          <Button
-            id='absence'
-            color='black'
-            $bgColor={buttonClicked === "absence" ? "black100" : "black50"}
-            $hoverColor='black100'
-            onClick={() => onClick("absence")}
-          >
-            absence
+          <Button color='black' $bgColor='black50' $hoverColor='black100' onClick={() => onClick(data.scheduleId)}>
+            detail
           </Button>
         </ButtonDiv>
       </AlarmButtonDiv>
+      <ModalLayout
+        open={isModalOpen}
+        onClose={() => {
+          setIsModalOpen((prev) => !prev);
+        }}
+      >
+        <SuggestedModal
+          eventData={data}
+          onClose={() => {
+            setIsModalOpen((prev) => !prev);
+          }}
+        />
+      </ModalLayout>
     </AlarmInfoDiv>
   );
 }
@@ -94,12 +103,12 @@ const AlarmDetailDiv = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  height: 100%;
+  height: 4rem;
 `;
 
 const AlarmTextDiv = styled.div`
   font-weight: 600;
-  color: ${Color("blue")};
+  color: ${Color("yellow")};
 `;
 
 const TitleDiv = styled.div`
@@ -117,4 +126,5 @@ const SubjectDiv = styled.div`
 const ButtonDiv = styled.div`
   display: flex;
   justify-content: end;
+  align-items: center;
 `;
