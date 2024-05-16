@@ -1,71 +1,45 @@
-import React, { useState, useEffect } from "react";
+"use client"
+import React, { useState } from "react";
 import styled from "styled-components";
 import { getDay } from "date-fns";
 import { MdClose } from "react-icons/md";
 
 import { Color } from "@/shared/lib/styles/color";
-import Button from "@/shared/ui/button";
-import ProposalModal from "@/shared/ui/proposalModal";
+import { ProposalButton } from "@/shared/ui/proposalButton";
+import ProposalModal from "@/shared/ui/modalLayout";
 import { dayList, MonthList } from "@/shared/lib/data";
-import ModalContent from "@/shared/ui/modalContent";
+import ModalContent from "@/shared/ui/proposalModal";
+import { PostMeetingAccepted } from "@/shared/api/postMeetingAccepted";
+import ConversionTimeMini from "@/features/noticeList/model/conversionTimeMini";
 
-export default function CreateNotice({ eventData, onClose }: { eventData: any; onClose: () => void }) {
-  const [startDate, startTime] = eventData.startTime.split("T");
-  const [endDate, endTime] = eventData.endTime.split("T");
+export default function UpdatedTimeNotice({ eventData, onClose }: { eventData: any; onClose: () => void }) {
+  const startDate = eventData.updatedStartTime.split("T")[0];
   const [year, month, date] = startDate.split("-");
   const day = getDay(new Date(startDate));
-  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [buttonClicked, setButtonClicked] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const tmpAccessToken =
-    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcxNTU3NTUwM30.q_v6N2EIEmB0NVnYhnsAti3SQGcs_dfDOpPhhGsx5ZE";
-
-  useEffect(() => {
-    setAccessToken(sessionStorage.getItem("accessToken"));
-  }, []); // 토큰 저장
-
-  const addMeetingAccepted = async (scheduleId: number) => {
-    try {
-      await fetch(`https://gateway.edgescheduler.co.kr/schedule-service/schedules/1/members/attendance`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tmpAccessToken}`,
-        },
-        body: JSON.stringify({
-          status: "ACCEPTED",
-        }),
-      });
-      console.log("success");
-    } catch (error) {
-      console.log(error);
-    }
-    return true;
-  };
 
   // sse 알림 닫는 함수
   const closeHandle = () => {
     onClose();
   };
 
-  // 버튼 클릭 시 상태 변경 함수
   const onClick = (status: string, scheduleId: number) => {
-    setButtonClicked(status);
     if (status === "attend") {
-      addMeetingAccepted(scheduleId);
+      setButtonClicked("ACCEPTED");
+      PostMeetingAccepted(scheduleId);
     } else if (status === "absence") {
       setIsModalOpen(true);
     }
   };
 
   return (
-    <CreateNoticeLayout>
+    <UpdatedTimeNoticeLayout>
       <NoticeTitle>
         <NoticeTitleDetail>
           <div>{eventData.organizerName}&nbsp;</div>
-          <CategoryDiv>sent a request&nbsp;</CategoryDiv>
-          <div>to attend the meeting.</div>
+          <CategoryDiv>updated&nbsp;</CategoryDiv>
+          <div>the meeting schedule.</div>
         </NoticeTitleDetail>
         <CustomMdClose size={15} onClick={closeHandle} />
       </NoticeTitle>
@@ -81,34 +55,16 @@ export default function CreateNotice({ eventData, onClose }: { eventData: any; o
         <InfoDiv>
           <TitleDiv>{eventData.scheduleName}</TitleDiv>
           <TimeDiv>
-            {startTime.slice(0, 5)} - {endTime.slice(0, 5)}
+          <ConversionTimeMini start={eventData.updatedStartTime} end={eventData.updatedEndTime} />
           </TimeDiv>
-          <ButtonDiv>
-            <Button
-              id='attend'
-              color='black'
-              $bgColor={buttonClicked === "attend" ? "black100" : "black50"}
-              $hoverColor='black100'
-              onClick={() => onClick("attend", eventData.scheduleId)}
-              width={5}
-              height={2}
-              fontSize={12}
-            >
-              attend
-            </Button>
-            <Button
-              id='absence'
-              color='black'
-              $bgColor={buttonClicked === "absence" ? "black100" : "black50"}
-              $hoverColor='black100'
-              onClick={() => onClick("absence", eventData.scheduleId)}
-              width={5}
-              height={2}
-              fontSize={12}
-            >
-              absence
-            </Button>
-          </ButtonDiv>
+          <ProposalButton
+            buttonClicked={buttonClicked}
+            onClickAttend={() => onClick("attend", eventData.scheduleId)}
+            onClickAbsence={() => onClick("absence", eventData.scheduleId)}
+            width={5}
+            height={2}
+            fontSize={12}
+          />
         </InfoDiv>
       </NoticeContent>
       <ProposalModal
@@ -124,17 +80,18 @@ export default function CreateNotice({ eventData, onClose }: { eventData: any; o
           }}
         />
       </ProposalModal>
-    </CreateNoticeLayout>
+    </UpdatedTimeNoticeLayout>
   );
 }
 
-const CreateNoticeLayout = styled.div`
+const UpdatedTimeNoticeLayout = styled.div`
   width: 20rem;
   height: 8rem;
   border: 2px solid ${Color("black100")};
   border-radius: 10px;
   background-color: white;
   font-size: 14px;
+  margin-bottom: 0.5rem;
 `;
 
 const NoticeTitle = styled.div`

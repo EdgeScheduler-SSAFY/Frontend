@@ -41,6 +41,7 @@ export const colors = {
   yellow400: '#fcc93a',
   yellow600: '#e4ab08',
   yellow700: '#b28506',
+  white: '#ffffff',
 };
 
 export type ColorsTypes = typeof colors;

@@ -1,3 +1,6 @@
+import exp from "constants";
+import { ColorName } from "./types";
+
 export interface MeetingData {
   name: string;
   description: string;
@@ -109,4 +112,34 @@ export interface RetrieveData {
 
 export interface isRequiredDiv {
   $isRequired: boolean;
+}
+
+export interface MemberList {
+  memberId: number;
+  memberName: string;
+  isRequired: boolean;
+}
+
+export interface NoticeLogoProps {
+  type: string;
+  month: number;
+  day: number;
+  date: Date;
+  response?: string;
+}
+
+export interface PaginationProps {
+  totalElements: number; // 데이터 총 개수
+  totalPages: number; // 전체 페이지 개수
+  currentPage: number; // 현재 페이지
+  setPage: (page: number) => void;
+}
+
+export interface ProposalButtonProps {
+  buttonClicked: string;
+  onClickAttend: () => void;
+  onClickAbsence: () => void;
+  width?: number;
+  height?: number;
+  fontSize?: number;
 }
