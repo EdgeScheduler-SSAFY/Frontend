@@ -103,6 +103,7 @@ export interface getScheduleDetailsResponse {
     count: number;
     recurrenceDay: ("MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN")[];
   };
+  myStatus: string;
 }
 
 export interface searchAvailableAttendeesRequest {
