@@ -95,26 +95,36 @@ export function DetailProposal({
           <div>
             <ProfilesLayout>
               {attendeeList.availableMembers?.map((attendee) => (
-                <ProfileLayout key={attendee.memberId}>
-                  <ProfileImage src="" alt="" />
-                  <AteendeeNameLayout>
-                    <div>{attendee.memberName}</div>
+                <EachMemberDiv key={attendee.memberId}>
+                  <ProfileImage
+                    src="/images/profile.webp"
+                    alt="프로필사진"
+                    width={30}
+                    height={30}
+                  />
+                  <MemberNameLayout>
+                    {attendee.memberName}
                     {attendee.isRequired && <RequiredDiv>required</RequiredDiv>}
-                  </AteendeeNameLayout>
-                </ProfileLayout>
+                  </MemberNameLayout>
+                </EachMemberDiv>
               ))}
             </ProfilesLayout>
           </div>
           <div>
             <ProfilesLayout>
               {attendeeList.unavailableMembers?.map((attendee: any) => (
-                <ProfileLayout key={attendee.memberId}>
-                  <ProfileImage src="" alt="" />
-                  <AteendeeNameLayout>
-                    <div>{attendee.memberName}</div>
+                <EachMemberDiv key={attendee.memberId}>
+                  <ProfileImage
+                    src="/images/profile.webp"
+                    alt="프로필사진"
+                    width={30}
+                    height={30}
+                  />
+                  <MemberNameLayout>
+                    {attendee.memberName}
                     {attendee.isRequired && <RequiredDiv>required</RequiredDiv>}
-                  </AteendeeNameLayout>
-                </ProfileLayout>
+                  </MemberNameLayout>
+                </EachMemberDiv>
               ))}
             </ProfilesLayout>
           </div>
@@ -204,25 +214,11 @@ const ProfilesLayout = styled.div`
   height: 120px;
   overflow: auto;
 `;
-const ProfileLayout = styled.div`
-  display: grid;
-  grid-template-columns: 35px 1fr;
-  position: relative;
-`;
 const ProfileImage = styled.img`
   width: 30px;
   height: 30px;
   border-radius: 50%;
   background-color: black;
-`;
-const AteendeeNameLayout = styled.div`
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: smaller;
-  align-items: center;
 `;
 const RequiredDiv = styled.div`
   color: ${Color("blue")};
@@ -234,4 +230,17 @@ const BoldDiv = styled.div`
 const LabelLayout = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
+`;
+const EachMemberDiv = styled.div`
+  font-size: 13px;
+  margin: 0.25rem 0;
+  border-radius: 5px;
+  padding: 0.1rem 0.5rem;
+  display: flex;
+  align-items: center;
+  background-color: ${Color("black10")};
+`;
+const MemberNameLayout = styled.div`
+  display: flex;
+  flex-direction: column;
 `;

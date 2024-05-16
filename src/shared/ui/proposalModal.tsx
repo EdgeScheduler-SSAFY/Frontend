@@ -11,9 +11,15 @@ import Input from "@/shared/ui/input";
 import SelectTime from "@/shared/ui/selectTime";
 import { Color } from "@/shared/lib/styles/color";
 import { ColorName } from "@/shared/lib/type/types";
-import { Togle, fetchWithInterceptor} from "@/shared/index";
+import { Togle, fetchWithInterceptor } from "@/shared/index";
 
-export default function ProposalModal({ eventData, onClose }: { eventData: any; onClose: () => void }) {
+export default function ProposalModal({
+  eventData,
+  onClose,
+}: {
+  eventData: any;
+  onClose: () => void;
+}) {
   console.log(eventData);
   const runningTime = eventData.runningTime / 15;
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
@@ -27,7 +33,7 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
   });
 
   const [retreiveData, setRetreiveData] = useState<RetrieveData>({
-    scheduleId: 89,
+    scheduleId: eventData.scheduleId,
     startDatetime: declinedData.startDatetime,
     endDatetime: declinedData.endDatetime,
   });
@@ -134,9 +140,9 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
         <SuggestLayout>
           <TimeSuggestDiv>
             <Input
-              id='startDate'
+              id="startDate"
               width={5}
-              type='date'
+              type="date"
               value={declinedData.startDatetime.split("T")[0]}
               onChange={(e) => startDateHandle(e)}
             />
@@ -165,10 +171,15 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
                 {availableMember &&
                   availableMember.map((member) => (
                     <EachMemberDiv key={member.memberId}>
-                      <ProfileImage src='/images/profile.webp' alt='프로필사진' width={30} height={30} />
+                      <ProfileImage
+                        src="/images/profile.webp"
+                        alt="프로필사진"
+                        width={30}
+                        height={30}
+                      />
                       <MemberNameLayout>
-                      {member.memberName}
-                      {member.isRequired && <RequiredDiv>required</RequiredDiv>}
+                        {member.memberName}
+                        {member.isRequired && <RequiredDiv>required</RequiredDiv>}
                       </MemberNameLayout>
                     </EachMemberDiv>
                   ))}
@@ -183,7 +194,16 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
                 {unAvailableMember &&
                   unAvailableMember.map((member) => (
                     <EachMemberDiv key={member.memberId}>
-                      {member.memberName}
+                      <ProfileImage
+                        src="/images/profile.webp"
+                        alt="프로필사진"
+                        width={30}
+                        height={30}
+                      />
+                      <MemberNameLayout>
+                        {member.memberName}
+                        {member.isRequired && <RequiredDiv>required</RequiredDiv>}
+                      </MemberNameLayout>
                     </EachMemberDiv>
                   ))}
               </ParticipantListDiv>
