@@ -70,16 +70,14 @@ export default function CreateMeeting() {
   const searchRef = useRef<HTMLDivElement>(null);
   const [isFolded, setIsFolded] = useState(true); // 전체 부서 주소록
   const [teamStates, setTeamStates] = useState<developmentType[]>([]); // 각 부서에 대한 상태를 관리할 배열
-  const [clickedUsers, setClickedUsers] = useState<{
-    [userId: number]: boolean;
-  }>({}); // 클릭 여부 사용자 ID 기준
+  const [clickedUsers, setClickedUsers] = useState<{[userId: number]: boolean;}>({}); // 클릭 여부 사용자 ID 기준
   const [showStartMiniCalendar, setShowStartMiniCalendar] = useState<boolean>(false);
   const [showEndMiniCalendar, setShowEndMiniCalendar] = useState<boolean>(false);
   const [selectedStartDate, setSelectedStartDate] = useState(new Date());
   const [selectedEndDate, setSelectedEndDate] = useState(new Date());
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
   const [sameDate, setSameDate] = useState<boolean>(true);
-  
+
   useEffect(() => {
     const userItem = sessionStorage.getItem("user");
     if (userItem) {
@@ -421,7 +419,7 @@ export default function CreateMeeting() {
                 <SelectTime
                   options={intervalTime}
                   show={false}
-                  width={6.5}
+                  width={7}
                   onSelectChange={startTimeChangeHandle}
                   standardIdx={0}
                   disabledLastIndex={sameDate ? intervalTime.length - 1 : intervalTime.length}
@@ -445,7 +443,7 @@ export default function CreateMeeting() {
                 <SelectTime
                   options={intervalTime}
                   show={false}
-                  width={6.5}
+                  width={7}
                   onSelectChange={endTimeChangeHandle}
                   standardIdx={disabledIndex + 1}
                   disabledIndex={sameDate ? disabledIndex : -1}
@@ -709,6 +707,8 @@ const OptionalButton = styled.button<{ $isRequired: boolean }>`
   font-size: 9px;
   transition: all 0.2s ease-in-out;
   cursor: pointer;
+  z-index: 1;
+  background-color: ${Color("white")};
 `;
 
 const RestDiv = styled.div`
