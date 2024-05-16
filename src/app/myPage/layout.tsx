@@ -66,9 +66,10 @@ const MyPageLink = styled.div`
   display: flex;
   flex-direction: column;
   gap: 3rem;
-  justify-content: space-around;
+  justify-content: start;
   align-items: center;
   text-align: center;
+  margin-top: 2rem;
 `;
 
 const ContentLayout = styled.div`

@@ -29,7 +29,7 @@ const CustomButton = styled.button<ButtonProps>`
   width: ${(props) => (props.width ? `${props.width}rem` : "6rem")};
   height: ${(props) => (props.height ? `${props.height}rem` : "2.5rem")};
   font-size: ${(props) => (props.fontSize ? `${props.fontSize}px` : "14px")};
-  background-color: ${(props) => (props.$bgColor ? props.$bgColor : Color("blue"))};
+  background-color: ${(props) => (props.$bgColor ? Color(props.$bgColor) : Color("blue"))};
   color: ${(props) => (props.color ? Color(props.color) : "white")};
   &:hover {
     /* box-shadow: 0 0.5em 0.5em -0.4em ${(props) => (props.color ? props.color : Color("blue600"))}; */
