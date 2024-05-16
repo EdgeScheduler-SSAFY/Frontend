@@ -43,12 +43,12 @@ export default function ScheduleComponent({
   const { startDatetime, endDatetime, runningtime, memberList } = useMeetStore(
     (state: MeetState) => state
   );
-  // useEffect(() => {
-  //   console.log("startDatetime", startDatetime);
-  //   console.log("endDatetime", endDatetime);
-  //   console.log("recommendedTimes", recommendedTimes);
-  //   console.log("schedulesAndAvailabilities", schedulesAndAvailabilities);
-  // }, p[]);
+  useEffect(() => {
+    // console.log("startDatetime", startDatetime);
+    // console.log("endDatetime", endDatetime);
+    // console.log("recommendedTimes", recommendedTimes);
+    console.log("schedulesAndAvailabilities", schedulesAndAvailabilities);
+  }, []);
 
   const [startIndex, setStartIndex] = useState<number>(-2);
   const [endIndex, setEndIndex] = useState<number>(-2);
@@ -231,6 +231,20 @@ export default function ScheduleComponent({
                   {personalScheduleInformation.availability
                     .slice(dayCount * 96, dayCount * 96 + 112)
                     .map((type: string, timeindex: number) => {
+                      let isScheduled = false;
+                      let scheduleName = "";
+                      personalScheduleInformation.schedules.some((schedule) => {
+                        if (
+                          schedule.startIndexInclusive <=
+                            timeindex + dayCount * 96 &&
+                          schedule.endIndexExclusive > timeindex + dayCount * 96
+                        ) {
+                          isScheduled = true;
+                          scheduleName = schedule.name;
+                          return true;
+                        }
+                        return false;
+                      }); // 스케줄 있는지 확인해서 스케줄 여부에 체크 + 스케줄 이름 넣어줌. isPublic 처리 여부에 따라 조금 달라질 수 있음
                       return (
                         <TimeDiv
                           key={dayCount * 96 + timeindex}
@@ -239,6 +253,8 @@ export default function ScheduleComponent({
                           $timeindex={timeindex}
                           $startindex={startIndex}
                           $endindex={endIndex}
+                          $isScheduled={isScheduled}
+                          $scheduleName={scheduleName}
                         />
                       );
                     })}
@@ -271,6 +287,7 @@ const PeopleLayout = styled.div`
   border: 1px solid black;
   border-right: none;
   font-size: small;
+  padding-bottom: 3rem;
 `;
 const TimeTableLayout = styled.div`
   width: full;
