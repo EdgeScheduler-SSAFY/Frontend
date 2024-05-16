@@ -39,7 +39,7 @@ const StyledDiv = styled.div<timeDivProps>`
   border-bottom: 2px solid ${Color("black200")};
   border-left: 2px solid ${Color("black200")};
   background-color: ${({ $timeindex, $startindex, $endindex, $type }) => {
-    if ($timeindex <= $endindex && $timeindex >= $startindex) {
+    if ($timeindex < $endindex && $timeindex >= $startindex) {
       switch ($type) {
         case "AVAILABLE":
           return Color("blue200");

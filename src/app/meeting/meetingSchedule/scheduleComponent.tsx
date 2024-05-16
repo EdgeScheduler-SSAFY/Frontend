@@ -17,9 +17,6 @@ import useMeetStore, { MeetState } from "@/store/meetStore";
 const startTime: number[] = [0];
 
 export default function ScheduleComponent({
-  setParentStartIndex,
-  setParentEndIndex,
-  dayCount,
   recommendedTimes,
   schedulesAndAvailabilities,
 }: ScheduleComponentProps) {
@@ -40,18 +37,27 @@ export default function ScheduleComponent({
 
   let fixedIndex = -1;
 
-  const { startDatetime, endDatetime, runningtime, memberList } = useMeetStore(
-    (state: MeetState) => state
-  );
+  const {
+    dayCount,
+    startDatetime,
+    endDatetime,
+    runningtime,
+    memberList,
+    zuStartIndex,
+    zuEndIndex,
+    setZuStartIndex,
+    setZuEndIndex,
+  } = useMeetStore((state: MeetState) => state);
   useEffect(() => {
     // console.log("startDatetime", startDatetime);
     // console.log("endDatetime", endDatetime);
     // console.log("recommendedTimes", recommendedTimes);
-    console.log("schedulesAndAvailabilities", schedulesAndAvailabilities);
+    // console.log("schedulesAndAvailabilities", schedulesAndAvailabilities);
   }, []);
+  // useEffect(() => {
+  //   console.log(zuStartIndex, zuEndIndex);
+  // }, [zuStartIndex, zuEndIndex]);
 
-  const [startIndex, setStartIndex] = useState<number>(-2);
-  const [endIndex, setEndIndex] = useState<number>(-2);
   // 첫지점과 끝지점을 통해 scope 설정에 이용할 예정
 
   const [timeDivGroupRef, timeDivGroupleftX] = [
@@ -104,12 +110,10 @@ export default function ScheduleComponent({
   }, [timeDivGroupRef, timeDivGroupleftX]);
 
   const updateStartIndex = (timeIndex: number) => {
-    setStartIndex(timeIndex);
-    setParentStartIndex(timeIndex);
+    setZuStartIndex(timeIndex);
   };
   const updateEndIndex = (timeIndex: number) => {
-    setEndIndex(timeIndex);
-    setParentEndIndex(timeIndex + 1);
+    setZuEndIndex(timeIndex + 1);
   };
 
   const renderTimeStampDiv = (timeIndex: number, personindex: number) => {
@@ -159,6 +163,7 @@ export default function ScheduleComponent({
       }
     }
   };
+
   return (
     <MainLayout>
       <PeopleLayout>
@@ -251,8 +256,8 @@ export default function ScheduleComponent({
                           $type={type}
                           $personindex={personindex}
                           $timeindex={timeindex}
-                          $startindex={startIndex}
-                          $endindex={endIndex}
+                          $startindex={zuStartIndex}
+                          $endindex={zuEndIndex}
                           $isScheduled={isScheduled}
                           $scheduleName={scheduleName}
                         />
