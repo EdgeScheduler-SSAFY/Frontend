@@ -13,6 +13,7 @@ import { PostMeetingAccepted } from "@/shared/api/postMeetingAccepted";
 export default function NoticeInfo({ data }: any) {
   const [buttonClicked, setButtonClicked] = useState<string>(data.receiverStatus);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isButtonShow, setIsButtonShow] = useState(new Date(data.startTime) <= new Date() ? false : true);
 
   // 버튼 클릭 시 상태 변경 함수
   const onClick = (status: string, scheduleId: number) => {
@@ -44,14 +45,16 @@ export default function NoticeInfo({ data }: any) {
           </TitleDiv>
           <DateDiv>
             <SubjectDiv>Date&nbsp;:&nbsp;</SubjectDiv>
-           <ConversionDate start={data.startTime} end={data.endTime} />
+            <ConversionDate start={data.startTime} end={data.endTime} />
           </DateDiv>
         </AlarmDetailDiv>
-        <ProposalButton
-          buttonClicked={buttonClicked}
-          onClickAttend={() => onClick("attend", data.scheduleId)}
-          onClickAbsence={() => onClick("absence", data.scheduleId)}
-        />
+        {isButtonShow && (
+          <ProposalButton
+            buttonClicked={buttonClicked}
+            onClickAttend={() => onClick("attend", data.scheduleId)}
+            onClickAbsence={() => onClick("absence", data.scheduleId)}
+          />
+        )}
       </AlarmButtonDiv>
       <ModalLayout
         open={isModalOpen}
@@ -124,4 +127,3 @@ const DateDiv = styled.div`
 const SubjectDiv = styled.div`
   font-weight: 600;
 `;
-

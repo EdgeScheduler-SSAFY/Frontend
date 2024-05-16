@@ -10,6 +10,7 @@ import { DetailProposal } from "@/features/schedule";
 export default function NoticeInfo({ data }: any) {
   const [trigger, setTrigger] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+  const [isButtonShow, setIsButtonShow] = useState(new Date(data.proposedStartTime) <= new Date() ? false : true);
 
   console.log(data);
   return (
@@ -32,27 +33,29 @@ export default function NoticeInfo({ data }: any) {
           </TitleDiv>
           <DateDiv>
             <SubjectDiv>Current&nbsp;:&nbsp;</SubjectDiv>
-            {/* <ConversionDate start={data.previousStartTime} end={data.previousEndTime}/> */}
+            <ConversionDate start={data.startTime} end={data.endTime} />
           </DateDiv>
           <DateDiv>
             <SubjectDiv>Suggested&nbsp;:&nbsp;</SubjectDiv>
             <ConversionDate start={data.proposedStartTime} end={data.proposedEndTime} />
           </DateDiv>
         </AlarmDetailDiv>
-        <ButtonDiv>
-          <Button
-            color='black200'
-            $bgColor='white'
-            $hoverColor='yellow50'
-            onClick={() => {
-              setShowDetail((prev) => !prev);
-            }}
-            $zIndex={10}
-            $borderColor='black200'
-          >
-            detail
-          </Button>
-        </ButtonDiv>
+        {isButtonShow && (
+          <ButtonDiv>
+            <Button
+              color='black200'
+              $bgColor='white'
+              $hoverColor='yellow50'
+              onClick={() => {
+                setShowDetail((prev) => !prev);
+              }}
+              $zIndex={10}
+              $borderColor='black200'
+            >
+              detail
+            </Button>
+          </ButtonDiv>
+        )}
       </AlarmButtonDiv>
       {showDetail && (
         <DetailProposal

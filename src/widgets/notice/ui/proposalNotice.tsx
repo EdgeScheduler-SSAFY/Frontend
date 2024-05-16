@@ -16,6 +16,8 @@ export default function CreatedNotice({ eventData, onClose }: { eventData: any; 
   const day = getDay(new Date(startDate));
   const [trigger, setTrigger] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+  const [isButtonShow, setIsButtonShow] = useState(new Date(eventData.proposedStartTime) <= new Date() ? false : true);
+
   // sse 알림 닫는 함수
   const closeHandle = () => {
     onClose();
@@ -45,23 +47,25 @@ export default function CreatedNotice({ eventData, onClose }: { eventData: any; 
           <TimeDiv>
             <ConversionTimeMini start={eventData.proposedStartTime} end={eventData.proposedEndTime} />
           </TimeDiv>
-          <ButtonDiv>
-            <Button
-              color='black200'
-              $bgColor='white'
-              $hoverColor='yellow50'
-              onClick={() => {
-                setShowDetail((prev) => !prev);
-              }}
-              width={5}
-              height={2}
-              fontSize={12}
-              $zIndex={10}
-              $borderColor='black200'
-            >
-              detail
-            </Button>
-          </ButtonDiv>
+          {isButtonShow && (
+            <ButtonDiv>
+              <Button
+                color='black200'
+                $bgColor='white'
+                $hoverColor='yellow50'
+                onClick={() => {
+                  setShowDetail((prev) => !prev);
+                }}
+                width={5}
+                height={2}
+                fontSize={12}
+                $zIndex={10}
+                $borderColor='black200'
+              >
+                detail
+              </Button>
+            </ButtonDiv>
+          )}
         </InfoDiv>
       </NoticeContent>
       {showDetail && (

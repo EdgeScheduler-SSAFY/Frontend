@@ -22,6 +22,7 @@ export default function CreatedNoticeBtn({ data }: { data: any }) {
   const [buttonClicked, setButtonClicked] = useState<string>(data.receiverStatus);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRead, setIsRead] = useState<boolean>(data.isRead);
+  const [isButtonShow, setIsButtonShow] = useState(new Date(data.startTime) <= new Date() ? false : true);
 
   const isReadHandle = async (isRead: boolean, id: string) => {
     if (!isRead) {
@@ -72,6 +73,7 @@ export default function CreatedNoticeBtn({ data }: { data: any }) {
           <TimeDiv>
             <ConversionTimeMini start={data.startTime} end={data.endTime} />
           </TimeDiv>
+          {isButtonShow && (
           <ProposalButton
             buttonClicked={buttonClicked}
             onClickAttend={() => onClick("attend", data.scheduleId)}
@@ -80,6 +82,7 @@ export default function CreatedNoticeBtn({ data }: { data: any }) {
             height={1.8}
             fontSize={10}
           />
+          )}
         </InfoDiv>
       </NoticeContent>
       <ModalLayout

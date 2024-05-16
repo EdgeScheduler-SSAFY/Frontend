@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { getDay } from "date-fns";
@@ -18,6 +18,7 @@ export default function CreatedNotice({ eventData, onClose }: { eventData: any; 
   const day = getDay(new Date(startDate));
   const [buttonClicked, setButtonClicked] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isButtonShow, setIsButtonShow] = useState(new Date(eventData.startTime) <= new Date() ? false : true);
 
   // sse 알림 닫는 함수
   const closeHandle = () => {
@@ -55,16 +56,18 @@ export default function CreatedNotice({ eventData, onClose }: { eventData: any; 
         <InfoDiv>
           <TitleDiv>{eventData.scheduleName}</TitleDiv>
           <TimeDiv>
-          <ConversionTimeMini start={eventData.startTime} end={eventData.endTime} />
+            <ConversionTimeMini start={eventData.startTime} end={eventData.endTime} />
           </TimeDiv>
-          <ProposalButton
-            buttonClicked={buttonClicked}
-            onClickAttend={() => onClick("attend", eventData.scheduleId)}
-            onClickAbsence={() => onClick("absence", eventData.scheduleId)}
-            width={5}
-            height={2}
-            fontSize={12}
-          />
+          {isButtonShow && (
+            <ProposalButton
+              buttonClicked={buttonClicked}
+              onClickAttend={() => onClick("attend", eventData.scheduleId)}
+              onClickAbsence={() => onClick("absence", eventData.scheduleId)}
+              width={5}
+              height={2}
+              fontSize={12}
+            />
+          )}
         </InfoDiv>
       </NoticeContent>
       <ModalLayout

@@ -22,6 +22,7 @@ export default function UpdatedTimeNoticeBtn({ data }: { data: any }) {
   const [buttonClicked, setButtonClicked] = useState<string>(data.receiverStatus);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRead, setIsRead] = useState<boolean>(data.isRead);
+  const [isButtonShow, setIsButtonShow] = useState(new Date(data.updatedStartTime) <= new Date() ? false : true);
 
   const isReadHandle = async (isRead: boolean, id: string) => {
     if (!isRead) {
@@ -73,14 +74,16 @@ export default function UpdatedTimeNoticeBtn({ data }: { data: any }) {
           <TimeDiv>
             <ConversionTimeMini start={data.updatedStartTime} end={data.updatedEndTime} />
           </TimeDiv>
-          <ProposalButton
-            buttonClicked={buttonClicked}
-            onClickAttend={() => onClick("attend", data.scheduleId)}
-            onClickAbsence={() => onClick("absence", data.scheduleId)}
-            width={3.5}
-            height={1.8}
-            fontSize={10}
-          />
+          {isButtonShow && (
+            <ProposalButton
+              buttonClicked={buttonClicked}
+              onClickAttend={() => onClick("attend", data.scheduleId)}
+              onClickAbsence={() => onClick("absence", data.scheduleId)}
+              width={3.5}
+              height={1.8}
+              fontSize={10}
+            />
+          )}
         </InfoDiv>
       </NoticeContent>
       <ModalLayout
