@@ -8,11 +8,30 @@ import { MdOutlineNotifications } from "react-icons/md";
 
 import { Color } from "@/shared/lib/styles/color";
 import { ColorName } from "@/shared/lib/type/types";
-import { NoticeList } from "@/widgets/notice/ui/noticeList";
+import { NoticeList } from "@/features/noticeList/ui/noticeList";
 import NewNotice from "@/widgets/notice/ui/newNotice";
+import { GetNoticeList } from "@/features/noticeList/api/getNoticeList";
+import useNoticeStore from "@/store/noticeStore";
 
 export function Header() {
   const [showNoticeList, setShowNoticeList] = useState<boolean>(false);
+  const noticeCount = useNoticeStore(state => state.noticeCount); 
+  const setNoticeCount = useNoticeStore(state => state.setNoticeCount);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const responseData = await GetNoticeList();
+        const unreadCount = responseData.reduce((count: number, notice: any) => {
+          return notice.isRead === false ? count + 1 : count;
+        }, 0);
+        setNoticeCount(unreadCount);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  });
 
   const noticeListHandle = () => {
     setShowNoticeList((prev) => !prev);
@@ -52,10 +71,11 @@ export function Header() {
         <StyledLink href='/myPage/notificationBox'>my page</StyledLink>
         <StyledLink href='/login'>sign in</StyledLink>
       </LinkDiv>
-      <MdOutlineNotifications size={25} onClick={noticeListHandle} style={{ cursor: "pointer" }} />
+      <CustomMdOutlineNotifications size={25} onClick={noticeListHandle} />
+      {noticeCount > 0 && <NoticeCountDiv>{noticeCount}</NoticeCountDiv>}
       {showNoticeList && (
         <NoticeLayout ref={ref}>
-           <NoticeList onClose={() => setShowNoticeList(false)} />
+          <NoticeList onClose={() => setShowNoticeList(false)} />
         </NoticeLayout>
       )}
     </HeaderNav>
@@ -103,4 +123,21 @@ const StyledLink = styled(Link)`
 
 const NoticeLayout = styled.div`
   position: relative;
+`;
+
+const CustomMdOutlineNotifications = styled(MdOutlineNotifications)`
+  position: relative;
+  cursor: pointer;
+`;
+
+const NoticeCountDiv = styled.div`
+  border-radius: 50%;
+  padding: 0.1rem 0.15rem;
+  background-color: ${Color("orange")};
+  color: ${Color("white")};
+  font-size: 9px;
+  font-weight: 600;
+  position: absolute;
+  top: 0.7rem;
+  right: 2.9rem;
 `;

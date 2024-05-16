@@ -3,14 +3,16 @@ import styled from "styled-components";
 import { IoMdArrowDropdown } from "react-icons/io";
 import React, { Fragment, useEffect, useState } from "react";
 import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
-
+import { MiniCalendar, fetchWithInterceptor } from "@/shared";
+import DateFormat from "@/shared/lib/dateFormat";
+import SelectTime from "@/shared/ui/selectTime";
+import { intervalTime, dayList } from "@/shared/lib/data";
 import ScheduleComponent from "./scheduleComponent";
 import { Color } from "@/shared/lib/styles/color";
 import RecommendTypeSetButton from "@/features/meetingSchedule/ui/RecommendTypeSetButton";
 import CancelButton from "@/features/meetingSchedule/ui/CancelButton";
 import SubmitButton from "@/features/meetingSchedule/ui/SubmitButton";
 import useMeetStore, { MeetState } from "@/store/meetStore";
-import { fetchWithInterceptor } from "@/shared";
 import { SchedulesAndAvailabilitiesProps } from "@/shared/lib/type";
 
 type Member = {
@@ -34,7 +36,6 @@ export default function MeetingSchedule() {
   useEffect(() => {
     console.log("endDatetiem: " + endDatetime);
   }, [endDatetime]);
-
   const [date, setDate] = useState<Date>(todayDate); // 현재 날짜
   const [dayCount, setDayCount] = useState<number>(0); // 날짜 카운트 (첫날이 0)
   const [recommededTime, setRecommendedTime] = useState<Recommended>({
@@ -55,15 +56,41 @@ export default function MeetingSchedule() {
       days[date.getDay()] +
       ")"
   ); // 시작 날짜
-  const [endDate, setEndDate] = useState<string>(startDate); // 끝 날짜
-  const [selectedOption, setSelectedOption] = useState(0); // 선택된 옵션
-  const [startIndex, setStartIndex] = useState<number>(-2); // 시작 시간 인덱스
-  const [endIndex, setEndIndex] = useState<number>(-2); // 끝 시간 인덱스
-  const [startTime, setStartTime] = useState<string>("AM 00:00"); // 시작 시간
-  const [endTime, setEndTime] = useState<string>("AM 00:00"); // 끝 시간
   const [schedulesAndAvailabilities, setSchedulesAndAvailabilities] = useState<
     SchedulesAndAvailabilitiesProps[]
   >([]);
+  const [showStartMiniCalendar, setShowStartMiniCalendar] = useState<boolean>(false);
+  const [endDate, setEndDate] = useState<string>(startDate);
+  const [selectedOption, setSelectedOption] = useState(0);
+  const [startIndex, setStartIndex] = useState<number>(-2);
+  const [startTime, setStartTime] = useState<string>("AM 00:00");
+  const [endTime, setEndTime] = useState<string>("AM 01:00");
+  const [endIndex, setEndIndex] = useState<number>(-2);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [disabledIndex, setDisabledIndex] = useState<number>(0);
+  // 시작날짜 값이 변경될 때 실행될 함수
+  const DateHandle = (selectedDate: Date) => {
+    setSelectedDate(selectedDate);
+    let tmpDate =
+      selectedDate.getFullYear() +
+      "." +
+      (selectedDate.getMonth() + 1) +
+      "." +
+      selectedDate.getDate() +
+      "(" +
+      dayList[selectedDate.getDay()] +
+      ")";
+    setStartDate(tmpDate);
+    setEndDate(tmpDate);
+  };
+
+  // 시작시간 값이 변경될 때 실행될 함수
+  const startTimeChangeHandle = (value: number | string) => {
+    setDisabledIndex(intervalTime.findIndex((option) => option.value === value));
+  };
+
+  // 끝시간 값이 변경될 때 실행될 함수
+  const endTimeChangeHandle = (value: number | string) => {};
 
   const handleOptionClick = (
     index: number,
@@ -73,12 +100,8 @@ export default function MeetingSchedule() {
     setSelectedRecommend(recommededTime[type]);
   };
   const handleGoToPastDay = () => {
-    let pastDate = new Date(date.getTime() - 24 * 60 * 60 * 1000);
-    let startOfNowDate = new Date(
-      todayDate.getFullYear(),
-      todayDate.getMonth(),
-      todayDate.getDate()
-    );
+    let pastDate = new Date(selectedDate.getTime() - 24 * 60 * 60 * 1000);
+    let startOfNowDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
     if (pastDate >= startOfNowDate) {
       let tmpDate =
         pastDate.getFullYear() +
@@ -87,9 +110,9 @@ export default function MeetingSchedule() {
         "." +
         pastDate.getDate() +
         "(" +
-        days[pastDate.getDay()] +
+        dayList[pastDate.getDay()] +
         ")";
-      setDate(pastDate);
+      setSelectedDate(pastDate);
       setStartDate(tmpDate);
       setEndDate(tmpDate);
       setDayCount((prev) => prev - 1);
@@ -111,9 +134,9 @@ export default function MeetingSchedule() {
         "." +
         nextDate.getDate() +
         "(" +
-        days[nextDate.getDay()] +
+        dayList[nextDate.getDay()] +
         ")";
-      setDate(nextDate);
+      setSelectedDate(nextDate);
       setStartDate(tmpDate);
       setEndDate(tmpDate);
       setDayCount((prev) => prev + 1);
@@ -122,18 +145,18 @@ export default function MeetingSchedule() {
 
   useEffect(() => {
     if (startIndex >= 0) {
-      changeDate(date, startIndex) &&
-        setStartDate(changeDate(date, startIndex));
+      changeDate(selectedDate, startIndex) && setStartDate(changeDate(selectedDate, startIndex));
+      setDisabledIndex(startIndex);
       setStartTime(changeTime(startIndex));
     }
-  }, [startIndex, date]);
+  }, [startIndex, selectedDate]);
 
   useEffect(() => {
     if (endIndex >= 0) {
-      changeDate(date, endIndex) && setEndDate(changeDate(date, endIndex));
+      changeDate(selectedDate, endIndex) && setEndDate(changeDate(selectedDate, endIndex));
       setEndTime(changeTime(endIndex));
     }
-  }, [endIndex, date]);
+  }, [endIndex, selectedDate]);
 
   const changeDate = (date: Date, timeIndex: number) => {
     if (timeIndex > 95) {
@@ -145,19 +168,12 @@ export default function MeetingSchedule() {
         "." +
         nextDate.getDate() +
         "(" +
-        days[nextDate.getDay()] +
+        dayList[nextDate.getDay()] +
         ")";
       return tmpDate;
     } else {
       const tmpDate =
-        date.getFullYear() +
-        "." +
-        (date.getMonth() + 1) +
-        "." +
-        date.getDate() +
-        "(" +
-        days[date.getDay()] +
-        ")";
+        date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate() + "(" + dayList[date.getDay()] + ")";
       return tmpDate;
     }
   };
@@ -276,6 +292,8 @@ export default function MeetingSchedule() {
         setSchedulesAndAvailabilities(data.schedulesAndAvailabilities);
 
         // 추천 데이터 받아오고 기록
+        console.log("hi");
+        console.log(data);
       } catch (error) {
         console.log(error);
       }
@@ -289,17 +307,25 @@ export default function MeetingSchedule() {
         <DateLayout>
           <DateinDateDiv>Date</DateinDateDiv>
           <TimeSelectionLayout>
-            <DateDiv data-testid="startDate">{startDate}</DateDiv>
-            <TimeButton>
-              <div>{startTime}</div>
-              <IoMdArrowDropdown />
-            </TimeButton>
+            <DateDiv data-testid='startDate'>{startDate}</DateDiv>
+            <SelectTime
+              options={intervalTime}
+              show={false}
+              width={7}
+              onSelectChange={startTimeChangeHandle}
+              standardIdx={startIndex <= 0 ? 0 : startIndex}
+              disabledLastIndex={intervalTime.length - 1}
+            ></SelectTime>
             <HypoonDiv>-</HypoonDiv>
-            <DateDiv data-testid="endDate">{endDate}</DateDiv>
-            <TimeButton>
-              <div>{endTime}</div>
-              <IoMdArrowDropdown />
-            </TimeButton>
+            <DateDiv data-testid='endDate'>{endDate}</DateDiv>
+            <SelectTime
+              options={intervalTime}
+              show={false}
+              width={7}
+              onSelectChange={endTimeChangeHandle}
+              standardIdx={endIndex <= 0 ? 0 : endIndex}
+              disabledIndex={disabledIndex}
+            ></SelectTime>
           </TimeSelectionLayout>
         </DateLayout>
         <OptionLayout>
@@ -327,26 +353,26 @@ export default function MeetingSchedule() {
       </HeaderLayout>
       <ScheduleHeaderLayout>
         <ScheduleHeaderTime>
-          <TimeChangeButton
-            onClick={handleGoToPastDay}
-            data-testid="goToPastDayButton"
-          >
+          <TimeChangeButton onClick={handleGoToPastDay} data-testid='goToPastDayButton'>
             <LuChevronLeftSquare />
           </TimeChangeButton>
-          <TimeDiv data-testid="nowDate">
-            {date.getFullYear() +
-              "." +
-              (date.getMonth() + 1) +
-              "." +
-              date.getDate() +
-              "(" +
-              days[date.getDay()] +
-              ")"}
+          <TimeDiv data-testid='nowDate'>
+            <DateButton onClick={() => setShowStartMiniCalendar((prev) => !prev)}>
+              <DateFormat selectedDate={selectedDate} />
+            </DateButton>
+            {showStartMiniCalendar && (
+              <CalendarDiv>
+                <MiniCalendar
+                  selectDate={DateHandle}
+                  selectedDate={selectedDate}
+                  close={() => setShowStartMiniCalendar(false)}
+                  view='day'
+                  $standardDate={new Date(new Date().setHours(0, 0, 0, 0))}
+                />
+              </CalendarDiv>
+            )}
           </TimeDiv>
-          <TimeChangeButton
-            onClick={handleGoToNextDay}
-            data-testid="goToNextDayButton"
-          >
+          <TimeChangeButton onClick={handleGoToNextDay} data-testid='goToNextDayButton'>
             <LuChevronRightSquare />
           </TimeChangeButton>
         </ScheduleHeaderTime>
@@ -357,9 +383,7 @@ export default function MeetingSchedule() {
             <ScheduleDiv />
             Scheduled
           </WorkingScheduleLayout>
-          <DetailDiv>
-            * Hover over the scheduled event area to view details.
-          </DetailDiv>
+          <DetailDiv>* Hover over the scheduled event area to view details.</DetailDiv>
         </ScheduleHeaderExp>
       </ScheduleHeaderLayout>
       <ScheduleComponent
@@ -424,30 +448,16 @@ const OptionLayout = styled.div`
 
 const DateDiv = styled.div`
   display: flex;
-  width: 8rem;
-
-  min-height: 2.5rem;
-  border: 1px solid gray;
-  padding-top: auto;
-  padding-bottom: auto;
-  padding-left: 5px;
-  margin-left: 10px;
-  margin-right: 10px;
-  font-size: 16px;
-  align-items: center;
-`;
-
-const TimeButton = styled.button`
-  display: flex;
-  min-height: 2.5rem;
-  border: 1px solid gray;
   width: 7rem;
-  font-size: 1rem;
-  padding-right: 8px;
+  min-height: 2rem;
+  border: solid 1px ${Color("black200")};
+  border-radius: 3px;
+  padding: 0.1rem 0.7rem;
+  margin-right: 10px;
+  font-size: 14px;
   align-items: center;
-  justify-content: space-between;
-  background-color: white;
 `;
+
 const DateinDateDiv = styled.div`
   margin-left: 10px;
   font-weight: bold;
@@ -457,6 +467,7 @@ const TimeSelectionLayout = styled.div`
   display: flex;
   flex-direction: row;
   margin-top: 0.5rem;
+  margin-left: 0.8rem;
 `;
 
 const HypoonDiv = styled.div`
@@ -478,7 +489,7 @@ const ScheduleHeaderLayout = styled.div`
 const ScheduleHeaderTime = styled.div`
   display: flex;
   gap: 2rem;
-  font-weight: bold;
+  font-weight: 500;
   font-size: 17px;
   padding-left: 3rem;
   align-items: center;
@@ -555,4 +566,23 @@ const RecommendLayout = styled.div`
 const RecTimeLayout = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+const CalendarDiv = styled.div`
+  position: relative;
+  top: -4rem;
+  left: -15rem;
+`;
+
+const DateButton = styled.div`
+  width: 7rem;
+  height: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  padding: 0.1rem 0.7rem;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
 `;
