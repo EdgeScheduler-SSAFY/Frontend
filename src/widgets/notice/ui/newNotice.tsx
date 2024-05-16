@@ -69,7 +69,7 @@ export default function NewNotice() {
 
   useEffect(() => {
     const EventSource = EventSourcePolyfill;
-    const eventSource = new EventSource("https://gateway.edgescheduler.co.kr/notification-service/subscribe/1", {
+    const eventSource = new EventSource("https://gateway.edgescheduler.co.kr/notification-service/subscribe", {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

@@ -36,10 +36,22 @@ export function NoticeList({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const [noticeList, setNoticeList] = useState<any[]>([]);
   const [noticeIds, setNoticeIds] = useState<string[]>([]);
+  const [layoutKey, setLayoutKey] = useState(0);
 
-  const readAllClickHandle = (e: React.MouseEvent) => {
+  const fetchData = async () => {
+    try {
+      const responseData = await GetNoticeList();
+      setNoticeList(responseData);
+      setNoticeIds(responseData.map((notice: any) => notice.id));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const readAllClickHandle = async (e: React.MouseEvent) => {
     e.stopPropagation(); // 이벤트 전파 막기
-    PostNoticeReadAll(noticeIds);
+    await PostNoticeReadAll(noticeIds);
+    fetchData();
   };
 
   const notificationBoxClickHandle = (e: React.MouseEvent) => {
@@ -48,22 +60,17 @@ export function NoticeList({ onClose }: { onClose: () => void }) {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const responseData = await GetNoticeList();
-        setNoticeList(responseData);
-        setNoticeIds(responseData.map((notice: any) => notice.id));
-      } catch (error) {
-        console.log(error);
-      }
-    };
     fetchData();
   }, []);
 
+  useEffect(() => {
+    setLayoutKey((prevKey) => prevKey + 1);
+  }, [noticeList]);
+
   return (
     <NoticeBoxLayout>
-           <NavLayout>
-      <NoticeListButton onClick={readAllClickHandle}>
+      <NavLayout>
+        <NoticeListButton onClick={readAllClickHandle}>
           <MdOutlineMarkChatRead size={13} />
           Read All
         </NoticeListButton>
@@ -72,13 +79,12 @@ export function NoticeList({ onClose }: { onClose: () => void }) {
           Notification Box
         </NoticeListButton>
       </NavLayout>
-      <NoticeListLayout>
+      <NoticeListLayout key={layoutKey}>
         {noticeList &&
           noticeList.map((notification: any) => (
             <div key={notification.id}>{renderNotificationComponent(notification)}</div>
           ))}
       </NoticeListLayout>
- 
     </NoticeBoxLayout>
   );
 }
