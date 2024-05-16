@@ -18,6 +18,7 @@ export default function UpdatedTimeNotice({ eventData, onClose }: { eventData: a
   const day = getDay(new Date(startDate));
   const [buttonClicked, setButtonClicked] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isButtonShow, setIsButtonShow] = useState(new Date(eventData.updatedStartTime) <= new Date() ? false : true);
 
   // sse 알림 닫는 함수
   const closeHandle = () => {
@@ -57,14 +58,16 @@ export default function UpdatedTimeNotice({ eventData, onClose }: { eventData: a
           <TimeDiv>
             <ConversionTimeMini start={eventData.updatedStartTime} end={eventData.updatedEndTime} />
           </TimeDiv>
-          <ProposalButton
-            buttonClicked={buttonClicked}
-            onClickAttend={() => onClick("attend", eventData.scheduleId)}
-            onClickAbsence={() => onClick("absence", eventData.scheduleId)}
-            width={5}
-            height={2}
-            fontSize={12}
-          />
+          {isButtonShow && (
+            <ProposalButton
+              buttonClicked={buttonClicked}
+              onClickAttend={() => onClick("attend", eventData.scheduleId)}
+              onClickAbsence={() => onClick("absence", eventData.scheduleId)}
+              width={5}
+              height={2}
+              fontSize={12}
+            />
+          )}
         </InfoDiv>
       </NoticeContent>
       <ModalLayout

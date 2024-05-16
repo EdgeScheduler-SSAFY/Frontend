@@ -20,6 +20,7 @@ export default function ProposalNoticeBtn({ data }: { data: any }) {
   const [isRead, setIsRead] = useState<boolean>(data.isRead);
   const [trigger, setTrigger] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+  const [isButtonShow, setIsButtonShow] = useState(new Date(data.proposedStartTime) <= new Date() ? false : true);
 
   const isReadHandle = async (isRead: boolean, id: string) => {
     if (!isRead) {
@@ -61,23 +62,25 @@ export default function ProposalNoticeBtn({ data }: { data: any }) {
           <TimeDiv>
             <ConversionTimeMini start={data.proposedStartTime} end={data.proposedEndTime} />
           </TimeDiv>
-          <ButtonDiv>
-            <Button
-              color='black100'
-              $bgColor='white'
-              $hoverColor='yellow50'
-              onClick={() => {
-                setShowDetail((prev) => !prev);
-              }}
-              width={3.5}
-              height={1.8}
-              fontSize={10}
-              $zIndex={10}
-              $borderColor='black100'
-            >
-              detail
-            </Button>
-          </ButtonDiv>
+          {isButtonShow && (
+            <ButtonDiv>
+              <Button
+                color='black100'
+                $bgColor='white'
+                $hoverColor='yellow50'
+                onClick={() => {
+                  setShowDetail((prev) => !prev);
+                }}
+                width={3.5}
+                height={1.8}
+                fontSize={10}
+                $zIndex={10}
+                $borderColor='black100'
+              >
+                detail
+              </Button>
+            </ButtonDiv>
+          )}
         </InfoDiv>
       </NoticeContent>
       {showDetail && (
