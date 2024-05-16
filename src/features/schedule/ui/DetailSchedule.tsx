@@ -16,7 +16,6 @@ import {
 import Button from "@/shared/ui//button";
 import { fetchWithInterceptor } from "@/shared";
 import ProposalModal from "@/shared/ui/proposalModal";
-import ModalContent from "@/shared/ui/modalContent";
 
 import useMeetStore, { MeetState } from "@/store/meetStore";
 
@@ -270,25 +269,6 @@ export function DetailSchedule({
               </Button>
             </ButtonDiv>
           )}
-        <ProposalModal
-          open={isModalOpen}
-          onClose={() => {
-            setIsModalOpen((prev) => !prev);
-          }}
-        >
-          <ModalContent
-            eventData={{
-              scheduleId: scheduleId,
-              scheduleName: data.name,
-              startTime: format(data.startDatetime, "yyyy-MM-dd'T'HH:mm:ss"),
-              endTime: format(data.endDatetime, "yyyy-MM-dd'T'HH:mm:ss"),
-            }}
-            onClose={() => {
-              setIsModalOpen((prev) => !prev);
-              setTrigger((prev) => !prev);
-            }}
-          />
-        </ProposalModal>
         {/* 회의인 경우에만 보여주는참석자 */}
         {data.type === "MEETING" && (
           <AttendeesLayout>

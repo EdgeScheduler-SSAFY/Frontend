@@ -329,7 +329,7 @@ const EachMemberDiv = styled.div`
   padding: 0.1rem 0.5rem;
   display: flex;
   align-items: center;
-  background-color: ${Color("black10")};
+  background-color: ${Color("black50")};
 `;
 
 const ProfileImage = styled(Image)`
