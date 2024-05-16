@@ -6,7 +6,7 @@ import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
 import { MiniCalendar, fetchWithInterceptor } from "@/shared";
 import DateFormat from "@/shared/lib/dateFormat";
 import SelectTime from "@/shared/ui/selectTime";
-import { intervalTime, dayList } from "@/shared/lib/data";
+import { intervalTimeExtended, dayList } from "@/shared/lib/data";
 import ScheduleComponent from "./scheduleComponent";
 import { Color } from "@/shared/lib/styles/color";
 import RecommendTypeSetButton from "@/features/meetingSchedule/ui/RecommendTypeSetButton";
@@ -14,6 +14,8 @@ import CancelButton from "@/features/meetingSchedule/ui/CancelButton";
 import SubmitButton from "@/features/meetingSchedule/ui/SubmitButton";
 import useMeetStore, { MeetState } from "@/store/meetStore";
 import { SchedulesAndAvailabilitiesProps } from "@/shared/lib/type";
+import { useRouter } from "next/navigation";
+import { addMinutes, format } from "date-fns";
 
 type Member = {
   memberId: number;
@@ -28,16 +30,23 @@ type Recommended = {
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export default function MeetingSchedule() {
-  const { startDatetime, endDatetime, runningtime, memberList } = useMeetStore(
-    (state: MeetState) => state
-  );
+  const {
+    meetName,
+    description,
+    dayCount,
+    startDatetime,
+    endDatetime,
+    runningtime,
+    memberList,
+    zuStartIndex,
+    zuEndIndex,
+    setDayCount,
+    setZuStartIndex,
+    setZuEndIndex,
+  } = useMeetStore((state: MeetState) => state);
   const todayDate = new Date(startDatetime); // 회의 추천받는 시작 날짜
   const finalDate = new Date(endDatetime); // 회의 추천받는 시작 날짜
-  useEffect(() => {
-    console.log("endDatetiem: " + endDatetime);
-  }, [endDatetime]);
   const [date, setDate] = useState<Date>(todayDate); // 현재 날짜
-  const [dayCount, setDayCount] = useState<number>(0); // 날짜 카운트 (첫날이 0)
   const [recommededTime, setRecommendedTime] = useState<Recommended>({
     fastest: [],
     minimumAbsentees: [],
@@ -56,17 +65,24 @@ export default function MeetingSchedule() {
       days[date.getDay()] +
       ")"
   ); // 시작 날짜
+
+  const router = useRouter();
   const [schedulesAndAvailabilities, setSchedulesAndAvailabilities] = useState<
     SchedulesAndAvailabilitiesProps[]
   >([]);
-  const [showStartMiniCalendar, setShowStartMiniCalendar] = useState<boolean>(false);
+  const [showStartMiniCalendar, setShowStartMiniCalendar] =
+    useState<boolean>(false);
   const [endDate, setEndDate] = useState<string>(startDate);
   const [selectedOption, setSelectedOption] = useState(0);
-  const [startIndex, setStartIndex] = useState<number>(-2);
   const [startTime, setStartTime] = useState<string>("AM 00:00");
   const [endTime, setEndTime] = useState<string>("AM 01:00");
-  const [endIndex, setEndIndex] = useState<number>(-2);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const start = new Date(startDatetime);
+  const dateWithNoTime = new Date(
+    start.getFullYear(),
+    start.getMonth(),
+    start.getDate()
+  );
+  const [selectedDate, setSelectedDate] = useState<Date>(dateWithNoTime);
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
   // 시작날짜 값이 변경될 때 실행될 함수
   const DateHandle = (selectedDate: Date) => {
@@ -82,11 +98,20 @@ export default function MeetingSchedule() {
       ")";
     setStartDate(tmpDate);
     setEndDate(tmpDate);
-  };
+
+    //startDatetime과 selectedDate의 차이를 구해서 dayCount를 변경
+    const startDate = new Date(startDatetime.split("T")[0] + "T00:00:00");
+    const diff = Math.floor(
+      (selectedDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    setDayCount(diff);
+  }; //달력에서 고를때
 
   // 시작시간 값이 변경될 때 실행될 함수
   const startTimeChangeHandle = (value: number | string) => {
-    setDisabledIndex(intervalTime.findIndex((option) => option.value === value));
+    setDisabledIndex(
+      intervalTimeExtended.findIndex((option) => option.value === value)
+    );
   };
 
   // 끝시간 값이 변경될 때 실행될 함수
@@ -101,7 +126,11 @@ export default function MeetingSchedule() {
   };
   const handleGoToPastDay = () => {
     let pastDate = new Date(selectedDate.getTime() - 24 * 60 * 60 * 1000);
-    let startOfNowDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
+    let startOfNowDate = new Date(
+      todayDate.getFullYear(),
+      todayDate.getMonth(),
+      todayDate.getDate()
+    );
     if (pastDate >= startOfNowDate) {
       let tmpDate =
         pastDate.getFullYear() +
@@ -115,17 +144,13 @@ export default function MeetingSchedule() {
       setSelectedDate(pastDate);
       setStartDate(tmpDate);
       setEndDate(tmpDate);
-      setDayCount((prev) => prev - 1);
+      setDayCount(dayCount - 1);
     }
   };
 
   const handleGoToNextDay = () => {
-    let nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000);
-    let endOfNowDate = new Date(
-      finalDate.getFullYear(),
-      finalDate.getMonth(),
-      finalDate.getDate()
-    );
+    let nextDate = new Date(selectedDate.getTime() + 24 * 60 * 60 * 1000);
+    let endOfNowDate = new Date(finalDate);
     if (nextDate <= endOfNowDate) {
       let tmpDate =
         nextDate.getFullYear() +
@@ -139,24 +164,74 @@ export default function MeetingSchedule() {
       setSelectedDate(nextDate);
       setStartDate(tmpDate);
       setEndDate(tmpDate);
-      setDayCount((prev) => prev + 1);
+      setDayCount(dayCount + 1);
+    }
+  };
+
+  const submitHandler = () => {
+    const meetingStartTime = format(
+      addMinutes(startDatetime, (dayCount * 96 + zuStartIndex) * 15),
+      "yyyy-MM-dd'T'HH:mm:ss"
+    );
+    const meetingEndTime = format(
+      addMinutes(startDatetime, (dayCount * 96 + zuEndIndex) * 15),
+      "yyyy-MM-dd'T'HH:mm:ss"
+    );
+    console.log(meetingStartTime, meetingEndTime);
+    try {
+      fetchWithInterceptor(
+        "https://gateway.edgescheduler.co.kr/schedule-service/schedules",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            organizerId: memberList[0].user.id,
+            name: meetName,
+            description: description,
+            type: "MEETING",
+            color: 4,
+            startDatetime: meetingStartTime,
+            endDatetime: meetingEndTime,
+            isPublic: true,
+            isRecurrence: false,
+            attendeeList: memberList.map((member) => {
+              return {
+                memberId: member.user.id,
+                isRequired: member.isRequired,
+              };
+            }),
+          }),
+        }
+      );
+      router.push("/");
+    } catch (error) {
+      console.log(error);
     }
   };
 
   useEffect(() => {
-    if (startIndex >= 0) {
-      changeDate(selectedDate, startIndex) && setStartDate(changeDate(selectedDate, startIndex));
-      setDisabledIndex(startIndex);
-      setStartTime(changeTime(startIndex));
+    if (zuStartIndex >= 0) {
+      changeDate(selectedDate, zuStartIndex) &&
+        setStartDate(changeDate(selectedDate, zuStartIndex));
+      setDisabledIndex(zuStartIndex);
+      setStartTime(changeTime(zuStartIndex));
     }
-  }, [startIndex, selectedDate]);
+  }, [zuStartIndex, selectedDate]);
 
   useEffect(() => {
-    if (endIndex >= 0) {
-      changeDate(selectedDate, endIndex) && setEndDate(changeDate(selectedDate, endIndex));
-      setEndTime(changeTime(endIndex));
+    if (zuEndIndex >= 0) {
+      changeDate(selectedDate, zuEndIndex) &&
+        setEndDate(changeDate(selectedDate, zuEndIndex));
+      setEndTime(changeTime(zuEndIndex));
     }
-  }, [endIndex, selectedDate]);
+  }, [zuEndIndex, selectedDate]);
+
+  useEffect(() => {
+    console.log("dayCount", dayCount);
+  }, [dayCount]);
+
+  useEffect(() => {
+    setDayCount(0);
+  }, [setDayCount]);
 
   const changeDate = (date: Date, timeIndex: number) => {
     if (timeIndex > 95) {
@@ -173,7 +248,14 @@ export default function MeetingSchedule() {
       return tmpDate;
     } else {
       const tmpDate =
-        date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate() + "(" + dayList[date.getDay()] + ")";
+        date.getFullYear() +
+        "." +
+        (date.getMonth() + 1) +
+        "." +
+        date.getDate() +
+        "(" +
+        dayList[date.getDay()] +
+        ")";
       return tmpDate;
     }
   };
@@ -202,8 +284,8 @@ export default function MeetingSchedule() {
   };
 
   useEffect(() => {
-    console.log("startDatetime", startDatetime);
-    console.log("endDatetime", endDatetime);
+    // console.log("startDatetime", startDatetime);
+    // console.log("endDatetime", endDatetime);
     const recData = async () => {
       const apiMemberList: Member[] = [];
       memberList.forEach((member) => {
@@ -292,7 +374,6 @@ export default function MeetingSchedule() {
         setSchedulesAndAvailabilities(data.schedulesAndAvailabilities);
 
         // 추천 데이터 받아오고 기록
-        console.log("hi");
         console.log(data);
       } catch (error) {
         console.log(error);
@@ -301,30 +382,40 @@ export default function MeetingSchedule() {
     recData();
   }, [startDatetime, endDatetime, runningtime, memberList]);
 
+  // useEffect(() => {
+  //   console.log("startIndex : " + startIndex);
+  //   console.log("endIndex : " + endIndex);
+  // }, [startIndex, endIndex]);
+
+  useEffect(() => {
+    console.log(new Date(endDatetime));
+  }, [endDatetime]);
   return (
     <MainLayout>
       <HeaderLayout>
         <DateLayout>
           <DateinDateDiv>Date</DateinDateDiv>
           <TimeSelectionLayout>
-            <DateDiv data-testid='startDate'>{startDate}</DateDiv>
+            <DateDiv data-testid="startDate">{startDate}</DateDiv>
             <SelectTime
-              options={intervalTime}
+              options={intervalTimeExtended}
               show={false}
               width={7}
               onSelectChange={startTimeChangeHandle}
-              standardIdx={startIndex <= 0 ? 0 : startIndex}
-              disabledLastIndex={intervalTime.length - 1}
+              standardIdx={zuStartIndex <= 0 ? 0 : zuStartIndex}
+              disabledLastIndex={intervalTimeExtended.length - 1}
+              onStartIndexChange={(value: number) => setZuStartIndex(value)}
             ></SelectTime>
             <HypoonDiv>-</HypoonDiv>
-            <DateDiv data-testid='endDate'>{endDate}</DateDiv>
+            <DateDiv data-testid="endDate">{endDate}</DateDiv>
             <SelectTime
-              options={intervalTime}
+              options={intervalTimeExtended}
               show={false}
               width={7}
               onSelectChange={endTimeChangeHandle}
-              standardIdx={endIndex <= 0 ? 0 : endIndex}
+              standardIdx={zuEndIndex <= 0 ? 0 : zuEndIndex}
               disabledIndex={disabledIndex}
+              onEndIndexChange={(value: number) => setZuEndIndex(value)}
             ></SelectTime>
           </TimeSelectionLayout>
         </DateLayout>
@@ -353,11 +444,16 @@ export default function MeetingSchedule() {
       </HeaderLayout>
       <ScheduleHeaderLayout>
         <ScheduleHeaderTime>
-          <TimeChangeButton onClick={handleGoToPastDay} data-testid='goToPastDayButton'>
+          <TimeChangeButton
+            onClick={handleGoToPastDay}
+            data-testid="goToPastDayButton"
+          >
             <LuChevronLeftSquare />
           </TimeChangeButton>
-          <TimeDiv data-testid='nowDate'>
-            <DateButton onClick={() => setShowStartMiniCalendar((prev) => !prev)}>
+          <TimeDiv data-testid="nowDate">
+            <DateButton
+              onClick={() => setShowStartMiniCalendar((prev) => !prev)}
+            >
               <DateFormat selectedDate={selectedDate} />
             </DateButton>
             {showStartMiniCalendar && (
@@ -366,13 +462,17 @@ export default function MeetingSchedule() {
                   selectDate={DateHandle}
                   selectedDate={selectedDate}
                   close={() => setShowStartMiniCalendar(false)}
-                  view='day'
-                  $standardDate={new Date(new Date().setHours(0, 0, 0, 0))}
+                  view="day"
+                  $standardDate={dateWithNoTime}
+                  $endDate={new Date(endDatetime)}
                 />
               </CalendarDiv>
             )}
           </TimeDiv>
-          <TimeChangeButton onClick={handleGoToNextDay} data-testid='goToNextDayButton'>
+          <TimeChangeButton
+            onClick={handleGoToNextDay}
+            data-testid="goToNextDayButton"
+          >
             <LuChevronRightSquare />
           </TimeChangeButton>
         </ScheduleHeaderTime>
@@ -383,12 +483,12 @@ export default function MeetingSchedule() {
             <ScheduleDiv />
             Scheduled
           </WorkingScheduleLayout>
-          <DetailDiv>* Hover over the scheduled event area to view details.</DetailDiv>
+          <DetailDiv>
+            * Hover over the scheduled event area to view details.
+          </DetailDiv>
         </ScheduleHeaderExp>
       </ScheduleHeaderLayout>
       <ScheduleComponent
-        setParentStartIndex={(timeIndex: number) => setStartIndex(timeIndex)}
-        setParentEndIndex={(timeIndex: number) => setEndIndex(timeIndex)}
         dayCount={dayCount}
         recommendedTimes={selectedRecommend}
         schedulesAndAvailabilities={schedulesAndAvailabilities}
@@ -412,8 +512,8 @@ export default function MeetingSchedule() {
           )}
         </RecommendLayout>
         <ButtonLayout>
-          <CancelButton>Cancel</CancelButton>
-          <SubmitButton onClick={() => {}}>Submit</SubmitButton>
+          <CancelButton onClick={() => router.push("/")}>Cancel</CancelButton>
+          <SubmitButton onClick={() => submitHandler()}>Submit</SubmitButton>
         </ButtonLayout>
       </ButtonAndRecommendLayout>
     </MainLayout>

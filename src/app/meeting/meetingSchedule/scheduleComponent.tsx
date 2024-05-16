@@ -17,9 +17,6 @@ import useMeetStore, { MeetState } from "@/store/meetStore";
 const startTime: number[] = [0];
 
 export default function ScheduleComponent({
-  setParentStartIndex,
-  setParentEndIndex,
-  dayCount,
   recommendedTimes,
   schedulesAndAvailabilities,
 }: ScheduleComponentProps) {
@@ -40,18 +37,27 @@ export default function ScheduleComponent({
 
   let fixedIndex = -1;
 
-  const { startDatetime, endDatetime, runningtime, memberList } = useMeetStore(
-    (state: MeetState) => state
-  );
+  const {
+    dayCount,
+    startDatetime,
+    endDatetime,
+    runningtime,
+    memberList,
+    zuStartIndex,
+    zuEndIndex,
+    setZuStartIndex,
+    setZuEndIndex,
+  } = useMeetStore((state: MeetState) => state);
+  useEffect(() => {
+    // console.log("startDatetime", startDatetime);
+    // console.log("endDatetime", endDatetime);
+    // console.log("recommendedTimes", recommendedTimes);
+    // console.log("schedulesAndAvailabilities", schedulesAndAvailabilities);
+  }, []);
   // useEffect(() => {
-  //   console.log("startDatetime", startDatetime);
-  //   console.log("endDatetime", endDatetime);
-  //   console.log("recommendedTimes", recommendedTimes);
-  //   console.log("schedulesAndAvailabilities", schedulesAndAvailabilities);
-  // }, p[]);
+  //   console.log(zuStartIndex, zuEndIndex);
+  // }, [zuStartIndex, zuEndIndex]);
 
-  const [startIndex, setStartIndex] = useState<number>(-2);
-  const [endIndex, setEndIndex] = useState<number>(-2);
   // 첫지점과 끝지점을 통해 scope 설정에 이용할 예정
 
   const [timeDivGroupRef, timeDivGroupleftX] = [
@@ -104,12 +110,10 @@ export default function ScheduleComponent({
   }, [timeDivGroupRef, timeDivGroupleftX]);
 
   const updateStartIndex = (timeIndex: number) => {
-    setStartIndex(timeIndex);
-    setParentStartIndex(timeIndex);
+    setZuStartIndex(timeIndex);
   };
   const updateEndIndex = (timeIndex: number) => {
-    setEndIndex(timeIndex);
-    setParentEndIndex(timeIndex + 1);
+    setZuEndIndex(timeIndex + 1);
   };
 
   const renderTimeStampDiv = (timeIndex: number, personindex: number) => {
@@ -159,6 +163,7 @@ export default function ScheduleComponent({
       }
     }
   };
+
   return (
     <MainLayout>
       <PeopleLayout>
@@ -231,14 +236,30 @@ export default function ScheduleComponent({
                   {personalScheduleInformation.availability
                     .slice(dayCount * 96, dayCount * 96 + 112)
                     .map((type: string, timeindex: number) => {
+                      let isScheduled = false;
+                      let scheduleName = "";
+                      personalScheduleInformation.schedules.some((schedule) => {
+                        if (
+                          schedule.startIndexInclusive <=
+                            timeindex + dayCount * 96 &&
+                          schedule.endIndexExclusive > timeindex + dayCount * 96
+                        ) {
+                          isScheduled = true;
+                          scheduleName = schedule.name;
+                          return true;
+                        }
+                        return false;
+                      }); // 스케줄 있는지 확인해서 스케줄 여부에 체크 + 스케줄 이름 넣어줌. isPublic 처리 여부에 따라 조금 달라질 수 있음
                       return (
                         <TimeDiv
                           key={dayCount * 96 + timeindex}
                           $type={type}
                           $personindex={personindex}
                           $timeindex={timeindex}
-                          $startindex={startIndex}
-                          $endindex={endIndex}
+                          $startindex={zuStartIndex}
+                          $endindex={zuEndIndex}
+                          $isScheduled={isScheduled}
+                          $scheduleName={scheduleName}
                         />
                       );
                     })}
@@ -271,6 +292,7 @@ const PeopleLayout = styled.div`
   border: 1px solid black;
   border-right: none;
   font-size: small;
+  padding-bottom: 3rem;
 `;
 const TimeTableLayout = styled.div`
   width: full;

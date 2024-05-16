@@ -76,9 +76,13 @@ export default function CreateMeeting() {
   const searchRef = useRef<HTMLDivElement>(null);
   const [isFolded, setIsFolded] = useState(true); // 전체 부서 주소록
   const [teamStates, setTeamStates] = useState<developmentType[]>([]); // 각 부서에 대한 상태를 관리할 배열
-  const [clickedUsers, setClickedUsers] = useState<{[userId: number]: boolean;}>({}); // 클릭 여부 사용자 ID 기준
-  const [showStartMiniCalendar, setShowStartMiniCalendar] = useState<boolean>(false);
-  const [showEndMiniCalendar, setShowEndMiniCalendar] = useState<boolean>(false);
+  const [clickedUsers, setClickedUsers] = useState<{
+    [userId: number]: boolean;
+  }>({}); // 클릭 여부 사용자 ID 기준
+  const [showStartMiniCalendar, setShowStartMiniCalendar] =
+    useState<boolean>(false);
+  const [showEndMiniCalendar, setShowEndMiniCalendar] =
+    useState<boolean>(false);
   const [selectedStartDate, setSelectedStartDate] = useState(new Date());
   const [selectedEndDate, setSelectedEndDate] = useState(new Date());
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
@@ -126,7 +130,9 @@ export default function CreateMeeting() {
   // 특정 부서의 상태를 변경
   const toggleTeamFold = (index: number) => {
     setTeamStates((prev) =>
-      prev.map((team, i) => (i === index ? { ...team, folded: !team.folded } : team))
+      prev.map((team, i) =>
+        i === index ? { ...team, folded: !team.folded } : team
+      )
     );
   };
 
@@ -148,6 +154,7 @@ export default function CreateMeeting() {
     const startTime = meetingData.period.start.split("T")[1]; // 기존 시작 시간
     setMeetingData({
       ...meetingData,
+      startDatetime: `${year}-${month}-${date}T${startTime}`,
       period: {
         ...meetingData.period,
         start: `${year}-${month}-${date}T${startTime}`,
@@ -163,7 +170,9 @@ export default function CreateMeeting() {
       ...meetingData,
       period: { ...meetingData.period, start: `${startDate}T${value}` },
     });
-    setDisabledIndex(intervalTime.findIndex((option) => option.value === value));
+    setDisabledIndex(
+      intervalTime.findIndex((option) => option.value === value)
+    );
   };
 
   // 끝날짜 값이 변경될 때 실행될 함수
@@ -175,6 +184,7 @@ export default function CreateMeeting() {
     const endTime = meetingData.period.end.split("T")[1]; // 기존 시작 시간
     setMeetingData({
       ...meetingData,
+      endDatetime: `${year}-${month}-${date}T${endTime}`,
       period: {
         ...meetingData.period,
         end: `${year}-${month}-${date}T${endTime}`,
@@ -196,9 +206,14 @@ export default function CreateMeeting() {
   };
 
   // 사용자 버튼 클릭 이벤트
-  const userButtonClickHandle = (clickedMember: { user: userList; isRequired: boolean }) => {
+  const userButtonClickHandle = (clickedMember: {
+    user: userList;
+    isRequired: boolean;
+  }) => {
     // console.log("userButtonClickHandle called with userId:", clickedMember.user.id);
-    const clickedUser = userLists.find((user) => user.id === clickedMember.user.id);
+    const clickedUser = userLists.find(
+      (user) => user.id === clickedMember.user.id
+    );
     // 이미 참가자 목록에 있는 사용자인지 확인
     const isParticipant = meetingData.memberList.some(
       (member) => member.user.id === clickedMember.user.id
@@ -208,13 +223,18 @@ export default function CreateMeeting() {
     if (clickedUser && isParticipant) {
       setMeetingData((prev) => ({
         ...prev,
-        memberList: prev.memberList.filter((member) => member.user.id !== clickedMember.user.id),
+        memberList: prev.memberList.filter(
+          (member) => member.user.id !== clickedMember.user.id
+        ),
       }));
     } else {
       if (clickedUser) {
         setMeetingData((prev) => ({
           ...prev,
-          memberList: [...prev.memberList, { user: clickedUser, isRequired: false }],
+          memberList: [
+            ...prev.memberList,
+            { user: clickedUser, isRequired: false },
+          ],
         }));
       }
     }
@@ -262,16 +282,19 @@ export default function CreateMeeting() {
     router.push("/");
   };
   const nextHandle = async () => {
-    await Promise.all([
-      setMeetName(meetingData.name),
-      setDescription(meetingData.description),
-      setStartDatetime(meetingData.period.start),
-      setEndDatetime(meetingData.period.end),
-      setRunningTime(meetingData.runningTime),
-      setMemberList(meetingData.memberList),
-    ]);
-
-    router.push("./meetingSchedule");
+    try {
+      await Promise.all([
+        setMeetName(meetingData.name),
+        setDescription(meetingData.description),
+        setStartDatetime(meetingData.period.start),
+        setEndDatetime(meetingData.period.end),
+        setRunningTime(meetingData.runningTime),
+        setMemberList(meetingData.memberList),
+      ]);
+      router.push("./meetingSchedule");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // useEffect(() => {
@@ -285,11 +308,15 @@ export default function CreateMeeting() {
       .then((data) => {
         console.log(data);
         setUserLists(data);
-        const developmentSet: Set<string> = new Set(data.map((user: userList) => user.department));
-        const teamSet: developmentType[] = Array.from(developmentSet).map((name) => ({
-          name,
-          folded: true,
-        }));
+        const developmentSet: Set<string> = new Set(
+          data.map((user: userList) => user.department)
+        );
+        const teamSet: developmentType[] = Array.from(developmentSet).map(
+          (name) => ({
+            name,
+            folded: true,
+          })
+        );
         setTeamStates(teamSet);
       });
   }, []); // 멤버 리스트 불러오기
@@ -324,7 +351,12 @@ export default function CreateMeeting() {
                     filterUserList(userLists, searchTerm).map((member) => (
                       <SearchListOption
                         key={member.id}
-                        onClick={() => userButtonClickHandle({ user: member, isRequired: false })}
+                        onClick={() =>
+                          userButtonClickHandle({
+                            user: member,
+                            isRequired: false,
+                          })
+                        }
                       >
                         <ProfileImage
                           src="/images/profile.webp"
@@ -332,7 +364,9 @@ export default function CreateMeeting() {
                           width={20}
                           height={20}
                         />
-                        <UserName>{highlightSearchTerm(member.name, searchTerm)}</UserName>
+                        <UserName>
+                          {highlightSearchTerm(member.name, searchTerm)}
+                        </UserName>
                         <Department>{member.department}</Department>
                       </SearchListOption>
                     ))
@@ -346,7 +380,11 @@ export default function CreateMeeting() {
             )}
             <AdressBookDiv>
               <ButtonFold onClick={toggleFold} className={noto.className}>
-                {isFolded ? <MdKeyboardArrowRight size={16} /> : <MdKeyboardArrowDown size={16} />}
+                {isFolded ? (
+                  <MdKeyboardArrowRight size={16} />
+                ) : (
+                  <MdKeyboardArrowDown size={16} />
+                )}
                 부서 주소록
               </ButtonFold>
               {!isFolded && (
@@ -370,13 +408,18 @@ export default function CreateMeeting() {
                         {!team.folded && (
                           <li>
                             {userLists
-                              .filter((member) => member.department === team.name)
+                              .filter(
+                                (member) => member.department === team.name
+                              )
                               .map((member) => (
                                 <MenuItem key={member.id}>
                                   <UserButton
                                     $isClicked={clickedUsers[member.id]}
                                     onClick={() =>
-                                      userButtonClickHandle({ user: member, isRequired: false })
+                                      userButtonClickHandle({
+                                        user: member,
+                                        isRequired: false,
+                                      })
                                     }
                                     className={noto.className}
                                   >
@@ -409,7 +452,9 @@ export default function CreateMeeting() {
                 width={33}
                 placeholder="Please enter a title."
                 value={meetingData.name}
-                onChange={(e) => setMeetingData((prev) => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setMeetingData((prev) => ({ ...prev, name: e.target.value }))
+                }
               ></Input>
             </InlineDiv>
             <InlineDiv>
@@ -425,7 +470,9 @@ export default function CreateMeeting() {
             <div>
               <Label htmlFor="period">Period</Label>
               <PeriodDiv id="period">
-                <DateButton onClick={() => setShowStartMiniCalendar((prev) => !prev)}>
+                <DateButton
+                  onClick={() => setShowStartMiniCalendar((prev) => !prev)}
+                >
                   {selectedStartDate.getFullYear()}.
                   {("0" + (selectedStartDate.getMonth() + 1)).slice(-2)}.
                   {("0" + selectedStartDate.getDate()).slice(-2)}
@@ -447,10 +494,14 @@ export default function CreateMeeting() {
                   width={7}
                   onSelectChange={startTimeChangeHandle}
                   standardIdx={0}
-                  disabledLastIndex={sameDate ? intervalTime.length - 1 : intervalTime.length}
+                  disabledLastIndex={
+                    sameDate ? intervalTime.length - 1 : intervalTime.length
+                  }
                 ></SelectTime>
                 <LineDiv>-</LineDiv>
-                <DateButton onClick={() => setShowEndMiniCalendar((prev) => !prev)}>
+                <DateButton
+                  onClick={() => setShowEndMiniCalendar((prev) => !prev)}
+                >
                   {selectedEndDate.getFullYear()}.
                   {("0" + (selectedEndDate.getMonth() + 1)).slice(-2)}.
                   {("0" + selectedEndDate.getDate()).slice(-2)}
@@ -495,11 +546,17 @@ export default function CreateMeeting() {
               <Label htmlFor="participant">Participant</Label>
               <ParticipantDiv id="participant">
                 {meetingData.memberList.map((member) => {
-                  const user = userLists.find((user) => user.id === member.user.id);
+                  const user = userLists.find(
+                    (user) => user.id === member.user.id
+                  );
                   return (
                     <div key={member.user.id}>
                       {user ? (
-                        <ParticipantInfoDiv onClick={() => participantRemoveHandle(member.user.id)}>
+                        <ParticipantInfoDiv
+                          onClick={() =>
+                            participantRemoveHandle(member.user.id)
+                          }
+                        >
                           <div>
                             <ProfileImage
                               src="/images/profile.webp"
@@ -515,7 +572,9 @@ export default function CreateMeeting() {
                           <div>
                             <OptionalButton
                               className={noto.className}
-                              onClick={(e) => optionalButtonClickHandle(e, member.user.id)}
+                              onClick={(e) =>
+                                optionalButtonClickHandle(e, member.user.id)
+                              }
                               $isRequired={member.isRequired}
                             >
                               {member.isRequired ? "required" : "optional"}
@@ -681,7 +740,8 @@ const UserButton = styled.button<{ $isClicked: boolean }>`
   position: relative;
   margin-left: 1rem;
   transition: all 0.2s ease-in;
-  background-color: ${(props) => (props.$isClicked ? Color("yellow100") : Color("black50"))};
+  background-color: ${(props) =>
+    props.$isClicked ? Color("yellow100") : Color("black50")};
 `;
 
 const ProfileImage = styled(Image)`
@@ -726,8 +786,10 @@ const UserDepartment = styled.div`
 `;
 
 const OptionalButton = styled.button<{ $isRequired: boolean }>`
-  border: 1px solid ${(props) => (props.$isRequired ? Color("black200") : Color("blue600"))};
-  color: ${(props) => (props.$isRequired ? Color("black200") : Color("blue600"))};
+  border: 1px solid
+    ${(props) => (props.$isRequired ? Color("black200") : Color("blue600"))};
+  color: ${(props) =>
+    props.$isRequired ? Color("black200") : Color("blue600")};
   border-radius: 2px;
   background: none;
   width: 2.7rem;

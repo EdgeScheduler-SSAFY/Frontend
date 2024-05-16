@@ -1,6 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, format } from "date-fns";
+import {
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  addDays,
+  format,
+} from "date-fns";
 import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
 import { Color } from "../lib/styles/color";
 // 미니 캘린더 뷰 타입
@@ -12,6 +19,7 @@ interface IMiniCalendarProps {
   selectDate: (date: Date) => void; // 날짜 선택시 실행되는 함수
   view: CalendarView; // 현재 뷰(day, week,none)
   $standardDate?: Date; // 기준 날짜
+  $endDate?: Date; // 마지막 날짜
 }
 // 미니 캘린더 컴포넌트
 export function MiniCalendar({
@@ -20,6 +28,7 @@ export function MiniCalendar({
   selectDate,
   view,
   $standardDate,
+  $endDate,
 }: IMiniCalendarProps) {
   const [selected, setSelected] = useState(selectedDate); // 선택된 날짜
   const firstDayOfMonth = startOfMonth(selected); // 선택된 달의 첫날
@@ -29,12 +38,23 @@ export function MiniCalendar({
   const [selectedWeek] = useState(startOfWeek(selected)); // 선택된 주
   const dates: Date[] = []; // 날짜 배열
 
+  useEffect(() => {
+    console.log($endDate);
+  }, [$endDate]);
+
   const isDisabled = (date: Date) => {
     // 기준 날짜가 없으면 모든 날짜가 활성화
     if (!$standardDate) return false;
 
     // 비활성여부 확인
-    return date < $standardDate;
+    if ($standardDate) {
+      if ($endDate) {
+        return date < $standardDate || date > $endDate;
+      }
+
+      return date < $standardDate;
+    }
+    return true;
   };
   let currentDate = startDate; // 현재 날짜
   // 날짜 배열 채우기
@@ -83,7 +103,11 @@ export function MiniCalendar({
               selected.getMonth() !== subDate.getMonth() ? (
                 <SubMonthDay
                   key={format(subDate, "yyyy-MM-dd")}
-                  onClick={isDisabled(subDate) ? undefined : () => handleDayClick(subDate)}
+                  onClick={
+                    isDisabled(subDate)
+                      ? undefined
+                      : () => handleDayClick(subDate)
+                  }
                   $disabled={isDisabled(subDate)}
                 >
                   {format(subDate, "d")}
@@ -101,7 +125,11 @@ export function MiniCalendar({
                 </SelectedDay>
               ) : (
                 <Day
-                  onClick={isDisabled(subDate) ? undefined : () => handleDayClick(subDate)}
+                  onClick={
+                    isDisabled(subDate)
+                      ? undefined
+                      : () => handleDayClick(subDate)
+                  }
                   key={format(subDate, "yyyy-MM-dd")}
                   $disabled={isDisabled(subDate)}
                 >
@@ -118,14 +146,22 @@ export function MiniCalendar({
               selected.getMonth() !== subDate.getMonth() ? (
                 <SubMonthDay
                   key={format(subDate, "yyyy-MM-dd")}
-                  onClick={isDisabled(subDate) ? undefined : () => handleDayClick(subDate)}
+                  onClick={
+                    isDisabled(subDate)
+                      ? undefined
+                      : () => handleDayClick(subDate)
+                  }
                   $disabled={isDisabled(subDate)}
                 >
                   {format(subDate, "d")}
                 </SubMonthDay>
               ) : (
                 <Day
-                  onClick={isDisabled(subDate) ? undefined : () => handleDayClick(subDate)}
+                  onClick={
+                    isDisabled(subDate)
+                      ? undefined
+                      : () => handleDayClick(subDate)
+                  }
                   key={format(subDate, "yyyy-MM-dd")}
                   $disabled={isDisabled(subDate)}
                 >
@@ -139,18 +175,30 @@ export function MiniCalendar({
     );
   };
   return (
-    <CalendarLayout onClick={(e) => e.stopPropagation()} ref={ref} data-testid="miniCalendar">
+    <CalendarLayout
+      onClick={(e) => e.stopPropagation()}
+      ref={ref}
+      data-testid="miniCalendar"
+    >
       {/* 미니캘린더 네브 */}
       <NavLayout>
         <ArrowLayout>
           <LuChevronLeftSquare
-            onClick={() => setSelected(new Date(selected.getFullYear(), selected.getMonth() - 1))}
+            onClick={() =>
+              setSelected(
+                new Date(selected.getFullYear(), selected.getMonth() - 1)
+              )
+            }
           ></LuChevronLeftSquare>
         </ArrowLayout>
         <div>{format(selected, "yyyy.M")}</div>
         <ArrowLayout>
           <LuChevronRightSquare
-            onClick={() => setSelected(new Date(selected.getFullYear(), selected.getMonth() + 1))}
+            onClick={() =>
+              setSelected(
+                new Date(selected.getFullYear(), selected.getMonth() + 1)
+              )
+            }
           ></LuChevronRightSquare>
         </ArrowLayout>
       </NavLayout>
@@ -210,7 +258,8 @@ const Day = styled.div<{ $disabled: boolean }>`
   cursor: ${({ $disabled }) => ($disabled ? "default" : "pointer")};
   color: ${({ $disabled }) => ($disabled ? Color("black100") : Color("black"))};
   &:hover {
-    background-color: ${({ $disabled }) => ($disabled ? "none" : Color("blue50"))};
+    background-color: ${({ $disabled }) =>
+      $disabled ? "none" : Color("blue50")};
     border-radius: 5px;
   }
 `;
