@@ -96,18 +96,18 @@ export default function MeetingSchedule() {
 
   useEffect(() => {
     if (startIndex >= 0) {
-      changeDate(date, startIndex) && setStartDate(changeDate(date, startIndex));
+      changeDate(selectedDate, startIndex) && setStartDate(changeDate(selectedDate, startIndex));
       setDisabledIndex(startIndex);
       setStartTime(changeTime(startIndex));
     }
-  }, [startIndex, date]);
+  }, [startIndex, selectedDate]);
 
   useEffect(() => {
     if (endIndex >= 0) {
-      changeDate(date, endIndex) && setEndDate(changeDate(date, endIndex));
+      changeDate(selectedDate, endIndex) && setEndDate(changeDate(selectedDate, endIndex));
       setEndTime(changeTime(endIndex));
     }
-  }, [endIndex, date]);
+  }, [endIndex, selectedDate]);
 
   const changeDate = (date: Date, timeIndex: number) => {
     if (timeIndex > 95) {
@@ -187,7 +187,7 @@ export default function MeetingSchedule() {
             <SelectTime
               options={intervalTime}
               show={false}
-              width={6.5}
+              width={7}
               onSelectChange={startTimeChangeHandle}
               standardIdx={startIndex <= 0 ? 0 : startIndex}
               disabledLastIndex={intervalTime.length - 1}
@@ -197,7 +197,7 @@ export default function MeetingSchedule() {
             <SelectTime
               options={intervalTime}
               show={false}
-              width={6.5}
+              width={7}
               onSelectChange={endTimeChangeHandle}
               standardIdx={endIndex <= 0 ? 0 : endIndex}
               disabledIndex={disabledIndex}
