@@ -4,6 +4,7 @@ import { create } from "zustand";
 // Zustand 스토어 생성
 
 export interface MeetState {
+  scheduleId: number;
   dayCount: number;
   meetName: string;
   startDatetime: string;
@@ -12,6 +13,7 @@ export interface MeetState {
   description: string;
   zuStartIndex: number;
   zuEndIndex: number;
+  isUpdate: boolean;
   memberList: { user: userList; isRequired: boolean }[];
   setStartDatetime: (startdatetime: string) => void;
   setEndDatetime: (endDatetime: string) => void;
@@ -22,9 +24,12 @@ export interface MeetState {
   setZuStartIndex: (startIndex: number) => void;
   setZuEndIndex: (endIndex: number) => void;
   setDayCount: (dayCount: number) => void;
+  setIsUpdate: (isUpdate: boolean) => void;
+  setScheduleId: (scheduleId: number) => void;
 }
 
 const useMeetStore = create<MeetState>((set) => ({
+  scheduleId: 0,
   dayCount: 0,
   zuStartIndex: 0,
   zuEndIndex: 1,
@@ -34,6 +39,7 @@ const useMeetStore = create<MeetState>((set) => ({
   endDatetime: "",
   runningtime: 15,
   memberList: [],
+  isUpdate: false,
   setStartDatetime: (startDatetime) => set({ startDatetime }),
   setEndDatetime: (endDatetime) => set({ endDatetime }),
   setRunningTime: (runningtime) => set({ runningtime }),
@@ -43,6 +49,8 @@ const useMeetStore = create<MeetState>((set) => ({
   setZuStartIndex: (zuStartIndex) => set({ zuStartIndex }),
   setZuEndIndex: (zuEndIndex) => set({ zuEndIndex }),
   setDayCount: (dayCount) => set({ dayCount }),
+  setIsUpdate: (isUpdate) => set({ isUpdate }),
+  setScheduleId: (scheduleId) => set({ scheduleId }),
 }));
 
 export default useMeetStore;
