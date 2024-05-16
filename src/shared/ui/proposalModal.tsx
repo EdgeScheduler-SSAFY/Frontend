@@ -11,6 +11,7 @@ import Input from "@/shared/ui/input";
 import SelectTime from "@/shared/ui/selectTime";
 import { Color } from "@/shared/lib/styles/color";
 import { ColorName } from "@/shared/lib/type/types";
+<<<<<<< HEAD
 import { Togle, fetchWithInterceptor } from "@/shared/index";
 
 export default function ProposalModal({
@@ -20,6 +21,11 @@ export default function ProposalModal({
   eventData: any;
   onClose: () => void;
 }) {
+=======
+import { Togle, fetchWithInterceptor} from "@/shared/index";
+
+export default function ProposalModal({ eventData, onClose }: { eventData: any; onClose: () => void }) {
+>>>>>>> dev-noticeFeat
   console.log(eventData);
   const runningTime = eventData.runningTime / 15;
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
@@ -140,9 +146,9 @@ export default function ProposalModal({
         <SuggestLayout>
           <TimeSuggestDiv>
             <Input
-              id="startDate"
+              id='startDate'
               width={5}
-              type="date"
+              type='date'
               value={declinedData.startDatetime.split("T")[0]}
               onChange={(e) => startDateHandle(e)}
             />
@@ -171,15 +177,10 @@ export default function ProposalModal({
                 {availableMember &&
                   availableMember.map((member) => (
                     <EachMemberDiv key={member.memberId}>
-                      <ProfileImage
-                        src="/images/profile.webp"
-                        alt="프로필사진"
-                        width={30}
-                        height={30}
-                      />
+                      <ProfileImage src='/images/profile.webp' alt='프로필사진' width={30} height={30} />
                       <MemberNameLayout>
-                        {member.memberName}
-                        {member.isRequired && <RequiredDiv>required</RequiredDiv>}
+                      {member.memberName}
+                      {member.isRequired && <RequiredDiv>required</RequiredDiv>}
                       </MemberNameLayout>
                     </EachMemberDiv>
                   ))}
@@ -193,7 +194,9 @@ export default function ProposalModal({
               <ParticipantListDiv>
                 {unAvailableMember &&
                   unAvailableMember.map((member) => (
-                    <EachMemberDiv key={member.memberId}>{member.memberName}</EachMemberDiv>
+                    <EachMemberDiv key={member.memberId}>
+                      {member.memberName}
+                    </EachMemberDiv>
                   ))}
               </ParticipantListDiv>
             </ImpossibleDiv>
@@ -329,7 +332,7 @@ const EachMemberDiv = styled.div`
   padding: 0.1rem 0.5rem;
   display: flex;
   align-items: center;
-  background-color: ${Color("black50")};
+  background-color: ${Color("black10")};
 `;
 
 const ProfileImage = styled(Image)`

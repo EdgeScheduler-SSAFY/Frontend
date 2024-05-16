@@ -5,9 +5,9 @@ import { getDay } from "date-fns";
 
 import { Color } from "@/shared/lib/styles/color";
 import { ProposalButton } from "@/shared/ui/proposalButton";
-import ProposalModal from "@/shared/ui/modalLayout";
+import ModalLayout from "@/shared/ui/modalLayout";
 import { dayList, MonthList } from "@/shared/lib/data";
-import ModalContent from "@/shared/ui/proposalModal";
+import ProposalModal from "@/shared/ui/proposalModal";
 import { PatchNoticeRead } from "../api/patchNoticeRead";
 import { PostMeetingAccepted } from "@/shared/api/postMeetingAccepted";
 import ConversionTimeMini from "../model/conversionTimeMini";
@@ -82,19 +82,19 @@ export default function CreatedNoticeBtn({ data }: { data: any }) {
           />
         </InfoDiv>
       </NoticeContent>
-      <ProposalModal
+      <ModalLayout
         open={isModalOpen}
         onClose={() => {
           setIsModalOpen((prev) => !prev);
         }}
       >
-        <ModalContent
+        <ProposalModal
           eventData={data}
           onClose={() => {
             setIsModalOpen((prev) => !prev);
           }}
         />
-      </ProposalModal>
+      </ModalLayout>
     </CreateNoticeLayout>
   );
 }
