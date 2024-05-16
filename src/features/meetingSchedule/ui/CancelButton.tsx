@@ -3,6 +3,7 @@ import React from "react";
 import styled from "styled-components";
 
 interface SubmitButtonProps {
+  onClick?: () => void;
   children: React.ReactNode;
 }
 
@@ -21,8 +22,8 @@ const StyledButton = styled.button<SubmitButtonProps>`
     background-color: ${Color("orange600")};
   }
 `;
-const CancelButton: React.FC<SubmitButtonProps> = ({ children }) => (
-  <StyledButton>{children}</StyledButton>
+const CancelButton: React.FC<SubmitButtonProps> = ({ onClick, children }) => (
+  <StyledButton onClick={onClick}>{children}</StyledButton>
 );
 
 export default CancelButton;

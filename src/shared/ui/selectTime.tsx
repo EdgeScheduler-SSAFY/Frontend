@@ -15,6 +15,8 @@ interface SelectProps {
   disabledLastIndex?: number;
   show: boolean;
   onSelectChange: (value: number | string) => void;
+  onStartIndexChange?: (value: number) => void;
+  onEndIndexChange?: (value: number) => void;
 }
 
 export default function SelectTime(props: SelectProps) {
@@ -27,7 +29,8 @@ export default function SelectTime(props: SelectProps) {
       // 시작시간 선택하면 끝 시간은 idx + 1 되는데
       // 시작시간에서 마지막 idx 선택하면  idx로 되도록
       const lastIdx = props.options.length - 1;
-      const finalIdx = props.standardIdx > lastIdx ? lastIdx : props.standardIdx;
+      const finalIdx =
+        props.standardIdx > lastIdx ? lastIdx : props.standardIdx;
       setSelectedValue(props.options[finalIdx].option);
     } else if (props.options.length > 0) {
       setSelectedValue(props.options[0].option);
@@ -51,11 +54,22 @@ export default function SelectTime(props: SelectProps) {
   // 선택값
   const handleOptionClick = (value: number | string) => {
     // value에 해당하는 option 찾기
-    const selectedOption = props.options.find((option) => option.value === value);
+    const selectedIndex = props.options.findIndex(
+      (option) => option.value === value
+    );
+    const selectedOption = props.options.find(
+      (option) => option.value === value
+    );
     if (selectedOption) {
       setSelectedValue(selectedOption.option); // option으로 설정
       setSelectFlag(false);
       props.onSelectChange(value);
+      if (props.onStartIndexChange) {
+        props.onStartIndexChange(selectedIndex);
+      }
+      if (props.onEndIndexChange) {
+        props.onEndIndexChange(selectedIndex);
+      }
     }
   };
 
@@ -63,7 +77,10 @@ export default function SelectTime(props: SelectProps) {
   const selectRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+      if (
+        selectRef.current &&
+        !selectRef.current.contains(event.target as Node)
+      ) {
         setSelectFlag(false);
       }
     }
@@ -84,8 +101,12 @@ export default function SelectTime(props: SelectProps) {
         <SelectList width={props.width} $show={selectFlag}>
           {props.options.map((option, index) => (
             <SelectOption
-              key={option.value}
-              onClick={isDisabled(index) || isLastDisabled(index) ? undefined : () => handleOptionClick(option.value)}
+              key={index}
+              onClick={
+                isDisabled(index) || isLastDisabled(index)
+                  ? undefined
+                  : () => handleOptionClick(option.value)
+              }
               $disabled={isDisabled(index) || isLastDisabled(index) || false}
             >
               {option.option}
@@ -143,7 +164,8 @@ const SelectList = styled.ul<{ $show: boolean; width: number }>`
 `;
 
 const SelectOption = styled.li<{ $disabled: boolean }>`
-  background-color: ${({ $disabled }) => ($disabled ? Color("black50") : "none")};
+  background-color: ${({ $disabled }) =>
+    $disabled ? Color("black50") : "none"};
   height: 1.9rem;
   line-height: 1.9rem;
   margin: 0.05rem 0;
@@ -153,7 +175,8 @@ const SelectOption = styled.li<{ $disabled: boolean }>`
   transition: all 0.2s ease-in;
   &:hover {
     font-weight: 500;
-    background-color: ${({ $disabled }) => ($disabled ? Color("black50") : Color("blue50"))};
+    background-color: ${({ $disabled }) =>
+      $disabled ? Color("black50") : Color("blue50")};
     box-sizing: border-box;
   }
 `;

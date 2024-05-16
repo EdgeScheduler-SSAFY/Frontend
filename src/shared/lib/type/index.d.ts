@@ -43,17 +43,22 @@ export interface SchedulesAndAvailabilitiesProps {
   availability: string[];
   isRequired: boolean;
   memberId: number;
-  schedules: MeetingData[];
+  schedules: ScheduleProps[];
   tzOffset: string;
 }
 export interface RecommendeTime {
   startIndex: number;
   endIndex: number;
 }
+export interface ScheduleProps {
+  name: string;
+  isPublic: boolean;
+  startIndexInclusive: number;
+  endIndexExclusive: number;
+  type: string;
+}
 
 export interface ScheduleComponentProps {
-  setParentStartIndex: (timeIndex: number) => void;
-  setParentEndIndex: (timeIndex: number) => void;
   dayCount: number;
   recommendedTimes: RecommendeTime[];
   schedulesAndAvailabilities: SchedulesAndAvailabilitiesProps[];
@@ -75,7 +80,9 @@ export interface timeDivProps {
   $timeindex: number;
   $startindex: number;
   $endindex: number;
-} // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 border 색깔 바꾸기 위함
+  $isScheduled: boolean;
+  $scheduleName: string;
+} // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 backgroundColor 색깔 바꾸기 위함
 
 export interface RecommendTimeDivProps {
   $dayCount: number;
