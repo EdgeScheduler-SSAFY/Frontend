@@ -32,7 +32,7 @@ export default function NotificationBox() {
   const [notificationData, setNotificationData] = useState<any>([]);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [totalElements, setTotalElements] = useState<number>(0);
-  const [page, setPage] = useState<number>(1);
+  const [page, setPage] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
