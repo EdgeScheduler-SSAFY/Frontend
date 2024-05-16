@@ -40,7 +40,8 @@ const TextDiv = styled.div`
 `;
 const AlldayMoreDiv = styled.div`
   display: grid;
-  grid-template-rows: 1fr 1.5fr;
+  grid-template-rows: 40px;
+  align-items: start;
 `;
 const DayDiv = styled.div`
   width: 100%;
