@@ -4,6 +4,29 @@ import { CalendarHeader } from "@/widgets/schedule/index";
 import "@testing-library/jest-dom";
 import { format } from "date-fns";
 import userEvent from "@testing-library/user-event";
+
+jest.mock("@/shared/ui/button", () => {
+  return {
+    __esModule: true,
+    default: jest.fn(
+      ({ id, width, height, color, $bgColor, $hoverColor, fontSize, children, onClick }) => (
+        <button
+          id={id}
+          style={{
+            width: `${width}rem`,
+            height: `${height}rem`,
+            backgroundColor: $bgColor,
+            color: color,
+            fontSize: `${fontSize}px`,
+          }}
+          onClick={onClick}
+        >
+          {children}
+        </button>
+      )
+    ),
+  };
+});
 // 캘린더헤더 잘 렌더링 되는지 확인
 describe("calendar Header render well", () => {
   test("render calendar header", () => {
@@ -13,6 +36,7 @@ describe("calendar Header render well", () => {
     const selectedDate = new Date();
     render(
       <CalendarHeader
+        setIsMeetingFilter={jest.fn()}
         changeDate={mockChangeDate}
         changeView={mockChangeView}
         selectDate={mockSelectDate}
@@ -39,6 +63,7 @@ describe("calendar Header calendarNavButton test", () => {
     const selectedDate = new Date();
     render(
       <CalendarHeader
+        setIsMeetingFilter={jest.fn()}
         changeDate={mockChangeDate}
         changeView={mockChangeView}
         selectDate={mockSelectDate}
@@ -64,6 +89,7 @@ describe("calendar Header calendarNavButton test", () => {
     const selectedDate = new Date();
     render(
       <CalendarHeader
+        setIsMeetingFilter={jest.fn()}
         changeDate={mockChangeDate}
         changeView={mockChangeView}
         selectDate={mockSelectDate}
@@ -93,6 +119,7 @@ describe("calendar Header calendarNavButton test", () => {
     const selectedDate = new Date();
     render(
       <CalendarHeader
+        setIsMeetingFilter={jest.fn()}
         changeDate={mockChangeDate}
         changeView={mockChangeView}
         selectDate={mockSelectDate}
@@ -119,6 +146,7 @@ describe("view selecetor test", () => {
     const selectedDate = new Date();
     render(
       <CalendarHeader
+        setIsMeetingFilter={jest.fn()}
         changeDate={mockChangeDate}
         changeView={mockChangeView}
         selectDate={mockSelectDate}
