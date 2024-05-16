@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { getDay } from "date-fns";
@@ -6,24 +6,19 @@ import { MdClose } from "react-icons/md";
 
 import { Color } from "@/shared/lib/styles/color";
 import Button from "@/shared/ui/button";
-import ProposalModal from "@/shared/ui/modalLayout";
 import { dayList, MonthList } from "@/shared/lib/data";
-import ModalContent from "@/shared/ui/proposalModal";
 import ConversionTimeMini from "@/features/noticeList/model/conversionTimeMini";
+import { DetailProposal } from "@/features/schedule";
 
 export default function CreatedNotice({ eventData, onClose }: { eventData: any; onClose: () => void }) {
   const startDate = eventData.startTime.split("T")[0];
   const [year, month, date] = startDate.split("-");
   const day = getDay(new Date(startDate));
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [trigger, setTrigger] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
   // sse 알림 닫는 함수
   const closeHandle = () => {
     onClose();
-  };
-
-  const onClick = (scheduleId: number) => {
-    setIsModalOpen(true);
   };
 
   return (
@@ -48,36 +43,39 @@ export default function CreatedNotice({ eventData, onClose }: { eventData: any; 
         <InfoDiv>
           <TitleDiv>{eventData.scheduleName}</TitleDiv>
           <TimeDiv>
-          <ConversionTimeMini start={eventData.proposedStartTime} end={eventData.proposedEndTime} />
+            <ConversionTimeMini start={eventData.proposedStartTime} end={eventData.proposedEndTime} />
           </TimeDiv>
           <ButtonDiv>
             <Button
-              color='black'
-              $bgColor='black50'
-              $hoverColor='black100'
-              onClick={() => onClick(eventData.scheduleId)}
+              color='black200'
+              $bgColor='white'
+              $hoverColor='yellow50'
+              onClick={() => {
+                setShowDetail((prev) => !prev);
+              }}
               width={5}
               height={2}
               fontSize={12}
+              $zIndex={10}
+              $borderColor='black200'
             >
-              Detail
+              detail
             </Button>
           </ButtonDiv>
         </InfoDiv>
       </NoticeContent>
-      <ProposalModal
-        open={isModalOpen}
-        onClose={() => {
-          setIsModalOpen((prev) => !prev);
-        }}
-      >
-        <ModalContent
-          eventData={eventData}
-          onClose={() => {
-            setIsModalOpen((prev) => !prev);
-          }}
+      {showDetail && (
+        <DetailProposal
+          triggerReload={() => setTrigger((prev) => !prev)}
+          endDatetime={eventData.proposedEndTime}
+          name={eventData.scheduleName}
+          proposalId={eventData.proposalId}
+          reason={eventData.reason}
+          scheduleId={eventData.scheduleId}
+          startDatetime={eventData.proposedStartTime}
+          close={() => setShowDetail(false)}
         />
-      </ProposalModal>
+      )}
     </ProposalNoticeLayout>
   );
 }

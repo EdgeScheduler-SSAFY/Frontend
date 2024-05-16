@@ -5,12 +5,11 @@ import { getDay } from "date-fns";
 
 import { Color } from "@/shared/lib/styles/color";
 import Button from "@/shared/ui/button";
-import ProposalModal from "@/shared/ui/modalLayout";
 import { dayList, MonthList } from "@/shared/lib/data";
-import ModalContent from "@/shared/ui/proposalModal";
 import { PatchNoticeRead } from "../api/patchNoticeRead";
 import ConversionTimeMini from "../model/conversionTimeMini";
 import useNoticeStore from "@/store/noticeStore";
+import { DetailProposal } from "@/features/schedule";
 
 export default function ProposalNoticeBtn({ data }: { data: any }) {
   const noticeCount = useNoticeStore((state) => state.noticeCount);
@@ -18,8 +17,9 @@ export default function ProposalNoticeBtn({ data }: { data: any }) {
   const startDate = data.proposedStartTime.split("T")[0];
   const [year, month, date] = startDate.split("-");
   const day = getDay(new Date(startDate));
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRead, setIsRead] = useState<boolean>(data.isRead);
+  const [trigger, setTrigger] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
 
   const isReadHandle = async (isRead: boolean, id: string) => {
     if (!isRead) {
@@ -31,11 +31,6 @@ export default function ProposalNoticeBtn({ data }: { data: any }) {
         console.log(error);
       }
     }
-  };
-
-
-  const onClick = (scheduleId: number) => {
-    setIsModalOpen(true);
   };
 
   return (
@@ -68,32 +63,35 @@ export default function ProposalNoticeBtn({ data }: { data: any }) {
           </TimeDiv>
           <ButtonDiv>
             <Button
-              color='black'
-              $bgColor='black50'
-              $hoverColor='black100'
-              onClick={() => onClick(data.scheduleId)}
+              color='black100'
+              $bgColor='white'
+              $hoverColor='yellow50'
+              onClick={() => {
+                setShowDetail((prev) => !prev);
+              }}
               width={3.5}
               height={1.8}
               fontSize={10}
+              $zIndex={10}
+              $borderColor='black100'
             >
-              Detail
+              detail
             </Button>
           </ButtonDiv>
         </InfoDiv>
       </NoticeContent>
-      <ProposalModal
-        open={isModalOpen}
-        onClose={() => {
-          setIsModalOpen((prev) => !prev);
-        }}
-      >
-        <ModalContent
-          eventData={data}
-          onClose={() => {
-            setIsModalOpen((prev) => !prev);
-          }}
+      {showDetail && (
+        <DetailProposal
+          triggerReload={() => setTrigger((prev) => !prev)}
+          endDatetime={data.proposedEndTime}
+          name={data.scheduleName}
+          proposalId={data.proposalId}
+          reason={data.reason}
+          scheduleId={data.scheduleId}
+          startDatetime={data.proposedStartTime}
+          close={() => setShowDetail(false)}
         />
-      </ProposalModal>
+      )}
     </ProposalNoticeLayout>
   );
 }

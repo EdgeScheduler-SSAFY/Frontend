@@ -5,17 +5,11 @@ import Image from "next/image";
 
 import { Color } from "@/shared/lib/styles/color";
 import Button from "@/shared/ui/button";
-import ModalLayout from "@/shared/ui/modalLayout";
-import SuggestedModal from "@/shared/ui/suggestedModal";
 import ConversionDate from "../../model/conversionDate";
-
+import { DetailProposal } from "@/features/schedule";
 export default function NoticeInfo({ data }: any) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // 버튼 클릭 시 상태 변경 함수
-  const onClick = (scheduleId: number) => {
-    setIsModalOpen(true);
-  };
+  const [trigger, setTrigger] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
 
   console.log(data);
   return (
@@ -42,28 +36,36 @@ export default function NoticeInfo({ data }: any) {
           </DateDiv>
           <DateDiv>
             <SubjectDiv>Suggested&nbsp;:&nbsp;</SubjectDiv>
-            <ConversionDate start={data.proposedStartTime} end={data.proposedEndTime}/>
+            <ConversionDate start={data.proposedStartTime} end={data.proposedEndTime} />
           </DateDiv>
         </AlarmDetailDiv>
         <ButtonDiv>
-          <Button color='black' $bgColor='black50' $hoverColor='black100' onClick={() => onClick(data.scheduleId)}>
+          <Button
+            color='black200'
+            $bgColor='white'
+            $hoverColor='yellow50'
+            onClick={() => {
+              setShowDetail((prev) => !prev);
+            }}
+            $zIndex={10}
+            $borderColor='black200'
+          >
             detail
           </Button>
         </ButtonDiv>
       </AlarmButtonDiv>
-      <ModalLayout
-        open={isModalOpen}
-        onClose={() => {
-          setIsModalOpen((prev) => !prev);
-        }}
-      >
-        <SuggestedModal
-          eventData={data}
-          onClose={() => {
-            setIsModalOpen((prev) => !prev);
-          }}
+      {showDetail && (
+        <DetailProposal
+          triggerReload={() => setTrigger((prev) => !prev)}
+          endDatetime={data.proposedEndTime}
+          name={data.scheduleName}
+          proposalId={data.proposalId}
+          reason={data.reason}
+          scheduleId={data.scheduleId}
+          startDatetime={data.proposedStartTime}
+          close={() => setShowDetail(false)}
         />
-      </ModalLayout>
+      )}
     </AlarmInfoDiv>
   );
 }
