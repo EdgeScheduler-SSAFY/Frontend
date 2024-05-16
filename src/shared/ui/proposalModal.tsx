@@ -13,7 +13,13 @@ import { Color } from "@/shared/lib/styles/color";
 import { ColorName } from "@/shared/lib/type/types";
 import { Togle, fetchWithInterceptor } from "@/shared/index";
 
-export default function ProposalModal({ eventData, onClose }: { eventData: any; onClose: () => void }) {
+export default function ProposalModal({
+  eventData,
+  onClose,
+}: {
+  eventData: any;
+  onClose: () => void;
+}) {
   console.log(eventData);
   const runningTime = eventData.runningTime / 15;
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
@@ -27,7 +33,7 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
   });
 
   const [retreiveData, setRetreiveData] = useState<RetrieveData>({
-    scheduleId: 89,
+    scheduleId: eventData.scheduleId,
     startDatetime: declinedData.startDatetime,
     endDatetime: declinedData.endDatetime,
   });
@@ -117,7 +123,7 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
     <ModalContentLayout>
       <ModalTitle>Would you like to be absent from the meeting?</ModalTitle>
       <TextArea
-        placeholder='Please enter the reason for your absence OR suggesting the another time.'
+        placeholder="Please enter the reason for your absence OR suggesting the another time."
         width={30}
         value={declinedData.reason}
         onChange={(e) => setDeclinedData({ ...declinedData, reason: e.target.value })}
@@ -135,9 +141,9 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
         <SuggestLayout>
           <TimeSuggestDiv>
             <Input
-              id='startDate'
+              id="startDate"
               width={5}
-              type='date'
+              type="date"
               value={declinedData.startDatetime.split("T")[0]}
               onChange={(e) => startDateHandle(e)}
             />
@@ -150,7 +156,7 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
               disabledLastIndex={intervalTime.length - runningTime}
             ></SelectTime>
             <LineDiv>-</LineDiv>
-            <EndDateDiv id='endDate'>{declinedData.endDatetime.split("T")[0]}</EndDateDiv>
+            <EndDateDiv id="endDate">{declinedData.endDatetime.split("T")[0]}</EndDateDiv>
             <EndTimeDiv>{intervalTime[disabledIndex + runningTime].option}</EndTimeDiv>
             <SearchBtn onClick={() => searchAvailableAttendds()}>
               <RiSearchLine size={20} />
@@ -158,7 +164,7 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
           </TimeSuggestDiv>
           <ParticipantDiv>
             <PossibleDiv>
-              <ParticipantTitleDiv color='green'>
+              <ParticipantTitleDiv color="green">
                 <RiUserFollowLine />
                 &nbsp; Possible
               </ParticipantTitleDiv>
@@ -166,7 +172,12 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
                 {availableMember &&
                   availableMember.map((member) => (
                     <EachMemberDiv key={member.memberId}>
-                      <ProfileImage src='/images/profile.webp' alt='프로필사진' width={30} height={30} />
+                      <ProfileImage
+                        src="/images/profile.webp"
+                        alt="프로필사진"
+                        width={30}
+                        height={30}
+                      />
                       <MemberNameLayout>
                         {member.memberName}
                         {member.isRequired && <RequiredDiv>required</RequiredDiv>}
@@ -176,14 +187,25 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
               </ParticipantListDiv>
             </PossibleDiv>
             <ImpossibleDiv>
-              <ParticipantTitleDiv color='orange'>
+              <ParticipantTitleDiv color="orange">
                 <RiUserForbidLine />
                 &nbsp; Impossible
               </ParticipantTitleDiv>
               <ParticipantListDiv>
                 {unAvailableMember &&
                   unAvailableMember.map((member) => (
-                    <EachMemberDiv key={member.memberId}>{member.memberName}</EachMemberDiv>
+                    <EachMemberDiv key={member.memberId}>
+                      <ProfileImage
+                        src="/images/profile.webp"
+                        alt="프로필사진"
+                        width={30}
+                        height={30}
+                      />
+                      <MemberNameLayout>
+                        {member.memberName}
+                        {member.isRequired && <RequiredDiv>required</RequiredDiv>}
+                      </MemberNameLayout>
+                    </EachMemberDiv>
                   ))}
               </ParticipantListDiv>
             </ImpossibleDiv>
@@ -194,7 +216,7 @@ export default function ProposalModal({ eventData, onClose }: { eventData: any; 
         <Button width={5} onClick={() => addMeetingDeclined(eventData.scheduleId)}>
           save
         </Button>
-        <Button width={5} color='black' $bgColor='black50' $hoverColor='black100' onClick={onClose}>
+        <Button width={5} color="black" $bgColor="black50" $hoverColor="black100" onClick={onClose}>
           cancel
         </Button>
       </ButtonDiv>

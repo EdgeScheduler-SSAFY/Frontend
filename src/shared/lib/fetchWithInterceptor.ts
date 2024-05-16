@@ -7,6 +7,7 @@ export async function fetchWithInterceptor(url: string, options: RequestOptions 
   let accessToken = sessionStorage.getItem("accessToken");
   if (!accessToken) {
     console.log("access token is not found");
+    window.location.replace("https://edgescheduler.co.kr");
     return Promise.reject("access token is not found");
   }
   const refreshToken = sessionStorage.getItem("refreshToken");
@@ -33,6 +34,9 @@ export async function fetchWithInterceptor(url: string, options: RequestOptions 
           );
           sessionStorage.setItem("expiresAt", expiresAt.toISOString());
         }
+      })
+      .catch((error) => {
+        window.location.replace("https://edgescheduler.co.kr");
       });
     accessToken = sessionStorage.getItem("accessToken");
   }
