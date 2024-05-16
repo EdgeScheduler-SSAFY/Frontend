@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import { format, differenceInMinutes } from "date-fns";
+import { format, differenceInMinutes, addDays, set } from "date-fns";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { GoPencil } from "react-icons/go";
 import ReactDOM from "react-dom";
+import { useRouter } from "next/navigation";
 
 import { DetailProposal } from "@/features/schedule/index";
 import { Color } from "@/shared/lib/styles/color";
@@ -16,6 +17,7 @@ import {
 import Button from "@/shared/ui//button";
 import { fetchWithInterceptor } from "@/shared";
 import ProposalModal from "@/shared/ui/proposalModal";
+import ModalLayout from "@/shared/ui/modalLayout";
 
 import useMeetStore, { MeetState } from "@/store/meetStore";
 
@@ -37,6 +39,7 @@ export function DetailSchedule({
   left,
   top,
 }: IDetailScheduleProps) {
+  const router = useRouter();
   const [data, setData] = useState<getScheduleDetailsResponse | null>(null); //data api 가져온다.
   const [trigger, setTrigger] = useState(false); //
   const [buttonClicked, setButtonClicked] = useState<string>("");
@@ -95,6 +98,8 @@ export function DetailSchedule({
     setRunningTime,
     setMemberList,
     setDescription,
+    setIsUpdate,
+    setScheduleId,
   } = useMeetStore((state: MeetState) => state);
   const nextHandle = async () => {
     await Promise.all([
@@ -103,10 +108,12 @@ export function DetailSchedule({
       setStartDatetime(
         data?.startDatetime ? format(data.startDatetime, "yyyy-MM-dd'T'HH:mm:ss") : ""
       ),
-      setEndDatetime(data?.endDatetime ? format(data.endDatetime, "yyyy-MM-dd'T'HH:mm:ss") : ""),
+      setEndDatetime(
+        data?.endDatetime ? format(addDays(data.endDatetime, 7), "yyyy-MM-dd'T'HH:mm:ss") : ""
+      ),
       setRunningTime(
         data?.startDatetime && data?.endDatetime
-          ? differenceInMinutes(data.startDatetime, data.endDatetime)
+          ? differenceInMinutes(data.endDatetime, data.startDatetime)
           : 15
       ),
       setMemberList(
@@ -122,7 +129,10 @@ export function DetailSchedule({
           isRequired: attendee.isRequired,
         }))
       ),
+      setIsUpdate(true),
+      setScheduleId(scheduleId),
     ]);
+    router.push("/meeting/createMeeting");
   };
   // 수정창 보여주기
   const handleUpdate = async () => {
@@ -166,8 +176,10 @@ export function DetailSchedule({
   const onClick = (status: string, scheduleId: number) => {
     setButtonClicked(status);
     if (status === "attend") {
+      if (buttonClicked === "attend") return;
       addMeetingAccepted(scheduleId);
     } else if (status === "absence") {
+      if (buttonClicked === "absence") return;
       setIsModalOpen(true);
     }
   };
@@ -202,13 +214,13 @@ export function DetailSchedule({
             (data.type === "MEETING" &&
               JSON.parse(sessionStorage.getItem("user") || "").id === data.organizerId)) && (
             <IconLayout>
-              <div>
+              <IconDiv>
                 <GoPencil size={20} onClick={() => handleUpdate()}></GoPencil>
-              </div>
+              </IconDiv>
               <div></div>
-              <div onClick={() => setShowDelete((prev) => !prev)}>
+              <IconDiv onClick={() => setShowDelete((prev) => !prev)}>
                 <FaRegTrashAlt size={20}></FaRegTrashAlt>
-              </div>
+              </IconDiv>
             </IconLayout>
           )}
         </NameLayout>
@@ -269,6 +281,25 @@ export function DetailSchedule({
               </Button>
             </ButtonDiv>
           )}
+        <ModalLayout
+          open={isModalOpen}
+          onClose={() => {
+            setIsModalOpen((prev) => !prev);
+          }}
+        >
+          <ProposalModal
+            eventData={{
+              scheduleId: scheduleId,
+              scheduleName: data.name,
+              startTime: format(data.startDatetime, "yyyy-MM-dd'T'HH:mm:ss"),
+              endTime: format(data.endDatetime, "yyyy-MM-dd'T'HH:mm:ss"),
+              runningTime: differenceInMinutes(data.endDatetime, data.startDatetime),
+            }}
+            onClose={() => {
+              setIsModalOpen((prev) => !prev);
+            }}
+          />
+        </ModalLayout>
         {/* 회의인 경우에만 보여주는참석자 */}
         {data.type === "MEETING" && (
           <AttendeesLayout>
@@ -518,4 +549,7 @@ const BackLayout = styled.div`
   right: 0;
   z-index: 300;
   background-color: rgba(0, 0, 0, 0);
+`;
+const IconDiv = styled.div`
+  cursor: pointer;
 `;
