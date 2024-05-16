@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import styled from "styled-components";
 import { Color } from "../lib/styles/color";
 import { ColorName } from "../lib/type/types";
@@ -10,9 +10,12 @@ interface ButtonProps {
   color?: ColorName;
   $bgColor?: ColorName;
   $hoverColor?: ColorName;
+  $hoverTextColor? : ColorName;
   fontSize?: number;
   children: string;
   onClick?: () => void;
+  $zIndex?: number;
+  $borderColor?: ColorName;
 }
 
 export default function Button(props: ButtonProps) {
@@ -20,7 +23,7 @@ export default function Button(props: ButtonProps) {
 }
 
 const CustomButton = styled.button<ButtonProps>`
-  border: none;
+  border: 1px solid ${(props) => (props.$borderColor ? Color(props.$borderColor) : Color("white"))};
   margin: 0.5rem;
   border-radius: 5px;
   cursor: pointer;
@@ -31,6 +34,7 @@ const CustomButton = styled.button<ButtonProps>`
   font-size: ${(props) => (props.fontSize ? `${props.fontSize}px` : "14px")};
   background-color: ${(props) => (props.$bgColor ? Color(props.$bgColor) : Color("blue"))};
   color: ${(props) => (props.color ? Color(props.color) : "white")};
+  z-index: ${(props) => (props.$zIndex ? props.$zIndex : 0)};
   &:hover {
     /* box-shadow: 0 0.5em 0.5em -0.4em ${(props) => (props.color ? props.color : Color("blue600"))}; */
     background-color: ${(props) => (props.$hoverColor ? Color(props.$hoverColor) : Color("blue600"))};

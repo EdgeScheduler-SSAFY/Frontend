@@ -15,7 +15,6 @@ import { Togle, fetchWithInterceptor } from "..";
 
 export default function ModalContent({ eventData, onClose }: { eventData: any; onClose: () => void }) {
   const runningTime = eventData.runningTime / 15; // 임시
-  const accessToken = sessionStorage.getItem("accessToken");
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
 
   const [isSuggestTime, setIsSuggestTime] = useState<boolean>(false); // 종일 여부
@@ -75,14 +74,10 @@ export default function ModalContent({ eventData, onClose }: { eventData: any; o
 
   const addMeetingDeclined = async (scheduleId: number) => {
     try {
-      await fetch(
+      await fetchWithInterceptor(
         `https://gateway.edgescheduler.co.kr/schedule-service/schedules/1/members/attendance`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
           body: JSON.stringify(declinedData),
         }
       );
@@ -95,14 +90,10 @@ export default function ModalContent({ eventData, onClose }: { eventData: any; o
 
   const searchAvailableAttendds = async () => {
     try {
-      const res = await fetch(
+      const res = await fetchWithInterceptor(
         `https://gateway.edgescheduler.co.kr/schedule-service/schedules/calculate-time-availability-with-proposal`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
           body: JSON.stringify(retreiveData),
         }
       );
