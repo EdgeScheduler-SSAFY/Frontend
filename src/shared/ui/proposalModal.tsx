@@ -11,21 +11,9 @@ import Input from "@/shared/ui/input";
 import SelectTime from "@/shared/ui/selectTime";
 import { Color } from "@/shared/lib/styles/color";
 import { ColorName } from "@/shared/lib/type/types";
-<<<<<<< HEAD
-import { Togle, fetchWithInterceptor } from "@/shared/index";
-
-export default function ProposalModal({
-  eventData,
-  onClose,
-}: {
-  eventData: any;
-  onClose: () => void;
-}) {
-=======
 import { Togle, fetchWithInterceptor} from "@/shared/index";
 
 export default function ProposalModal({ eventData, onClose }: { eventData: any; onClose: () => void }) {
->>>>>>> dev-noticeFeat
   console.log(eventData);
   const runningTime = eventData.runningTime / 15;
   const [disabledIndex, setDisabledIndex] = useState<number>(0);
