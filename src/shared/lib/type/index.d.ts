@@ -59,8 +59,6 @@ export interface ScheduleProps {
 }
 
 export interface ScheduleComponentProps {
-  setParentStartIndex: (timeIndex: number) => void;
-  setParentEndIndex: (timeIndex: number) => void;
   dayCount: number;
   recommendedTimes: RecommendeTime[];
   schedulesAndAvailabilities: SchedulesAndAvailabilitiesProps[];
@@ -84,7 +82,7 @@ export interface timeDivProps {
   $endindex: number;
   $isScheduled: boolean;
   $scheduleName: string;
-} // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 border 색깔 바꾸기 위함
+} // selected는 되는 시간 체크용, timeIndex는 meetingScope 설정 시 backgroundColor 색깔 바꾸기 위함
 
 export interface RecommendTimeDivProps {
   $dayCount: number;
