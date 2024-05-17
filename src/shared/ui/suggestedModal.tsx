@@ -26,7 +26,7 @@ export default function ModalContent({ eventData, onClose }: { eventData: any; o
   });
 
   const [retreiveData, setRetreiveData] = useState<RetrieveData>({
-    scheduleId: 89,
+    scheduleId: eventData.scheduleId,
     startDatetime: declinedData.startDatetime,
     endDatetime: declinedData.endDatetime,
   });
