@@ -79,11 +79,10 @@ export default function ProposalModal({
       return selectedIndex;
     });
   };
-
   const addMeetingDeclined = async (scheduleId: number) => {
     try {
       await fetchWithInterceptor(
-        `https://gateway.edgescheduler.co.kr/schedule-service/schedules/1/members/attendance`,
+        `https://gateway.edgescheduler.co.kr/schedule-service/schedules/${scheduleId}/members/attendance`,
         {
           method: "POST",
           body: JSON.stringify(declinedData),
