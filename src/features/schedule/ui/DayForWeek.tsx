@@ -86,7 +86,7 @@ export function DayForWeek({ scheduleList, triggerReload }: IDayForWeekProps) {
                 ? "orange"
                 : schedule.color === 3
                 ? "yellow"
-                : "black50" || "blue"
+                : "black200" || "blue"
             }
             hoverColor={
               schedule.color === 0
@@ -97,7 +97,7 @@ export function DayForWeek({ scheduleList, triggerReload }: IDayForWeekProps) {
                 ? "orange600"
                 : schedule.color === 3
                 ? "yellow600"
-                : "black200" || "blue"
+                : "black400" || "blue"
             }
             onClick={(e) => {
               setStartDatetime(format(schedule.startDatetime, "yyyy-MM-dd'T'HH:mm:ss"));
@@ -149,7 +149,7 @@ const ScheduleDiv = styled.div<{
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 12px;
-  color: ${Color("black50")};
+  color: ${Color("white")};
   padding: 0 ${(props) => props.width / 10}%;
   &:hover {
     background-color: ${(props) => Color(props.hoverColor || "black50")};
