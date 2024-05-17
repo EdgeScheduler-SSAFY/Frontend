@@ -1,7 +1,4 @@
 "use client";
-import React, { useEffect } from "react";
-import { fetchWithInterceptor } from "@/shared/index";
-import { useRouter } from "next/navigation";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import { Noto_Sans_KR } from "next/font/google";
@@ -33,7 +30,11 @@ export default function RootLayout({
         <ThemeProvider theme={theme}>
           <GlobalStyle theme={theme} />
           <StyledComponentsRegistry>
-            <Main>{children}</Main>
+            <Header />
+            <Main>
+              {children}
+              <Footer />
+            </Main>
             <div id="globalModal"></div>
             <div id="clickModal"></div>
           </StyledComponentsRegistry>
