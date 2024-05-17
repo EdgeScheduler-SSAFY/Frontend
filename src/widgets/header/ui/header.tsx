@@ -84,6 +84,17 @@ export function Header() {
         >
           my page
         </StyledLink>
+        <StyledLink
+          href={"/"}
+          onClick={(e) => {
+            e.preventDefault();
+            sessionStorage.clear();
+            window.location.href = "/";
+          }}
+          active={false}
+        >
+          logout
+        </StyledLink>
       </LinkDiv>
       <CustomMdOutlineNotifications size={25} onClick={noticeListHandle} />
       {noticeCount > 0 && <NoticeCountDiv>{noticeCount}</NoticeCountDiv>}
@@ -129,6 +140,16 @@ const StyledLink = styled(Link)<{ active: boolean }>`
   /* &:visited {
     color: ${Color("black")};
   } */
+  &:hover {
+    cursor: pointer;
+    color: ${Color("blue")};
+  }
+`;
+const LogoutDiv = styled.div`
+  display: flex;
+  text-decoration: none;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
   &:hover {
     cursor: pointer;
     color: ${Color("blue")};
