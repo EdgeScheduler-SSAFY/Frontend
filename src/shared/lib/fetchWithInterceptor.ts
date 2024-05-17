@@ -5,21 +5,21 @@ type RequestOptions = {
 };
 export async function fetchWithInterceptor(url: string, options: RequestOptions = {}) {
   let accessToken = sessionStorage.getItem("accessToken");
-  // if (!accessToken) {
-  //   console.log("access token is not found");
-  //   window.location.replace("https://edgescheduler.co.kr");
-  //   return Promise.reject("access token is not found");
-  // }
+  if (!accessToken) {
+    console.log("access token is not found");
+    window.location.replace("https://edgescheduler.co.kr");
+    return Promise.reject("access token is not found");
+  }
   const response = await fetch("https://user-service.edgescheduler.co.kr/auth/me", {
     headers: { Authorization: "Bearer " + accessToken },
   });
 
-  // if (response.status !== 200) {
-  //   alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
-  //   sessionStorage.clear();
-  //   window.location.replace("https://edgescheduler.co.kr");
-  //   return Promise.reject("Unauthorized");
-  // }
+  if (response.status !== 200) {
+    alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
+    sessionStorage.clear();
+    window.location.replace("https://edgescheduler.co.kr");
+    return Promise.reject("Unauthorized");
+  }
 
   const refreshToken = sessionStorage.getItem("refreshToken");
   const expiresAt = sessionStorage.getItem("expiresAt");
