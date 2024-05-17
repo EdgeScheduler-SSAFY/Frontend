@@ -88,7 +88,7 @@ export function DayForWeek({ scheduleList, triggerReload }: IDayForWeekProps) {
                 ? "yellow"
                 : "black200" || "blue"
             }
-            hoverColor={
+            $hoverColor={
               schedule.color === 0
                 ? "blue600"
                 : schedule.color === 1
@@ -134,7 +134,7 @@ const ScheduleDiv = styled.div<{
   width: number;
   zindex: number;
   color: ColorName;
-  hoverColor: ColorName;
+  $hoverColor: ColorName;
 }>`
   position: absolute;
   top: ${(props) => props.top}px;
