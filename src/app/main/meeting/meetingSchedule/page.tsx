@@ -500,13 +500,17 @@ export default function MeetingSchedule() {
       <ButtonAndRecommendLayout>
         <RecommendLayout>
           {selectedRecommend.map((indexes: { startIndex: number; endIndex: number }, i: number) => {
-            let startDate = new Date(startDatetime);
-            let endDate = new Date(startDatetime);
-            startDate.setMinutes(date.getMinutes() + indexes.startIndex * 15);
-            endDate.setMinutes(date.getMinutes() + indexes.endIndex * 15);
+            console.log(indexes);
+            console.log(startDatetime);
+            let recStartDate = new Date(startDatetime.split("T")[0] + "T00:00:00");
+            let recEndDate = new Date(startDatetime.split("T")[0] + "T00:00:00");
+            recStartDate.setMinutes(recStartDate.getMinutes() + indexes.startIndex * 15);
+
+            recEndDate.setMinutes(recEndDate.getMinutes() + indexes.endIndex * 15);
+
             return (
               <RecTimeLayout key={i}>
-                {`추천시간 ${i + 1}. ${startDate.toISOString().slice(0, 19)} ~ ${endDate
+                {`추천시간 ${i + 1}. ${recStartDate.toISOString().slice(0, 19)} ~ ${recEndDate
                   .toISOString()
                   .slice(0, 19)}`}
               </RecTimeLayout>
