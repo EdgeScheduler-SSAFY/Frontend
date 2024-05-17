@@ -292,7 +292,7 @@ export default function CreateMeeting() {
   };
 
   const cancleHandle = () => {
-    router.push("/");
+    router.push("/main/schedule");
   };
   const nextHandle = async () => {
     try {
