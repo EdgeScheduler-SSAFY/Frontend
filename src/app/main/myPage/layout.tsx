@@ -7,17 +7,12 @@ import styled from "styled-components";
 import { fetchWithInterceptor } from "@/shared";
 import { selectList } from "@/shared/lib/type";
 
-export default function MyPageLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function MyPageLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const worldTimeChangeHandle = (option: selectList) => {
-    fetchWithInterceptor(
-      "https://user-service.edgescheduler.co.kr/members/my/timezone",
-      {
-        method: "PUT",
-        body: JSON.stringify({ region: option.option, zoneId: option.value }),
-      }
-    ).then((res) => {
+    fetchWithInterceptor("https://user-service.edgescheduler.co.kr/members/my/timezone", {
+      method: "PUT",
+      body: JSON.stringify({ region: option.option, zoneId: option.value }),
+    }).then((res) => {
       if (res.status === 200) {
         alert("Timezone changed successfully.");
       } else {
@@ -31,8 +26,8 @@ export default function MyPageLayout({
     <MainLayout>
       <SubLayout>
         <MyPageLink>
-          <StyledLink href="/myPage/updateInfo">Update Information</StyledLink>
-          <StyledLink href="/myPage/notificationBox">Notification Box</StyledLink>
+          <StyledLink href="/main/myPage/updateInfo">Update Information</StyledLink>
+          <StyledLink href="/main/myPage/notificationBox">Notification Box</StyledLink>
           <div>
             Change my LocalTime
             <SelectLocalTime

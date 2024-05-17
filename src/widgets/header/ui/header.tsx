@@ -52,7 +52,6 @@ export function Header() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showNoticeList]);
-
   return (
     <HeaderNav>
       <NewNotice />
@@ -80,9 +79,6 @@ export function Header() {
           active={/myPage/.test(currentPath as string)}
         >
           my page
-        </StyledLink>
-        <StyledLink href="/main/login" active={currentPath === "/login"}>
-          sign in
         </StyledLink>
       </LinkDiv>
       <CustomMdOutlineNotifications size={25} onClick={noticeListHandle} />

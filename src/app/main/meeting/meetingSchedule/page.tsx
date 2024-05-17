@@ -202,7 +202,7 @@ export default function MeetingSchedule() {
         parentEndDatetime: res.startDatetime as string,
         parentStartDatetime: res.endDatetime as string,
       });
-      router.push("/");
+      router.push("/main/schedule");
       return;
     }
     try {
@@ -226,7 +226,7 @@ export default function MeetingSchedule() {
           }),
         }),
       });
-      router.push("/");
+      router.push("/main/schedule");
     } catch (error) {
       console.log(error);
     }
