@@ -1,13 +1,18 @@
 "use client";
 import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import styled from "styled-components";
+
 import { worldTime } from "@/shared/lib/data";
 import SelectLocalTime from "@/shared/ui/selectLocalTime";
-import Link from "next/link";
-import styled from "styled-components";
 import { fetchWithInterceptor } from "@/shared";
 import { selectList } from "@/shared/lib/type";
+import { Color } from "@/shared/lib/styles/color";
 
 export default function MyPageLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const currentPath = usePathname();
+
   const worldTimeChangeHandle = (option: selectList) => {
     fetchWithInterceptor("https://user-service.edgescheduler.co.kr/members/my/timezone", {
       method: "PUT",
@@ -26,10 +31,14 @@ export default function MyPageLayout({ children }: Readonly<{ children: React.Re
     <MainLayout>
       <SubLayout>
         <MyPageLink>
-          <StyledLink href="/main/myPage/updateInfo">Update Information</StyledLink>
-          <StyledLink href="/main/myPage/notificationBox">Notification Box</StyledLink>
-          <div>
-            Change my LocalTime
+          <StyledLink href="/main/myPage/updateInfo" $active={/updateInfo/.test(currentPath as string)}>
+            Update Information
+          </StyledLink>
+          <StyledLink href="/main/myPage/notificationBox" $active={/notificationBox/.test(currentPath as string)}>
+            Notification Box
+          </StyledLink>
+          <LocalChangeDiv>
+            🌏Change my LocalTime
             <SelectLocalTime
               id="worldTime"
               options={worldTime}
@@ -37,7 +46,7 @@ export default function MyPageLayout({ children }: Readonly<{ children: React.Re
               margin={1}
               onSelectChange={worldTimeChangeHandle}
             ></SelectLocalTime>
-          </div>
+          </LocalChangeDiv>
         </MyPageLink>
         <ContentLayout>{children}</ContentLayout>
       </SubLayout>
@@ -73,6 +82,15 @@ const ContentLayout = styled.div`
   justify-content: center;
 `;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(Link)<{ $active: boolean }>`
   text-decoration: none;
+  color: ${(props) => (props.$active ? Color("blue") : Color("black"))};
+  &:hover {
+    cursor: pointer;
+    color: ${Color("blue")};
+  }
+`;
+
+const LocalChangeDiv = styled.div`
+  margin-top: 2rem;
 `;
