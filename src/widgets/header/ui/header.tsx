@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import styled from "styled-components";
 import { MdOutlineNotifications } from "react-icons/md";
-
+import { RiArrowDropDownLine, RiArrowDropUpLine, RiAccountCircleLine } from "react-icons/ri";
+import { MdOutlineLogout } from "react-icons/md";
 import { Color } from "@/shared/lib/styles/color";
 import { ColorName } from "@/shared/lib/type/types";
 import { NoticeList } from "@/features/noticeList/ui/noticeList";
@@ -15,9 +16,16 @@ import useNoticeStore from "@/store/noticeStore";
 
 export function Header() {
   const [showNoticeList, setShowNoticeList] = useState<boolean>(false);
+  const [showInfoDropDown, setShowInfoDropDown] = useState<boolean>(false);
+  const [sessoionUserName, setSessionUserName] = useState<number>(0);
   const noticeCount = useNoticeStore((state) => state.noticeCount);
   const setNoticeCount = useNoticeStore((state) => state.setNoticeCount);
   const currentPath = usePathname();
+
+  useEffect(() => {
+    setSessionUserName(JSON.parse(sessionStorage.getItem("user") || "{}").name);
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -60,7 +68,7 @@ export function Header() {
     <HeaderNav>
       <NewNotice />
       <MainLogo>
-        <StyledLink href="/main/schedule" active={false}>
+        <StyledLink href="/main/schedule" $active={false}>
           <Image src="/images/edgeScheduler.png" alt="edgeSchedulerLogo" height={50} width={50} />
           <LogoName color="blue">Edge&nbsp;</LogoName>
           <LogoName color="green">Sch</LogoName>
@@ -69,40 +77,48 @@ export function Header() {
         </StyledLink>
       </MainLogo>
       <LinkDiv>
-        <StyledLink href="/main/schedule" active={/schedule/.test(currentPath as string)}>
+        <StyledLink href="/main/schedule" $active={/schedule/.test(currentPath as string)}>
           schedule
         </StyledLink>
-        <StyledLink
-          href="/main/meeting/createMeeting"
-          active={/meeting/.test(currentPath as string)}
-        >
+        <StyledLink href="/main/meeting/createMeeting" $active={/meeting/.test(currentPath as string)}>
           create meeting
         </StyledLink>
-        <StyledLink
-          href="/main/myPage/notificationBox"
-          active={/myPage/.test(currentPath as string)}
-        >
-          my page
-        </StyledLink>
-        <StyledLink
-          href={"/"}
-          onClick={(e) => {
-            e.preventDefault();
-            sessionStorage.clear();
-            window.location.href = "/";
-          }}
-          active={false}
-        >
-          logout
-        </StyledLink>
       </LinkDiv>
-      <CustomMdOutlineNotifications size={25} onClick={noticeListHandle} />
-      {noticeCount > 0 && <NoticeCountDiv>{noticeCount}</NoticeCountDiv>}
-      {showNoticeList && (
-        <NoticeLayout ref={ref}>
-          <NoticeList onClose={() => setShowNoticeList(false)} />
-        </NoticeLayout>
-      )}
+      <ProfileInfoDiv>
+        <ProfileDiv onClick={() => setShowInfoDropDown((prev) => !prev)}>
+          <ProfileImage src="/images/profile.webp" alt="프로필사진" width={25} height={25} />
+          {sessoionUserName}
+          {showInfoDropDown ? <RiArrowDropUpLine size={25} /> : <RiArrowDropDownLine size={25} />}
+        </ProfileDiv>
+        {showInfoDropDown && (
+          <InfoDropDown>
+            <InfoDiv>
+              <RiAccountCircleLine size={18} />
+              <MyInfoLink href="/main/myPage/notificationBox">UserInfo</MyInfoLink>
+            </InfoDiv>
+            <InfoDiv>
+              <MdOutlineLogout size={18} />
+              <MyInfoLink
+                href={"/"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  sessionStorage.clear();
+                  window.location.href = "/";
+                }}
+              >
+                Logout
+              </MyInfoLink>
+            </InfoDiv>
+          </InfoDropDown>
+        )}
+        <CustomMdOutlineNotifications size={25} onClick={noticeListHandle} />
+        {noticeCount > 0 && <NoticeCountDiv>{noticeCount}</NoticeCountDiv>}
+        {showNoticeList && (
+          <NoticeLayout ref={ref}>
+            <NoticeList onClose={() => setShowNoticeList(false)} />
+          </NoticeLayout>
+        )}
+      </ProfileInfoDiv>
     </HeaderNav>
   );
 }
@@ -126,13 +142,13 @@ const LogoName = styled.span<{ color: ColorName }>`
 `;
 
 const LinkDiv = styled.div`
-  width: 60%;
+  width: 35%;
   display: flex;
   justify-content: space-evenly;
 `;
 
-const StyledLink = styled(Link)<{ active: boolean }>`
-  color: ${(props) => (props.active ? Color("blue") : Color("black"))};
+const StyledLink = styled(Link)<{ $active: boolean }>`
+  color: ${(props) => (props.$active ? Color("blue") : Color("black"))};
   display: flex;
   text-decoration: none;
   align-items: center;
@@ -140,16 +156,6 @@ const StyledLink = styled(Link)<{ active: boolean }>`
   /* &:visited {
     color: ${Color("black")};
   } */
-  &:hover {
-    cursor: pointer;
-    color: ${Color("blue")};
-  }
-`;
-const LogoutDiv = styled.div`
-  display: flex;
-  text-decoration: none;
-  align-items: center;
-  transition: all 0.2s ease-in-out;
   &:hover {
     cursor: pointer;
     color: ${Color("blue")};
@@ -169,14 +175,71 @@ const NoticeCountDiv = styled.div`
   width: 1rem;
   height: 1rem;
   border-radius: 50%;
+  border: 1px solid ${Color("white")};
   background-color: ${Color("orange")};
   color: ${Color("white")};
   font-size: 9px;
   font-weight: 500;
   position: absolute;
-  top: 0.7rem;
-  right: 2.9rem;
+  top: 0.9rem;
+  right: 2.8rem;
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const ProfileImage = styled(Image)`
+  border-radius: 50%;
+  margin-right: 0.5rem;
+`;
+
+const ProfileDiv = styled.div`
+  width: 10rem;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  margin-right: 1rem;
+  cursor: pointer;
+  position: relative;
+`;
+
+const InfoDropDown = styled.div`
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  flex-direction: column;
+  width: 7rem;
+  height: 5rem;
+  top: 3.6rem;
+  right: 5rem;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(9, 30, 66, 0.31);
+  background-color: white;
+  z-index: 500;
+`;
+
+const ProfileInfoDiv = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: end;
+`;
+
+const MyInfoLink = styled(Link)`
+  color: ${Color("black")};
+  font-size: 13px;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    cursor: pointer;
+  }
+  margin-left: 0.9rem;
+`;
+
+const InfoDiv = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  margin: 0.2rem 0.7rem;
+  height: 2rem;
 `;
