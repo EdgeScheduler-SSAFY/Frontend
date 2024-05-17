@@ -52,7 +52,6 @@ export function Header() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showNoticeList]);
-  const user = JSON.parse(sessionStorage.getItem("user") as string);
   return (
     <HeaderNav>
       <NewNotice />
@@ -81,11 +80,6 @@ export function Header() {
         >
           my page
         </StyledLink>
-        {!user && (
-          <StyledLink href="/" active={currentPath === "/login"}>
-            sign in
-          </StyledLink>
-        )}
       </LinkDiv>
       <CustomMdOutlineNotifications size={25} onClick={noticeListHandle} />
       {noticeCount > 0 && <NoticeCountDiv>{noticeCount}</NoticeCountDiv>}
