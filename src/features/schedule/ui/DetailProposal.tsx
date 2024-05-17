@@ -232,6 +232,7 @@ const LabelLayout = styled.div`
   grid-template-columns: 1fr 1fr;
 `;
 const EachMemberDiv = styled.div`
+  height: 40px;
   font-size: 13px;
   margin: 0.25rem 0;
   border-radius: 5px;
