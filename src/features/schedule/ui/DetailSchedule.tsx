@@ -387,7 +387,7 @@ export function DetailSchedule({
               <Button
                 width={3}
                 height={2}
-                fontSize={10}
+                fontSize={8}
                 $bgColor="orange"
                 $hoverColor="orange400"
                 onClick={async () => {
@@ -406,7 +406,7 @@ export function DetailSchedule({
                 $hoverColor="orange400"
                 onClick={() => setShowDelete(false)}
               >
-                cancle
+                cancel
               </Button>
             </div>
           ) : (
