@@ -20,11 +20,18 @@ export default function MyPageLayout({ children }: Readonly<{ children: React.Re
     }).then((res) => {
       if (res.status === 200) {
         alert("Timezone changed successfully.");
+        const userItem = sessionStorage.getItem("user");
+        if (userItem) {
+          const user = JSON.parse(userItem);
+          user.region = option.option;
+          user.zoneId = option.value;
+          sessionStorage.setItem("user", JSON.stringify(user));
+        }
+
       } else {
         alert("Failed to change timezone.");
       }
     });
-    console.log(option);
     // 여기서 바로 api 요청 보내서 처리할 예정.
   };
   return (
