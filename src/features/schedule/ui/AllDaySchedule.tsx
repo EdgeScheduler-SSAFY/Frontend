@@ -60,7 +60,7 @@ export function AllDaySchedule({
         width={width}
         color={color}
         onClick={handleDayClick}
-        hoverColor={(color + "300") as ColorName}
+        $hoverColor={(color + "300") as ColorName}
       >
         <TextDiv>{title}</TextDiv>
       </Layout>
@@ -81,7 +81,7 @@ export function AllDaySchedule({
   );
 }
 // 종일 일정 컴포넌트 스타일
-const Layout = styled.div<{ color: ColorName; width: number; hoverColor: ColorName }>`
+const Layout = styled.div<{ color: ColorName; width: number; $hoverColor: ColorName }>`
   width: ${(props) => props.width}%;
   background-color: ${(props) => Color(props.color)};
   border-radius: 5px;
@@ -91,7 +91,7 @@ const Layout = styled.div<{ color: ColorName; width: number; hoverColor: ColorNa
   font-size: small;
   position: relative;
   &:hover {
-    background-color: ${(props) => Color(props.hoverColor)};
+    background-color: ${(props) => Color(props.$hoverColor)};
   }
   margin: 1px 0px;
   overflow: hidden;
