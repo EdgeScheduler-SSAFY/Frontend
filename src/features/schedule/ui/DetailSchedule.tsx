@@ -132,7 +132,7 @@ export function DetailSchedule({
       setIsUpdate(true),
       setScheduleId(scheduleId),
     ]);
-    router.push("/meeting/createMeeting");
+    router.push("/main/meeting/createMeeting");
   };
   // 수정창 보여주기
   const handleUpdate = async () => {

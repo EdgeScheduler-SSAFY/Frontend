@@ -44,5 +44,5 @@ export default function RootLayout({
 }
 
 const Main = styled.main`
-  min-height: calc(100% - 50px);
+  /* min-height: calc(100% - 50px); */
 `;
