@@ -152,6 +152,6 @@ const ScheduleDiv = styled.div<{
   color: ${Color("white")};
   padding: 0 ${(props) => props.width / 10}%;
   &:hover {
-    background-color: ${(props) => Color(props.hoverColor || "black50")};
+    background-color: ${(props) => Color(props.$hoverColor || "black50")};
   }
 `;
