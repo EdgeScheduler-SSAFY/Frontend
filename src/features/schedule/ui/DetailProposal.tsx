@@ -134,7 +134,7 @@ export function DetailProposal({
           <Button
             onClick={async () => {
               await handleButtonClick(true);
-              triggerReload && triggerReload();
+              triggerReload();
               close();
             }}
           >
@@ -143,7 +143,7 @@ export function DetailProposal({
           <Button
             onClick={async () => {
               await handleButtonClick(false);
-              triggerReload && triggerReload();
+              triggerReload();
               close();
             }}
           >
