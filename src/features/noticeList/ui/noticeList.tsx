@@ -55,7 +55,7 @@ export function NoticeList({ onClose }: { onClose: () => void }) {
   };
 
   const notificationBoxClickHandle = (e: React.MouseEvent) => {
-    router.push("/myPage/notificationBox");
+    router.push("/main/myPage/notificationBox");
     onClose();
   };
 
