@@ -35,7 +35,7 @@ function PageContent() {
           sessionStorage.setItem("user", JSON.stringify(data));
         });
 
-      router.push("/");
+      router.push("/main/schedule");
     }
   }, [searchParams, router]);
 

@@ -57,7 +57,7 @@ export function Header() {
     <HeaderNav>
       <NewNotice />
       <MainLogo>
-        <StyledLink href="/" active={false}>
+        <StyledLink href="/main/schedule" active={false}>
           <Image src="/images/edgeScheduler.png" alt="edgeSchedulerLogo" height={50} width={50} />
           <LogoName color="blue">Edge&nbsp;</LogoName>
           <LogoName color="green">Sch</LogoName>
@@ -66,16 +66,22 @@ export function Header() {
         </StyledLink>
       </MainLogo>
       <LinkDiv>
-        <StyledLink href="/schedule" active={currentPath === "/schedule"}>
+        <StyledLink href="/main/schedule" active={/schedule/.test(currentPath as string)}>
           schedule
         </StyledLink>
-        <StyledLink href="/meeting" active={/meeting/.test(currentPath as string)}>
+        <StyledLink
+          href="/main/meeting/createMeeting"
+          active={/meeting/.test(currentPath as string)}
+        >
           create meeting
         </StyledLink>
-        <StyledLink href="/myPage/notificationBox" active={/myPage/.test(currentPath as string)}>
+        <StyledLink
+          href="/main/myPage/notificationBox"
+          active={/myPage/.test(currentPath as string)}
+        >
           my page
         </StyledLink>
-        <StyledLink href="/login" active={currentPath === "/login"}>
+        <StyledLink href="/main/login" active={currentPath === "/login"}>
           sign in
         </StyledLink>
       </LinkDiv>

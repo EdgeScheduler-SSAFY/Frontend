@@ -3,31 +3,24 @@ import styled from "styled-components";
 import Image from "next/image";
 
 import { Color } from "@/shared/lib/styles/color";
-import ConversionDate from "@/app/myPage/notificationBox/model/conversionDate";
+import { ColorName } from "@/shared/lib/type/types";
+import ConversionDate from "@/app/main/myPage/notificationBox/model/conversionDate";
 
 export default function NoticeInfo({ data }: any) {
-  const isMeetingDeleted = data.type === "MEETING_DELETED";
+  const responseColor: ColorName = data.response === "ACCEPTED" ? "green" : "orange";
+
   return (
     <AlarmInfoDiv>
       <AlarmCategoryDiv>
         <div>
-          <ProfileImage src='/images/profile.webp' alt='프로필사진' width={18} height={18} />
-          {data.organizerName}
+          <ProfileImage src="/images/profile.webp" alt="프로필사진" width={18} height={18} />
+          {data.attendeeName}
         </div>
         &nbsp;
-        <AlarmTextDiv>{isMeetingDeleted ? "canceled" : "updated"}&nbsp;</AlarmTextDiv>
-        <div>{isMeetingDeleted ? "this event." : "an information to this event."}&nbsp;</div>
-        {isMeetingDeleted ? (
-          ""
-        ) : (
-          <AlarmTextDiv>
-            (
-            {data.updatedFields.map((field: string, index: number) => {
-              return index === data.updatedFields.length - 1 ? field : `${field}, `;
-            })}
-            )
-          </AlarmTextDiv>
-        )}
+        <AlarmTextDiv $responseColor={responseColor}>
+          {data.response.toLowerCase()}&nbsp;
+        </AlarmTextDiv>
+        <div>an invitation to this event.</div>
       </AlarmCategoryDiv>
       <DividingLine />
       <AlarmButtonDiv>
@@ -84,9 +77,9 @@ const AlarmDetailDiv = styled.div`
   height: 3.5rem;
 `;
 
-const AlarmTextDiv = styled.div`
+const AlarmTextDiv = styled.div<{ $responseColor: ColorName }>`
   font-weight: 600;
-  color: ${Color("black100")};
+  color: ${(props) => Color(props.$responseColor)};
 `;
 
 const TitleDiv = styled.div`
