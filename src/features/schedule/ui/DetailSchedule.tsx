@@ -132,7 +132,7 @@ export function DetailSchedule({
       setIsUpdate(true),
       setScheduleId(scheduleId),
     ]);
-    router.push("/meeting/createMeeting");
+    router.push("/main/meeting/createMeeting");
   };
   // 수정창 보여주기
   const handleUpdate = async () => {
@@ -212,7 +212,7 @@ export function DetailSchedule({
           {(data.type === "PERSONAL" ||
             data.type === "WORKING" ||
             (data.type === "MEETING" &&
-              JSON.parse(sessionStorage.getItem("user") || "").id === data.organizerId)) && (
+              JSON.parse(sessionStorage.getItem("user") || "{}").id === data.organizerId)) && (
             <IconLayout>
               <IconDiv>
                 <GoPencil size={20} onClick={() => handleUpdate()}></GoPencil>
