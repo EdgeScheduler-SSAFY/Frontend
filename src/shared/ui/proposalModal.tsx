@@ -120,7 +120,7 @@ export default function ProposalModal({
   }, [retreiveData]);
 
   return (
-    <ModalContentLayout>
+    <ModalContentLayout id="proposalModal">
       <ModalTitle>Would you like to be absent from the meeting?</ModalTitle>
       <TextArea
         placeholder="Please enter the reason for your absence OR suggesting the another time."
