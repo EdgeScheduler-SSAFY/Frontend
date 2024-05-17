@@ -44,7 +44,8 @@ export function Header() {
       if (
         ref.current &&
         !ref.current.contains(e.target as Node) &&
-        !document.getElementById("proposalModal")?.contains(e.target as Node)
+        !document.getElementById("proposalModal")?.contains(e.target as Node) &&
+        !document.getElementById("detailProposal")?.contains(e.target as Node)
       ) {
         setShowNoticeList(false);
       }
