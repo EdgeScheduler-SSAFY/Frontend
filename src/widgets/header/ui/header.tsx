@@ -41,7 +41,11 @@ export function Header() {
   // 외부영역 클릭시 알림리스트 닫기
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+      if (
+        ref.current &&
+        !ref.current.contains(e.target as Node) &&
+        !document.getElementById("proposalModal")?.contains(e.target as Node)
+      ) {
         setShowNoticeList(false);
       }
     };
