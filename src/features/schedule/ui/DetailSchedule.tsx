@@ -306,7 +306,7 @@ export function DetailSchedule({
             {data.attendeeList.map((attendee: any) => (
               <AttendeeLayout key={attendee.memberId}>
                 <ProfileLayout>
-                  <ProfileImage src="" alt="" />
+                  <ProfileImage src="/images/profile.webp" alt="" />
                   {attendee.status === "ACCEPTED" ? (
                     <CircleLayout color="green" />
                   ) : attendee.status === "DECLINED" ? (
@@ -520,8 +520,8 @@ const CircleLayout = styled.div<{ color: "green" | "orange" | "black100" }>`
   border-radius: 50%;
   background-color: ${(props) => Color(props.color)};
   position: absolute;
-  top: 15px;
-  left: 15px;
+  top: 20px;
+  left: 20px;
   border: 1px solid white;
 `;
 const SmTextDiv = styled.div`
