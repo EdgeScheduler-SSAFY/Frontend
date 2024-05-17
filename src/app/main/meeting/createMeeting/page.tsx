@@ -105,8 +105,32 @@ export default function CreateMeeting() {
   const [showEndMiniCalendar, setShowEndMiniCalendar] = useState<boolean>(false);
   const [selectedStartDate, setSelectedStartDate] = useState(new Date());
   const [selectedEndDate, setSelectedEndDate] = useState(new Date());
-  const [disabledIndex, setDisabledIndex] = useState<number>(0);
+  const [disabledIndex, setDisabledIndex] = useState<number>(meetingData.runningTime / 15);
   const [sameDate, setSameDate] = useState<boolean>(true);
+  const [todayDate, setTodayDate] = useState<boolean>(true);
+  // 현재시간 구하기
+  const currentTime = new Date();
+  const currentHours = currentTime.getHours();
+  const currentMinutes = currentTime.getMinutes();
+
+  // 현재 시간을 분 단위로 변환
+  const totalCurrentMinutes = currentHours * 60 + currentMinutes;
+
+  // intervalTime 배열에서 현재 시간 이후의 시간들을 추출하여 새 배열 생성
+  const futureTimes = intervalTime.filter((time) => {
+    const [hours, minutes] = time.value.split(":");
+    const totalMinutes = parseInt(hours) * 60 + parseInt(minutes);
+    return totalMinutes > totalCurrentMinutes;
+  });
+
+  // 첫 번째 시간의 인덱스를 구하기
+  const standardIndex = intervalTime.findIndex((time) => time.value === futureTimes[0]?.value);
+  const [sessionUserId, setSessionUserId] = useState<number>(0);
+  
+  useEffect(() => {
+    setSessionUserId(JSON.parse(sessionStorage.getItem("user") || "{}").id);
+  }, []);
+
 
   useEffect(() => {
     const userItem = sessionStorage.getItem("user");
@@ -157,9 +181,7 @@ export default function CreateMeeting() {
 
   // 특정 부서의 상태를 변경
   const toggleTeamFold = (index: number) => {
-    setTeamStates((prev) =>
-      prev.map((team, i) => (i === index ? { ...team, folded: !team.folded } : team))
-    );
+    setTeamStates((prev) => prev.map((team, i) => (i === index ? { ...team, folded: !team.folded } : team)));
   };
 
   // 회의시간 값이 변경될 때 실행될 함수
@@ -170,6 +192,7 @@ export default function CreateMeeting() {
   // 시작날짜 값이 변경될 때 실행될 함수
   const startDateHandle = (selectedDate: Date) => {
     setSelectedStartDate(selectedDate);
+    setTodayDate(selectedDate.getDate() === new Date().getDate());
     // 끝 날짜가 더 빠를 때만 변경
     if (selectedDate > selectedEndDate) {
       setSelectedEndDate(selectedDate);
@@ -196,7 +219,7 @@ export default function CreateMeeting() {
       ...meetingData,
       period: { ...meetingData.period, start: `${startDate}T${value}` },
     });
-    setDisabledIndex(intervalTime.findIndex((option) => option.value === value));
+    setDisabledIndex(intervalTime.findIndex((option) => option.value === value) + 1);
   };
 
   // 끝날짜 값이 변경될 때 실행될 함수
@@ -231,12 +254,10 @@ export default function CreateMeeting() {
 
   // 사용자 버튼 클릭 이벤트
   const userButtonClickHandle = (clickedMember: { user: userList; isRequired: boolean }) => {
-    // console.log("userButtonClickHandle called with userId:", clickedMember.user.id);
+    if (clickedMember.user.id === sessionUserId) return;
     const clickedUser = userLists.find((user) => user.id === clickedMember.user.id);
     // 이미 참가자 목록에 있는 사용자인지 확인
-    const isParticipant = meetingData.memberList.some(
-      (member) => member.user.id === clickedMember.user.id
-    );
+    const isParticipant = meetingData.memberList.some((member) => member.user.id === clickedMember.user.id);
 
     // 참가자 목록에 추가된 사용자라면 제거, 추가되지 않은 사용자라면 추가
     if (clickedUser && isParticipant) {
@@ -264,6 +285,7 @@ export default function CreateMeeting() {
 
   // 참가자 div에서 제거
   const participantRemoveHandle = (userId: number) => {
+    if (userId === sessionUserId) return;
     setMeetingData((prev) => ({
       ...prev,
       memberList: prev.memberList.filter((member) => member.user.id !== userId),
@@ -276,11 +298,9 @@ export default function CreateMeeting() {
   };
 
   // 필수 / 선택 여부 전환 이벤트
-  const optionalButtonClickHandle = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    userId: number
-  ) => {
+  const optionalButtonClickHandle = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, userId: number) => {
     e.stopPropagation(); // 이벤트 버블링 중단
+    if (userId === sessionUserId) return;
     setMeetingData((prev) => {
       const updatedMemberList = prev.memberList.map((member) => {
         if (member.user.id === userId) {
@@ -366,20 +386,13 @@ export default function CreateMeeting() {
                           })
                         }
                       >
-                        <ProfileImage
-                          src="/images/profile.webp"
-                          alt="프로필사진"
-                          width={20}
-                          height={20}
-                        />
+                        <ProfileImage src="/images/profile.webp" alt="프로필사진" width={20} height={20} />
                         <UserName>{highlightSearchTerm(member.name, searchTerm)}</UserName>
                         <Department>{member.department}</Department>
                       </SearchListOption>
                     ))
                   ) : (
-                    <SearchListOption onClick={undefined}>
-                      No one matches your search term😥
-                    </SearchListOption>
+                    <SearchListOption onClick={undefined}>No one matches your search term😥</SearchListOption>
                   )}
                 </SearchList>
               </SearchDiv>
@@ -395,15 +408,8 @@ export default function CreateMeeting() {
                     <li key={team.name}>
                       <LnbSubTree>
                         <MenuItem>
-                          <ButtonFold
-                            onClick={() => toggleTeamFold(index)}
-                            className={noto.className}
-                          >
-                            {team.folded ? (
-                              <MdKeyboardArrowRight size={16} />
-                            ) : (
-                              <MdKeyboardArrowDown size={16} />
-                            )}
+                          <ButtonFold onClick={() => toggleTeamFold(index)} className={noto.className}>
+                            {team.folded ? <MdKeyboardArrowRight size={16} /> : <MdKeyboardArrowDown size={16} />}
                             {team.name}
                           </ButtonFold>
                         </MenuItem>
@@ -423,12 +429,7 @@ export default function CreateMeeting() {
                                     }
                                     className={noto.className}
                                   >
-                                    <ProfileImage
-                                      src="/images/profile.webp"
-                                      alt="프로필사진"
-                                      width={25}
-                                      height={25}
-                                    />
+                                    <ProfileImage src="/images/profile.webp" alt="프로필사진" width={25} height={25} />
                                     <UserName>{member.name}</UserName>
                                     <TimeZone>{member.zoneId}</TimeZone>
                                   </UserButton>
@@ -470,8 +471,7 @@ export default function CreateMeeting() {
               <Label htmlFor="period">Period</Label>
               <PeriodDiv id="period">
                 <DateButton onClick={() => setShowStartMiniCalendar((prev) => !prev)}>
-                  {selectedStartDate.getFullYear()}.
-                  {("0" + (selectedStartDate.getMonth() + 1)).slice(-2)}.
+                  {selectedStartDate.getFullYear()}.{("0" + (selectedStartDate.getMonth() + 1)).slice(-2)}.
                   {("0" + selectedStartDate.getDate()).slice(-2)}
                 </DateButton>
                 {showStartMiniCalendar && (
@@ -490,13 +490,13 @@ export default function CreateMeeting() {
                   show={false}
                   width={7}
                   onSelectChange={startTimeChangeHandle}
-                  standardIdx={0}
+                  standardIdx={todayDate ? standardIndex : 0}
+                  disabledIndex={todayDate ? standardIndex - 1 : -1}
                   disabledLastIndex={sameDate ? intervalTime.length - 1 : intervalTime.length}
                 ></SelectTime>
                 <LineDiv>-</LineDiv>
                 <DateButton onClick={() => setShowEndMiniCalendar((prev) => !prev)}>
-                  {selectedEndDate.getFullYear()}.
-                  {("0" + (selectedEndDate.getMonth() + 1)).slice(-2)}.
+                  {selectedEndDate.getFullYear()}.{("0" + (selectedEndDate.getMonth() + 1)).slice(-2)}.
                   {("0" + selectedEndDate.getDate()).slice(-2)}
                 </DateButton>
                 {showEndMiniCalendar && (
@@ -515,8 +515,20 @@ export default function CreateMeeting() {
                   show={false}
                   width={7}
                   onSelectChange={endTimeChangeHandle}
-                  standardIdx={disabledIndex + 1}
-                  disabledIndex={sameDate ? disabledIndex : -1}
+                  standardIdx={
+                    todayDate
+                      ? standardIndex + meetingData.runningTime / 15
+                      : sameDate
+                      ? disabledIndex + meetingData.runningTime / 15 - 1
+                      : 0
+                  }
+                  disabledIndex={
+                    todayDate
+                      ? standardIndex + meetingData.runningTime / 15 - 1
+                      : sameDate
+                      ? disabledIndex + meetingData.runningTime / 15 - 2
+                      : -1
+                  }
                 ></SelectTime>
               </PeriodDiv>
             </div>
@@ -543,14 +555,12 @@ export default function CreateMeeting() {
                   return (
                     <div key={member.user.id}>
                       {user ? (
-                        <ParticipantInfoDiv onClick={() => participantRemoveHandle(member.user.id)}>
+                        <ParticipantInfoDiv
+                          $isOranizer={member.user.id === JSON.parse(sessionStorage.getItem("user") || "{}").id}
+                          onClick={() => participantRemoveHandle(member.user.id)}
+                        >
                           <div>
-                            <ProfileImage
-                              src="/images/profile.webp"
-                              alt="프로필사진"
-                              width={25}
-                              height={25}
-                            />
+                            <ProfileImage src="/images/profile.webp" alt="프로필사진" width={25} height={25} />
                           </div>
                           <RestDiv>
                             <UserName>{user.name}</UserName>
@@ -565,9 +575,6 @@ export default function CreateMeeting() {
                               {member.isRequired ? "required" : "optional"}
                             </OptionalButton>
                           </div>
-                          {/* <CloseButton onClick={() => {}}>
-                            <MdClose />
-                          </CloseButton> */}
                         </ParticipantInfoDiv>
                       ) : (
                         <div>Unknown</div>
@@ -748,7 +755,7 @@ const TimeZone = styled.div`
 const Department = styled.div`
   color: ${Color("black300")};
 `;
-const ParticipantInfoDiv = styled.div`
+const ParticipantInfoDiv = styled.div<{ $isOranizer: boolean }>`
   border: 1px solid ${Color("black200")};
   border-radius: 10px;
   padding: 0.5rem;
@@ -760,7 +767,7 @@ const ParticipantInfoDiv = styled.div`
   margin: 0.2rem;
   transition: all 0.2s ease-in;
   &:hover {
-    background-color: ${Color("orange50")};
+    background-color: ${(props) => (props.$isOranizer ? "" : Color("orange50"))};
     cursor: pointer;
   }
 `;
@@ -770,8 +777,8 @@ const UserDepartment = styled.div`
 `;
 
 const OptionalButton = styled.button<{ $isRequired: boolean }>`
-  border: 1px solid ${(props) => (props.$isRequired ? Color("black200") : Color("blue600"))};
-  color: ${(props) => (props.$isRequired ? Color("black200") : Color("blue600"))};
+  border: 1px solid ${(props) => (props.$isRequired ? Color("blue600") : Color("black200"))};
+  color: ${(props) => (props.$isRequired ? Color("blue600") : Color("black200"))};
   border-radius: 2px;
   background: none;
   width: 2.7rem;
