@@ -10,6 +10,7 @@ import { schedule } from "@/widgets/schedule/model/type";
 export default function UpdateInfo() {
   const [selectedDate, setSelectedDate] = useState(new Date()); // 오늘 날짜
   const [scheduleList, setScheduleList] = useState<schedule[]>([]); // 스케줄 목록
+  const [triggerReload, setTriggerReload] = useState(false);
   useEffect(() => {
     const startDatetime = startOfWeek(selectedDate); // 이번주 시작일
     const endDatetime = endOfWeek(selectedDate); // 이번주 종료일
@@ -40,12 +41,12 @@ export default function UpdateInfo() {
       }
     };
     fetchData();
-  }, []);
+  }, [triggerReload]);
 
   return (
     <MainLayout>
       <WeekViewCalendar
-        triggerReload={() => {}}
+        triggerReload={() => setTriggerReload((prev) => !prev)}
         scheduleList={scheduleList.filter((schedule) => schedule.type === "WORKING")} // WORKING 타입의 스케줄만 필터링
         selectedDate={selectedDate}
         isWORKING={true}
