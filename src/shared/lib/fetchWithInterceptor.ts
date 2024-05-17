@@ -14,10 +14,11 @@ export async function fetchWithInterceptor(url: string, options: RequestOptions 
     headers: { Authorization: "Bearer " + accessToken },
   });
 
-  if (response.status === 401) {
+  if (response.status !== 200) {
     alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
+    sessionStorage.clear();
     window.location.replace("https://edgescheduler.co.kr");
-    return Promise.reject("Unauthorized"); // 프로미스 체인 종료
+    return Promise.reject("Unauthorized");
   }
 
   const refreshToken = sessionStorage.getItem("refreshToken");
@@ -46,6 +47,7 @@ export async function fetchWithInterceptor(url: string, options: RequestOptions 
         }
       })
       .catch((error) => {
+        sessionStorage.clear();
         window.location.replace("https://edgescheduler.co.kr");
       });
     accessToken = sessionStorage.getItem("accessToken");
