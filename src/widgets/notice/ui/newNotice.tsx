@@ -56,15 +56,15 @@ export default function NewNotice() {
     setAnimationClass("slide-in");
 
     // 5초 후에 알림을 숨김
-    // setTimeout(() => {
-    //   setAnimationClass("slide-out");
-    //   setTimeout(() => {
-    //     setNoticeState((prev) => ({
-    //       ...prev,
-    //       [eventType]: { state: undefined, eventType: eventType },
-    //     }));
-    //   }, 500);
-    // }, 5000);
+    setTimeout(() => {
+      setAnimationClass("slide-out");
+      setTimeout(() => {
+        setNoticeState((prev) => ({
+          ...prev,
+          [eventType]: { state: undefined, eventType: eventType },
+        }));
+      }, 500);
+    }, 5000);
   };
 
   useEffect(() => {

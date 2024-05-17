@@ -14,17 +14,17 @@ export function ProposalButton({
   return (
     <ButtonDiv>
       <Button
-        id='ATTENDED'
-        color={buttonClicked === "ATTENDED" ? "green" : "black200"}
-        $bgColor={buttonClicked === "ATTENDED" ? "green50" : "white"}
+        id='ACCEPTED'
+        color={buttonClicked === "ACCEPTED" ? "green" : "black200"}
+        $bgColor={buttonClicked === "ACCEPTED" ? "green50" : "white"}
         $hoverColor='green50'
         $hoverTextColor='green'
-        onClick={buttonClicked === "ATTENDED" ? undefined : onClickAttend}
+        onClick={buttonClicked === "ACCEPTED" ? undefined : onClickAttend}
         width={width}
         height={height}
         fontSize={fontSize}
         $zIndex={10}
-        $borderColor={buttonClicked === "ATTENDED" ? "green" : "black200"}
+        $borderColor={buttonClicked === "ACCEPTED" ? "green" : "black200"}
       >
         attend
       </Button>
