@@ -401,8 +401,13 @@ export default function MeetingSchedule() {
 
   useEffect(() => {
     if(selectedRecommend.length > 0) {
+   
+      let start = new Date(startDatetime.split("T")[0] + "T00:00:00");
+      start = new Date(start.getTime() + Math.floor(selectedRecommend[0].startIndex/96) * 24 * 60 * 60 * 1000);
+      console.log(start);
       setDayCount(Math.floor(selectedRecommend[0].startIndex/96));
-      setSelectedDate(new Date(startDatetime.split("T")[0] + "T00:00:00" + dayCount * 24 * 60 * 60 * 1000));
+      const dateWithNoTime = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      setSelectedDate(dateWithNoTime);
     }
 
   }, [selectedRecommend])
