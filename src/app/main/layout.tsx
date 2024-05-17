@@ -25,25 +25,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={noto.className}>
-      <body>
-        <ThemeProvider theme={theme}>
-          <GlobalStyle theme={theme} />
-          <StyledComponentsRegistry>
-            <Header />
-            <Main>
-              {children}
-              <Footer />
-            </Main>
-            <div id="globalModal"></div>
-            <div id="clickModal"></div>
-          </StyledComponentsRegistry>
-        </ThemeProvider>
-      </body>
-    </html>
+    <Main>
+      <Header />
+      <MainDiv>
+        {children}
+        <Footer />
+      </MainDiv>
+      <div id="globalModal"></div>
+      <div id="clickModal"></div>
+    </Main>
   );
 }
 
 const Main = styled.main`
-  min-height: calc(100% - 50px);
+  height: 100%;
+`;
+const MainDiv = styled.div`
+  height: calc(100% - 60px);
 `;

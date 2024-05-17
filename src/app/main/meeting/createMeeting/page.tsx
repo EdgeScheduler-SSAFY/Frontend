@@ -119,6 +119,7 @@ export default function CreateMeeting() {
         ...prev,
         [JSON.parse(userItem).id]: true,
       }));
+      return;
     }
     memberList.forEach((member) => {
       console.log("member:", member.user.id);
