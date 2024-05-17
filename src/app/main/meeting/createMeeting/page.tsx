@@ -308,7 +308,8 @@ export default function CreateMeeting() {
       if (updateFlag) {
         setIsUpdate(true);
       }
-      await router.push("./meetingSchedule");
+      
+      router.push("./meetingSchedule");
     } catch (error) {
       console.log(error);
     }

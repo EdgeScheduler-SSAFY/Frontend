@@ -51,6 +51,7 @@ export default function MeetingSchedule() {
     isUpdate,
     scheduleId,
   } = useMeetStore((state: MeetState) => state);
+
   const todayDate = new Date(startDatetime); // 회의 추천받는 시작 날짜
   const finalDate = new Date(endDatetime); // 회의 추천받는 시작 날짜
   const [date, setDate] = useState<Date>(todayDate); // 현재 날짜
@@ -78,7 +79,7 @@ export default function MeetingSchedule() {
     SchedulesAndAvailabilitiesProps[]
   >([]);
   const [showStartMiniCalendar, setShowStartMiniCalendar] = useState<boolean>(false);
-  const [endDate, setEndDate] = useState<string>(startDate);
+  const [endDate, setEndDate] = useState<string>(startDate); // 끝날짜
   const [selectedOption, setSelectedOption] = useState(0);
   const [startTime, setStartTime] = useState<string>("AM 00:00");
   const [endTime, setEndTime] = useState<string>("AM 01:00");
@@ -121,6 +122,7 @@ export default function MeetingSchedule() {
   ) => {
     setSelectedOption(index);
     setSelectedRecommend(recommededTime[type]);
+    
   };
   const handleGoToPastDay = () => {
     let pastDate = new Date(selectedDate.getTime() - 24 * 60 * 60 * 1000);
@@ -247,9 +249,6 @@ export default function MeetingSchedule() {
     }
   }, [zuEndIndex, selectedDate]);
 
-  useEffect(() => {
-    console.log("dayCount", dayCount);
-  }, [dayCount]);
 
   useEffect(() => {
     setDayCount(0);
@@ -401,6 +400,14 @@ export default function MeetingSchedule() {
   // }, [startIndex, endIndex]);
 
   useEffect(() => {
+    if(selectedRecommend.length > 0) {
+      setDayCount(Math.floor(selectedRecommend[0].startIndex/96));
+      setSelectedDate(new Date(startDatetime.split("T")[0] + "T00:00:00" + dayCount * 24 * 60 * 60 * 1000));
+    }
+
+  }, [selectedRecommend])
+
+  useEffect(() => {
     console.log(new Date(endDatetime));
   }, [endDatetime]);
   return (
@@ -500,19 +507,15 @@ export default function MeetingSchedule() {
       <ButtonAndRecommendLayout>
         <RecommendLayout>
           {selectedRecommend.map((indexes: { startIndex: number; endIndex: number }, i: number) => {
-            console.log(indexes);
-            console.log(startDatetime);
             let recStartDate = new Date(startDatetime.split("T")[0] + "T00:00:00");
             let recEndDate = new Date(startDatetime.split("T")[0] + "T00:00:00");
             recStartDate.setMinutes(recStartDate.getMinutes() + indexes.startIndex * 15);
-
             recEndDate.setMinutes(recEndDate.getMinutes() + indexes.endIndex * 15);
-
+            const startDate = format(recStartDate, "yyyy.MM.dd HH:mm");
+            const endDate = format(recEndDate, "yyyy.MM.dd HH:mm");
             return (
               <RecTimeLayout key={i}>
-                {`추천시간 ${i + 1}. ${recStartDate.toISOString().slice(0, 19)} ~ ${recEndDate
-                  .toISOString()
-                  .slice(0, 19)}`}
+                {`추천시간 ${i + 1}. ${startDate} ~ ${endDate} `}
               </RecTimeLayout>
             );
           })}
