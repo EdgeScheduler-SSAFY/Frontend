@@ -41,6 +41,7 @@ export default function CreatedNoticeBtn({ data }: { data: any }) {
       setButtonClicked("ACCEPTED");
       PostMeetingAccepted(scheduleId);
     } else if (status === "absence") {
+      setButtonClicked("DECLINED");
       setIsModalOpen(true);
     }
   };
