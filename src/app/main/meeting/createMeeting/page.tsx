@@ -72,6 +72,7 @@ export default function CreateMeeting() {
     memberList: [],
   });
   const [updateFlag, setUpdateFlag] = useState(false);
+
   useEffect(() => {
     if (isUpdate) {
       setMeetingData({
@@ -492,8 +493,6 @@ export default function CreateMeeting() {
                   width={7}
                   onSelectChange={startTimeChangeHandle}
                   standardIdx={todayDate ? standardIndex : 0}
-                  disabledIndex={todayDate ? standardIndex - 1 : -1}
-                  disabledLastIndex={sameDate ? intervalTime.length - 1 : intervalTime.length}
                 ></SelectTime>
                 <LineDiv>-</LineDiv>
                 <DateButton onClick={() => setShowEndMiniCalendar((prev) => !prev)}>

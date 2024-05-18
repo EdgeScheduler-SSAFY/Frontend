@@ -101,6 +101,7 @@ export function DetailSchedule({
     setIsUpdate,
     setScheduleId,
   } = useMeetStore((state: MeetState) => state);
+  
   const nextHandle = async () => {
     await Promise.all([
       setMeetName(data?.name || ""),
