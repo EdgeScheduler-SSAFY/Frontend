@@ -23,16 +23,6 @@ const noto = Noto_Sans_KR({
   subsets: ["latin"],
 });
 
-interface User {
-  id: number;
-  profile: string;
-  name: string;
-  role: string;
-  email: string | null;
-  department: string;
-  region: string;
-  zoneId: string;
-}
 export default function CreateMeeting() {
   // 회의 정보
   const router = useRouter();
@@ -52,46 +42,10 @@ export default function CreateMeeting() {
     startDatetime,
     isUpdate,
   } = useMeetStore((state: MeetState) => state);
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are 0-based in JavaScript
-  const date = String(now.getDate()).padStart(2, "0");
-  const todayString = `${year}-${month}-${date}T00:00:00`;
 
-  const [meetingData, setMeetingData] = useState<MeetingData>({
-    name: "",
-    description: "",
-    type: "MEETING",
-    color: 4,
-    startDatetime: todayString,
-    endDatetime: todayString,
-    runningTime: 15,
-    period: { start: `${todayString}`, end: `${todayString}` },
-    isPublic: true,
-    isRecurrence: false,
-    memberList: [],
-  });
-  const [updateFlag, setUpdateFlag] = useState(false);
 
-  useEffect(() => {
-    if (isUpdate) {
-      setMeetingData({
-        name: meetName || "",
-        description: description || "",
-        type: "MEETING",
-        color: 4,
-        startDatetime: startDatetime || todayString,
-        endDatetime: endDatetime || todayString,
-        runningTime: runningtime || 15,
-        period: { start: startDatetime || todayString, end: endDatetime || todayString },
-        isPublic: true,
-        isRecurrence: false,
-        memberList: memberList || [],
-      });
-      setIsUpdate(false);
-      setUpdateFlag(true);
-    }
-  }, []);
+  console.log("startDatetime : " + startDatetime)
+
 
   const [userLists, setUserLists] = useState<userList[]>([]); // 유저 리스트
   const [searchTerm, setSearchTerm] = useState<string>(""); // 검색어
@@ -106,7 +60,7 @@ export default function CreateMeeting() {
   const [showEndMiniCalendar, setShowEndMiniCalendar] = useState<boolean>(false);
   const [selectedStartDate, setSelectedStartDate] = useState(new Date());
   const [selectedEndDate, setSelectedEndDate] = useState(new Date());
-  const [disabledIndex, setDisabledIndex] = useState<number>(meetingData.runningTime / 15);
+  const [disabledIndex, setDisabledIndex] = useState<number>(0);
   const [sameDate, setSameDate] = useState<boolean>(true);
   const [todayDate, setTodayDate] = useState<boolean>(true);
   // 현재시간 구하기
@@ -127,6 +81,7 @@ export default function CreateMeeting() {
   // 첫 번째 시간의 인덱스를 구하기
   const standardIndex = intervalTime.findIndex((time) => time.value === futureTimes[0]?.value);
   const [sessionUserId, setSessionUserId] = useState<number>(0);
+  // 세션 스토리지에서 사용자 정보를 가져와서 사용자 ID를 설정
   
   useEffect(() => {
     setSessionUserId(JSON.parse(sessionStorage.getItem("user") || "{}").id);
@@ -136,10 +91,8 @@ export default function CreateMeeting() {
   useEffect(() => {
     const userItem = sessionStorage.getItem("user");
     if (userItem && !isUpdate) {
-      setMeetingData((prev) => ({
-        ...prev,
-        memberList: [{ user: JSON.parse(userItem), isRequired: true }],
-      }));
+      setMemberList([{ user: JSON.parse(userItem), isRequired: true }]);
+
       setClickedUsers((prev) => ({
         ...prev,
         [JSON.parse(userItem).id]: true,
@@ -187,7 +140,7 @@ export default function CreateMeeting() {
 
   // 회의시간 값이 변경될 때 실행될 함수
   const runningTimeChangeHandle = (value: number | string) => {
-    setMeetingData({ ...meetingData, runningTime: value as number });
+    setRunningTime(value as number);
   };
 
   // 시작날짜 값이 변경될 때 실행될 함수
@@ -201,25 +154,17 @@ export default function CreateMeeting() {
     const year = selectedDate.getFullYear();
     const month = ("0" + (selectedDate.getMonth() + 1)).slice(-2);
     const date = ("0" + selectedDate.getDate()).slice(-2);
-    const startTime = meetingData.period.start.split("T")[1]; // 기존 시작 시간
-    setMeetingData({
-      ...meetingData,
-      startDatetime: `${year}-${month}-${date}T${startTime}`,
-      period: {
-        ...meetingData.period,
-        start: `${year}-${month}-${date}T${startTime}`,
-      },
-    });
+    const startTime = startDatetime.split("T")[1]; // 기존 시작 시간
+
+    setStartDatetime(`${year}-${month}-${date}T${startTime}`);
+    
   };
 
   // 시작시간 값이 변경될 때 실행될 함수
   const startTimeChangeHandle = (value: number | string) => {
     console.log("startTimeChange : ", value);
-    const startDate = meetingData.period.start.split("T")[0]; // 기존 시작 날짜
-    setMeetingData({
-      ...meetingData,
-      period: { ...meetingData.period, start: `${startDate}T${value}` },
-    });
+    const startDate = startDatetime.split("T")[0]; // 기존 시작 날짜
+    setStartDatetime(`${startDate}T${value}`);
     setDisabledIndex(intervalTime.findIndex((option) => option.value === value) + 1);
   };
 
@@ -229,15 +174,8 @@ export default function CreateMeeting() {
     const year = selectedDate.getFullYear();
     const month = ("0" + (selectedDate.getMonth() + 1)).slice(-2);
     const date = ("0" + selectedDate.getDate()).slice(-2);
-    const endTime = meetingData.period.end.split("T")[1]; // 기존 시작 시간
-    setMeetingData({
-      ...meetingData,
-      endDatetime: `${year}-${month}-${date}T${endTime}`,
-      period: {
-        ...meetingData.period,
-        end: `${year}-${month}-${date}T${endTime}`,
-      },
-    });
+    const endTime = endDatetime.split("T")[1]; // 기존 시작 시간
+    setEndDatetime(`${year}-${month}-${date}T${endTime}`);
 
     // 두 날짜가 같은지 확인
     setSameDate(selectedDate.getDate() === selectedStartDate.getDate());
@@ -245,12 +183,8 @@ export default function CreateMeeting() {
 
   // 끝시간 값이 변경될 때 실행될 함수
   const endTimeChangeHandle = (value: number | string) => {
-    console.log("endTimeChange : ", value);
-    const endDate = meetingData.period.end.split("T")[0]; // 기존 시작 날짜
-    setMeetingData({
-      ...meetingData,
-      period: { ...meetingData.period, end: `${endDate}T${value}` },
-    });
+    const endDate = endDatetime.split("T")[0]; // 기존 시작 날짜
+    setEndDatetime(`${endDate}T${value}`);
   };
 
   // 사용자 버튼 클릭 이벤트
@@ -258,20 +192,15 @@ export default function CreateMeeting() {
     if (clickedMember.user.id === sessionUserId) return;
     const clickedUser = userLists.find((user) => user.id === clickedMember.user.id);
     // 이미 참가자 목록에 있는 사용자인지 확인
-    const isParticipant = meetingData.memberList.some((member) => member.user.id === clickedMember.user.id);
+    const isParticipant = memberList.some((member) => member.user.id === clickedMember.user.id);
 
     // 참가자 목록에 추가된 사용자라면 제거, 추가되지 않은 사용자라면 추가
     if (clickedUser && isParticipant) {
-      setMeetingData((prev) => ({
-        ...prev,
-        memberList: prev.memberList.filter((member) => member.user.id !== clickedMember.user.id),
-      }));
+      setMemberList(memberList.filter((member) => member.user.id !== clickedMember.user.id));
+   
     } else {
       if (clickedUser) {
-        setMeetingData((prev) => ({
-          ...prev,
-          memberList: [...prev.memberList, { user: clickedUser, isRequired: false }],
-        }));
+        setMemberList([...memberList, { user: clickedUser, isRequired: false }]);
       }
     }
 
@@ -287,10 +216,7 @@ export default function CreateMeeting() {
   // 참가자 div에서 제거
   const participantRemoveHandle = (userId: number) => {
     if (userId === sessionUserId) return;
-    setMeetingData((prev) => ({
-      ...prev,
-      memberList: prev.memberList.filter((member) => member.user.id !== userId),
-    }));
+    setMemberList(memberList.filter((member) => member.user.id !== userId));
 
     setClickedUsers((prev) => ({
       ...prev,
@@ -302,39 +228,22 @@ export default function CreateMeeting() {
   const optionalButtonClickHandle = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, userId: number) => {
     e.stopPropagation(); // 이벤트 버블링 중단
     if (userId === sessionUserId) return;
-    setMeetingData((prev) => {
-      const updatedMemberList = prev.memberList.map((member) => {
-        if (member.user.id === userId) {
-          return { ...member, isRequired: !member.isRequired };
-        }
-        return member;
-      });
-      return { ...prev, memberList: updatedMemberList };
-    });
+
+    setMemberList(memberList.map((member) => {
+      if (member.user.id === userId) {
+        return { ...member, isRequired: !member.isRequired };
+      }
+      return member;
+    }));
+
   };
 
   const cancleHandle = () => {
     router.push("/main/schedule");
   };
-  const nextHandle = async () => {
-    try {
-      await Promise.all([
-        setMeetName(meetingData.name),
-        setDescription(meetingData.description),
-        setStartDatetime(meetingData.period.start),
-        setEndDatetime(meetingData.period.end),
-        setRunningTime(meetingData.runningTime),
-        setMemberList(meetingData.memberList),
-      ]);
-      if (updateFlag) {
-        setIsUpdate(true);
-      }
-      
+  const nextHandle = () => {
       router.push("./meetingSchedule");
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    };
 
   useEffect(() => {
     fetchWithInterceptor("https://user-service.edgescheduler.co.kr/members")
@@ -454,8 +363,8 @@ export default function CreateMeeting() {
                 type="text"
                 width={33}
                 placeholder="Please enter a title."
-                value={meetingData.name}
-                onChange={(e) => setMeetingData((prev) => ({ ...prev, name: e.target.value }))}
+                value={meetName}
+                onChange={(e) => setMeetName(e.target.value) }
               ></Input>
             </InlineDiv>
             <InlineDiv>
@@ -463,7 +372,7 @@ export default function CreateMeeting() {
               <SelectTime
                 id="time"
                 options={runningTime}
-                standardIdx={meetingData.runningTime / 15 - 1}
+                standardIdx={runningtime / 15 - 1}
                 show={false}
                 width={10}
                 onSelectChange={runningTimeChangeHandle}
@@ -517,16 +426,16 @@ export default function CreateMeeting() {
                   onSelectChange={endTimeChangeHandle}
                   standardIdx={
                     todayDate
-                      ? standardIndex + meetingData.runningTime / 15
+                      ? standardIndex + runningtime / 15
                       : sameDate
-                      ? disabledIndex + meetingData.runningTime / 15 - 1
+                      ? disabledIndex + runningtime / 15 - 1
                       : 0
                   }
                   disabledIndex={
                     todayDate
-                      ? standardIndex + meetingData.runningTime / 15 - 1
+                      ? standardIndex + runningtime / 15 - 1
                       : sameDate
-                      ? disabledIndex + meetingData.runningTime / 15 - 2
+                      ? disabledIndex + runningtime / 15 - 2
                       : -1
                   }
                 ></SelectTime>
@@ -537,20 +446,15 @@ export default function CreateMeeting() {
               <div id="detail">
                 <TextArea
                   placeholder="Please enter a detail."
-                  value={meetingData.description}
-                  onChange={(e) =>
-                    setMeetingData((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
             </div>
             <div>
               <Label htmlFor="participant">Participant</Label>
               <ParticipantDiv id="participant">
-                {meetingData.memberList.map((member) => {
+                {memberList.map((member) => {
                   const user = userLists.find((user) => user.id === member.user.id);
                   return (
                     <div key={member.user.id}>

@@ -28,6 +28,13 @@ export interface MeetState {
   setScheduleId: (scheduleId: number) => void;
 }
 
+const now = new Date();
+const year = now.getFullYear();
+const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are 0-based in JavaScript
+const date = String(now.getDate()).padStart(2, "0");
+const todayString = `${year}-${month}-${date}T00:00:00`;
+const endDateString = `${year}-${month}-${date}T00:00:15`;
+
 const useMeetStore = create<MeetState>((set) => ({
   scheduleId: 0,
   dayCount: 0,
@@ -35,8 +42,8 @@ const useMeetStore = create<MeetState>((set) => ({
   zuEndIndex: 1,
   meetName: "",
   description: "",
-  startDatetime: "",
-  endDatetime: "",
+  startDatetime: todayString,
+  endDatetime: endDateString,
   runningtime: 15,
   memberList: [],
   isUpdate: false,
