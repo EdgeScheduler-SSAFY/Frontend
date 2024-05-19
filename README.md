@@ -157,19 +157,19 @@
 ### ✨ 1. MSA
 
 <div align="start">
-<img src="./assets/MSA.PNG" alt="MSA" width="90%" height="70%">
+<img src="./assets/MSA.png" alt="MSA" width="90%" height="70%">
 </div>
 
 ### ✨ 2. Event-Driven Architecture 구축
 
 <div align="start">
-<img src="./assets/kafka.PNG" alt="kafka" width="50%" height="70%">
+<img src="./assets/kafka.png" alt="kafka" width="50%" height="70%">
 </div>
 
 ### ✨ 3. 마이크로 서비스 서버별 DB 분리
 
 <div align="start">
-<img src="./assets/DB분리.PNG" alt="DB분리" width="50%" height="70%">
+<img src="./assets/DB분리.png" alt="DB분리" width="50%" height="70%">
 </div>
 
 ### ✨ 4. 비동기 알림 처리
@@ -183,25 +183,25 @@
 ### 🏛 서비스 아키택처
 
 <div align="start">
-<img src="./assets/서비스아키텍처.PNG" alt="architecture" width="70%" height="70%">
+<img src="./assets/서비스아키텍처.png" alt="architecture" width="70%" height="70%">
 </div>
 
 ### 🛢︎ ERD
 
 <div align="start">
-<img src="./assets/ERD.PNG" alt="ERD" width="70%" height="70%">
+<img src="./assets/ERD.png" alt="ERD" width="70%" height="70%">
 </div>
 
 ### [📄 API 명세서](https://cheddar-cloudberry-278.notion.site/API-d58760b094f04775b51fe521ff9c8015?pvs=74)
 
 <div align="start">
-<img src="./assets/api명세서.PNG" alt="api명세서" width="70%" height="70%">
+<img src="./assets/api명세서.png" alt="api명세서" width="70%" height="70%">
 </div>
 
 ### [🎨 화면 설계서](https://www.figma.com/design/WZr1HQ1PfhMd3nINjNrb3b/%F0%9F%93%B0?node-id=0%3A1&t=Y5XH75ckJ86cDiE9-1)
 
 <div align="start">
-<img src="./assets/figma.PNG" alt="화면설계서" width="70%" height="70%">
+<img src="./assets/figma.png" alt="화면설계서" width="70%" height="70%">
 </div>
 
 <br/>
