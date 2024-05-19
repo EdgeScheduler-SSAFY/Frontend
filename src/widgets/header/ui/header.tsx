@@ -17,7 +17,7 @@ import useNoticeStore from "@/store/noticeStore";
 export function Header() {
   const [showNoticeList, setShowNoticeList] = useState<boolean>(false);
   const [showInfoDropDown, setShowInfoDropDown] = useState<boolean>(false);
-  const [sessoionUserName, setSessionUserName] = useState<number>(0);
+  const [sessoionUserName, setSessionUserName] = useState<string>("");
   const noticeCount = useNoticeStore((state) => state.noticeCount);
   const setNoticeCount = useNoticeStore((state) => state.setNoticeCount);
   const currentPath = usePathname();
