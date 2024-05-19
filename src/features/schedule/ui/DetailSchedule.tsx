@@ -1,26 +1,26 @@
-import React, { useState, useRef, useEffect } from "react";
-import styled from "styled-components";
-import { format, differenceInMinutes, addDays, set } from "date-fns";
-import { FaRegTrashAlt } from "react-icons/fa";
-import { GoPencil } from "react-icons/go";
-import ReactDOM from "react-dom";
-import { useRouter } from "next/navigation";
+import React, { useState, useRef, useEffect } from 'react';
+import styled from 'styled-components';
+import { format, differenceInMinutes, addDays, set } from 'date-fns';
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { GoPencil } from 'react-icons/go';
+import ReactDOM from 'react-dom';
+import { useRouter } from 'next/navigation';
 
-import { DetailProposal } from "@/features/schedule/index";
-import { Color } from "@/shared/lib/styles/color";
+import { DetailProposal } from '@/features/schedule/index';
+import { Color } from '@/shared/lib/styles/color';
 import {
   getScheduleDetailsResponse,
   getScheduleDetails,
   deleteSchedule,
   CreateSchedule,
-} from "@/features/schedule/index";
-import Button from "@/shared/ui//button";
-import { fetchWithInterceptor } from "@/shared";
-import ProposalModal from "@/shared/ui/proposalModal";
-import ModalLayout from "@/shared/ui/modalLayout";
+} from '@/features/schedule/index';
+import Button from '@/shared/ui//button';
+import { fetchWithInterceptor } from '@/shared';
+import ProposalModal from '@/shared/ui/proposalModal';
+import ModalLayout from '@/shared/ui/modalLayout';
+import { ColorName } from '@/shared/lib/type/types';
 
-import useMeetStore, { MeetState } from "@/store/meetStore";
-
+import useMeetStore, { MeetState } from '@/store/meetStore';
 interface IDetailScheduleProps {
   close: () => void;
   scheduleId: number;
@@ -42,7 +42,9 @@ export function DetailSchedule({
   const router = useRouter();
   const [data, setData] = useState<getScheduleDetailsResponse | null>(null); //data api 가져온다.
   const [trigger, setTrigger] = useState(false); //
-  const [buttonClicked, setButtonClicked] = useState<string>("");
+  const [buttonClicked, setButtonClicked] = useState<string>('');
+  const colorList = ['blue', 'green', 'orange', 'yellow', 'black50'];
+
   //api 호출
   useEffect(() => {
     getScheduleDetails(scheduleId).then((response) => {
@@ -50,13 +52,7 @@ export function DetailSchedule({
       const startDate = new Date(startDatetime);
       const endDate = new Date(endDatetime);
       setData({ ...response, startDatetime: startDate, endDatetime: endDate });
-      setButtonClicked(
-        response.myStatus === "ACCEPTED"
-          ? "attend"
-          : response.myStatus === "DECLINED"
-          ? "absence"
-          : ""
-      );
+      setButtonClicked(response.myStatus === 'ACCEPTED' ? 'attend' : response.myStatus === 'DECLINED' ? 'absence' : '');
     });
   }, [scheduleId, trigger]);
   // 외부영역 클릭 확인을위한 ref
@@ -67,17 +63,17 @@ export function DetailSchedule({
       if (
         ref.current &&
         !ref.current.contains(event.target as Node) &&
-        !document.getElementById("createScheduleModal")?.contains(event.target as Node) &&
-        !document.getElementById("detailProposal")?.contains(event.target as Node) &&
-        !document.getElementById("proposalModal")?.contains(event.target as Node)
+        !document.getElementById('createScheduleModal')?.contains(event.target as Node) &&
+        !document.getElementById('detailProposal')?.contains(event.target as Node) &&
+        !document.getElementById('proposalModal')?.contains(event.target as Node)
       ) {
         close();
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
   const [showDetail, setShowDetail] = useState(false); // 시간변경제안 상세보기
@@ -103,18 +99,12 @@ export function DetailSchedule({
   } = useMeetStore((state: MeetState) => state);
   const nextHandle = async () => {
     await Promise.all([
-      setMeetName(data?.name || ""),
-      setDescription(data?.description || ""),
-      setStartDatetime(
-        data?.startDatetime ? format(data.startDatetime, "yyyy-MM-dd'T'HH:mm:ss") : ""
-      ),
-      setEndDatetime(
-        data?.endDatetime ? format(addDays(data.endDatetime, 7), "yyyy-MM-dd'T'HH:mm:ss") : ""
-      ),
+      setMeetName(data?.name || ''),
+      setDescription(data?.description || ''),
+      setStartDatetime(data?.startDatetime ? format(data.startDatetime, "yyyy-MM-dd'T'HH:mm:ss") : ''),
+      setEndDatetime(data?.endDatetime ? format(addDays(data.endDatetime, 7), "yyyy-MM-dd'T'HH:mm:ss") : ''),
       setRunningTime(
-        data?.startDatetime && data?.endDatetime
-          ? differenceInMinutes(data.endDatetime, data.startDatetime)
-          : 15
+        data?.startDatetime && data?.endDatetime ? differenceInMinutes(data.endDatetime, data.startDatetime) : 15
       ),
       setMemberList(
         (data?.attendeeList || []).map((attendee) => ({
@@ -132,18 +122,18 @@ export function DetailSchedule({
       setIsUpdate(true),
       setScheduleId(scheduleId),
     ]);
-    router.push("/main/meeting/createMeeting");
+    router.push('/main/meeting/createMeeting');
   };
   // 수정창 보여주기
   const handleUpdate = async () => {
-    if (data?.type === "MEETING") {
+    if (data?.type === 'MEETING') {
       await nextHandle();
       return;
     }
     setShowUpdate((prev) => !prev);
   };
   // 삭제 api 호출
-  const handelDelete = async (deleteRange?: "ALL" | "ONE" | "AFTERALL") => {
+  const handelDelete = async (deleteRange?: 'ALL' | 'ONE' | 'AFTERALL') => {
     await deleteSchedule({
       scheduleId: scheduleId,
       ...(deleteRange && {
@@ -159,13 +149,13 @@ export function DetailSchedule({
       await fetchWithInterceptor(
         `https://gateway.edgescheduler.co.kr/schedule-service/schedules/${scheduleId}/members/attendance`,
         {
-          method: "POST",
+          method: 'POST',
           body: JSON.stringify({
-            status: "ACCEPTED",
+            status: 'ACCEPTED',
           }),
         }
       );
-      console.log("success");
+      console.log('success');
     } catch (error) {
       console.log(error);
     }
@@ -175,11 +165,11 @@ export function DetailSchedule({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const onClick = (status: string, scheduleId: number) => {
     setButtonClicked(status);
-    if (status === "attend") {
-      if (buttonClicked === "attend") return;
+    if (status === 'attend') {
+      if (buttonClicked === 'attend') return;
       addMeetingAccepted(scheduleId);
-    } else if (status === "absence") {
-      if (buttonClicked === "absence") return;
+    } else if (status === 'absence') {
+      if (buttonClicked === 'absence') return;
       setIsModalOpen(true);
     }
   };
@@ -205,14 +195,15 @@ export function DetailSchedule({
         <NameLayout>
           <TextDiv>
             {/* 일정 이름 */}
-            <h3>{data.name}</h3>
+            <ColorDiv $bgColor={colorList[data.color]}></ColorDiv>
+            <div>{data.name}</div>
           </TextDiv>
           <div></div>
           {/* MEETING의 경우 주최자만 수정 삭제 가능하기때문에 보여주지 않는다. */}
-          {(data.type === "PERSONAL" ||
-            data.type === "WORKING" ||
-            (data.type === "MEETING" &&
-              JSON.parse(sessionStorage.getItem("user") || "{}").id === data.organizerId)) && (
+          {(data.type === 'PERSONAL' ||
+            data.type === 'WORKING' ||
+            (data.type === 'MEETING' &&
+              JSON.parse(sessionStorage.getItem('user') || '{}').id === data.organizerId)) && (
             <IconLayout>
               <IconDiv>
                 <GoPencil size={20} onClick={() => handleUpdate()}></GoPencil>
@@ -228,59 +219,53 @@ export function DetailSchedule({
         <DataLayout>
           {data.startDatetime &&
           data.endDatetime &&
-          format(data.startDatetime, "yyyy-MM-dd(EE)") !==
-            format(data.endDatetime, "yyyy-MM-dd(EE)") ? (
+          format(data.startDatetime, 'yyyy-MM-dd(EE)') !== format(data.endDatetime, 'yyyy-MM-dd(EE)') ? (
             <div>
-              {format(data.startDatetime, "yyyy-MM-dd(EE) HH:mm") +
-                " ~ " +
-                format(data.endDatetime, "yyyy-MM-dd(EE) HH:mm")}
+              {format(data.startDatetime, 'yyyy-MM-dd(EE) HH:mm') +
+                ' ~ ' +
+                format(data.endDatetime, 'yyyy-MM-dd(EE) HH:mm')}
             </div>
           ) : (
-            <div>
-              {format(data.startDatetime, "yyyy-MM-dd(EE) HH:mm") +
-                " ~ " +
-                format(data.endDatetime, "HH:mm")}
-            </div>
+            <div>{format(data.startDatetime, 'yyyy-MM-dd(EE) HH:mm') + ' ~ ' + format(data.endDatetime, 'HH:mm')}</div>
           )}
         </DataLayout>
         {/* 일정 설명 */}
         <DataLayout>{data.description && <div>{data.description}</div>}</DataLayout>
-        {data.type === "MEETING" && <DataLayout>attendee</DataLayout>}
         {/* 회의참석자만 보여줌 */}
-        {data.type === "MEETING" &&
-          JSON.parse(sessionStorage.getItem("user") || "").id !== data.organizerId && (
-            <ButtonDiv>
-              <Button
-                id="attend"
-                color="black"
-                $bgColor={buttonClicked === "attend" ? "green" : "black50"}
-                $hoverColor="black100"
-                onClick={() => {
-                  onClick("attend", scheduleId);
-                }}
-                width={5}
-                height={2}
-                fontSize={12}
-              >
-                attend
-              </Button>
-              <Button
-                id="absence"
-                color="black"
-                $bgColor={buttonClicked === "absence" ? "orange" : "black50"}
-                $hoverColor="black100"
-                onClick={async () => {
-                  await onClick("absence", scheduleId);
-                  // close();
-                }}
-                width={5}
-                height={2}
-                fontSize={12}
-              >
-                absence
-              </Button>
-            </ButtonDiv>
-          )}
+        {data.type === 'MEETING' && JSON.parse(sessionStorage.getItem('user') || '').id !== data.organizerId && (
+          <ButtonDiv>
+            <Button
+              id="attend"
+              color="black"
+              $bgColor={buttonClicked === 'attend' ? 'green' : 'black50'}
+              $hoverColor="black100"
+              onClick={() => {
+                onClick('attend', scheduleId);
+              }}
+              width={4.5}
+              height={2}
+              fontSize={10}
+            >
+              attend
+            </Button>
+            <Button
+              id="absence"
+              color="black"
+              $bgColor={buttonClicked === 'absence' ? 'orange' : 'black50'}
+              $hoverColor="black100"
+              onClick={async () => {
+                await onClick('absence', scheduleId);
+                // close();
+              }}
+              width={4.5}
+              height={2}
+              fontSize={10}
+            >
+              absence
+            </Button>
+          </ButtonDiv>
+        )}
+        {data.type === 'MEETING' && <DataLayout>Attendee List</DataLayout>}
         <ModalLayout
           open={isModalOpen}
           onClose={() => {
@@ -301,15 +286,15 @@ export function DetailSchedule({
           />
         </ModalLayout>
         {/* 회의인 경우에만 보여주는참석자 */}
-        {data.type === "MEETING" && (
+        {data.type === 'MEETING' && (
           <AttendeesLayout>
             {data.attendeeList.map((attendee: any) => (
               <AttendeeLayout key={attendee.memberId}>
                 <ProfileLayout>
                   <ProfileImage src="/images/profile.webp" alt="" />
-                  {attendee.status === "ACCEPTED" ? (
+                  {attendee.status === 'ACCEPTED' ? (
                     <CircleLayout color="green" />
-                  ) : attendee.status === "DECLINED" ? (
+                  ) : attendee.status === 'DECLINED' ? (
                     <CircleLayout color="orange" />
                   ) : (
                     <CircleLayout color="black100" />
@@ -320,20 +305,19 @@ export function DetailSchedule({
                   {attendee.reason ? <SmTextDiv>{attendee.reason}</SmTextDiv> : null}
                 </AteendeeNameLayout>
                 {/* 제안이 있는 참가자만 보여줌 */}
-                {attendee.proposal &&
-                  JSON.parse(sessionStorage.getItem("user") || "").id === data.organizerId && (
-                    <Button
-                      width={3}
-                      height={1.5}
-                      fontSize={10}
-                      onClick={() => {
-                        setShowDetail((prev) => !prev);
-                        setDetailData(attendee);
-                      }}
-                    >
-                      detail
-                    </Button>
-                  )}
+                {attendee.proposal && JSON.parse(sessionStorage.getItem('user') || '').id === data.organizerId && (
+                  <Button
+                    width={3}
+                    height={1.5}
+                    fontSize={10}
+                    onClick={() => {
+                      setShowDetail((prev) => !prev);
+                      setDetailData(attendee);
+                    }}
+                  >
+                    detail
+                  </Button>
+                )}
               </AttendeeLayout>
             ))}
           </AttendeesLayout>
@@ -363,7 +347,7 @@ export function DetailSchedule({
                 $bgColor="orange"
                 $hoverColor="orange400"
                 onClick={async () => {
-                  await handelDelete("ONE");
+                  await handelDelete('ONE');
                   triggerReload();
                   close();
                 }}
@@ -377,7 +361,7 @@ export function DetailSchedule({
                 $bgColor="orange"
                 $hoverColor="orange400"
                 onClick={async () => {
-                  await handelDelete("ALL");
+                  await handelDelete('ALL');
                   triggerReload();
                   close();
                 }}
@@ -391,7 +375,7 @@ export function DetailSchedule({
                 $bgColor="orange"
                 $hoverColor="orange400"
                 onClick={async () => {
-                  await handelDelete("AFTERALL");
+                  await handelDelete('AFTERALL');
                   triggerReload();
                   close();
                 }}
@@ -411,7 +395,7 @@ export function DetailSchedule({
             </div>
           ) : (
             <div>
-              sure?{" "}
+              sure?{' '}
               <Button
                 width={3}
                 height={2}
@@ -419,7 +403,7 @@ export function DetailSchedule({
                 $bgColor="orange"
                 $hoverColor="orange400"
                 onClick={async () => {
-                  await handelDelete("ONE");
+                  await handelDelete('ONE');
                   triggerReload();
                   close();
                 }}
@@ -445,7 +429,7 @@ export function DetailSchedule({
             left={window.innerWidth / 2 - 200}
             top={window.innerHeight / 2 - 225}
             triggerReload={triggerReload}
-            isWORKING={data.type === "WORKING" ? true : false}
+            isWORKING={data.type === 'WORKING' ? true : false}
             startDate={new Date(data.startDatetime)}
             close={() => setShowUpdate(false)}
             type={data.type}
@@ -455,28 +439,42 @@ export function DetailSchedule({
         )}
       </MainLayout>
     </BackLayout>,
-    document.getElementById("clickModal") as HTMLElement
+    document.getElementById('clickModal') as HTMLElement
   );
 }
 
 const MainLayout = styled.div<{ left: number; top: number; viewportHeight: number }>`
   position: absolute;
-  top: ${(props) => (props.top > props.viewportHeight / 2 ? "auto" : `${props.top}px`)};
-  bottom: ${(props) =>
-    props.top > props.viewportHeight / 2 ? `${props.viewportHeight - props.top}px` : "auto"};
+  top: ${(props) => (props.top > props.viewportHeight / 2 ? 'auto' : `${props.top}px`)};
+  bottom: ${(props) => (props.top > props.viewportHeight / 2 ? `${props.viewportHeight - props.top}px` : 'auto')};
   left: ${(props) => `${props.left}px`};
   background-color: white;
   width: 350px;
   z-index: 301;
-  color: black;
+  color: ${Color('black')};
   border-radius: 5px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   padding: 20px;
 `;
+
 const TextDiv = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-left: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+`;
+
+const ColorDiv = styled.div<{ $bgColor: ColorName }>`
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: ${(props) => Color(props.$bgColor)};
+  margin-right: 0.5rem;
 `;
 const NameLayout = styled.div`
   display: grid;
@@ -488,17 +486,22 @@ const IconLayout = styled.div`
   grid-template-columns: 1fr 1fr 1fr;
 `;
 const DataLayout = styled.div`
-  padding: 10px 0 0 5px;
+  padding: 5px;
+  font-size: 14px;
 `;
+
 const AttendeeLayout = styled.div`
   display: grid;
   grid-template-columns: 1fr 4fr 1fr;
-  padding: 10px 0 0 5px;
+  padding: 5px;
 `;
 const AttendeesLayout = styled.div`
-  padding: 10px 0 0 5px;
+  padding: 5px;
   overflow: auto;
   max-height: 150px;
+  border: 1px solid ${Color('black100')};
+  border-radius: 5px;
+  font-size: 14px;
 `;
 const ProfileLayout = styled.div`
   display: grid;
@@ -514,7 +517,7 @@ const ProfileImage = styled.img`
   height: 30px;
   border-radius: 50%;
 `;
-const CircleLayout = styled.div<{ color: "green" | "orange" | "black100" }>`
+const CircleLayout = styled.div<{ color: 'green' | 'orange' | 'black100' }>`
   width: 15px;
   height: 15px;
   border-radius: 50%;
@@ -526,7 +529,7 @@ const CircleLayout = styled.div<{ color: "green" | "orange" | "black100" }>`
 `;
 const SmTextDiv = styled.div`
   font-size: smaller;
-  color: ${Color("black400")};
+  color: ${Color('black400')};
 `;
 
 const ButtonLayout = styled.div`

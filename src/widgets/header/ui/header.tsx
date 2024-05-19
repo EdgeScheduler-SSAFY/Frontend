@@ -1,29 +1,32 @@
-"use client";
-import { useState, useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import styled from "styled-components";
-import { MdOutlineNotifications } from "react-icons/md";
-import { RiArrowDropDownLine, RiArrowDropUpLine, RiAccountCircleLine } from "react-icons/ri";
-import { MdOutlineLogout } from "react-icons/md";
-import { Color } from "@/shared/lib/styles/color";
-import { ColorName } from "@/shared/lib/type/types";
-import { NoticeList } from "@/features/noticeList/ui/noticeList";
-import NewNotice from "@/widgets/notice/ui/newNotice";
-import { GetNoticeList } from "@/features/noticeList/api/getNoticeList";
-import useNoticeStore from "@/store/noticeStore";
+'use client';
+import { useState, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import styled from 'styled-components';
+import { MdOutlineNotifications } from 'react-icons/md';
+import { RiArrowDropDownLine, RiArrowDropUpLine, RiAccountCircleLine } from 'react-icons/ri';
+import { MdOutlineLogout } from 'react-icons/md';
+import { Color } from '@/shared/lib/styles/color';
+import { ColorName } from '@/shared/lib/type/types';
+import { NoticeList } from '@/features/noticeList/ui/noticeList';
+import NewNotice from '@/widgets/notice/ui/newNotice';
+import { GetNoticeList } from '@/features/noticeList/api/getNoticeList';
+import useNoticeStore from '@/store/noticeStore';
 
 export function Header() {
   const [showNoticeList, setShowNoticeList] = useState<boolean>(false);
   const [showInfoDropDown, setShowInfoDropDown] = useState<boolean>(false);
-  const [sessoionUserName, setSessionUserName] = useState<string>("");
+  const [sessoionUserName, setSessionUserName] = useState<string>('');
   const noticeCount = useNoticeStore((state) => state.noticeCount);
   const setNoticeCount = useNoticeStore((state) => state.setNoticeCount);
   const currentPath = usePathname();
 
   useEffect(() => {
-    setSessionUserName(JSON.parse(sessionStorage.getItem("user") || "{}").name);
+    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    if (user && user.name) {
+      setSessionUserName(user.name);
+    }
   }, []);
 
   useEffect(() => {
@@ -52,17 +55,17 @@ export function Header() {
       if (
         ref.current &&
         !ref.current.contains(e.target as Node) &&
-        !document.getElementById("proposalModal")?.contains(e.target as Node) &&
-        !document.getElementById("detailProposal")?.contains(e.target as Node)
+        !document.getElementById('proposalModal')?.contains(e.target as Node) &&
+        !document.getElementById('detailProposal')?.contains(e.target as Node)
       ) {
         setShowNoticeList(false);
       }
     };
 
-    if (showNoticeList) document.addEventListener("mousedown", handleClickOutside);
+    if (showNoticeList) document.addEventListener('mousedown', handleClickOutside);
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showNoticeList]);
   return (
@@ -100,11 +103,11 @@ export function Header() {
             <InfoDiv>
               <MdOutlineLogout size={18} />
               <MyInfoLink
-                href={"/"}
+                href={'/'}
                 onClick={(e) => {
                   e.preventDefault();
                   sessionStorage.clear();
-                  window.location.href = "/";
+                  window.location.href = '/';
                 }}
               >
                 Logout
@@ -149,17 +152,17 @@ const LinkDiv = styled.div`
 `;
 
 const StyledLink = styled(Link)<{ $active: boolean }>`
-  color: ${(props) => (props.$active ? Color("blue") : Color("black"))};
+  color: ${(props) => (props.$active ? Color('blue') : Color('black'))};
   display: flex;
   text-decoration: none;
   align-items: center;
   transition: all 0.2s ease-in-out;
   /* &:visited {
-    color: ${Color("black")};
+    color: ${Color('black')};
   } */
   &:hover {
     cursor: pointer;
-    color: ${Color("blue")};
+    color: ${Color('blue')};
   }
 `;
 
@@ -176,9 +179,9 @@ const NoticeCountDiv = styled.div`
   width: 1rem;
   height: 1rem;
   border-radius: 50%;
-  border: 1px solid ${Color("white")};
-  background-color: ${Color("orange")};
-  color: ${Color("white")};
+  border: 1px solid ${Color('white')};
+  background-color: ${Color('orange')};
+  color: ${Color('white')};
   font-size: 9px;
   font-weight: 500;
   position: absolute;
@@ -227,7 +230,7 @@ const ProfileInfoDiv = styled.div`
 `;
 
 const MyInfoLink = styled(Link)`
-  color: ${Color("black")};
+  color: ${Color('black')};
   font-size: 13px;
   text-decoration: none;
   transition: all 0.2s ease-in-out;

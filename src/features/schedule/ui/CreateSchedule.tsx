@@ -1,31 +1,28 @@
-import React, { useState, useRef, useEffect } from "react";
-import styled from "styled-components";
-import { MdOutlineDescription } from "react-icons/md";
-import { FaAngleDown } from "react-icons/fa";
-import { IoIosArrowUp } from "react-icons/io";
-import { IoIosArrowDown } from "react-icons/io";
-import { format, addHours } from "date-fns";
-import ReactDOM from "react-dom";
+import React, { useState, useRef, useEffect } from 'react';
+import styled from 'styled-components';
+import { MdOutlineDescription } from 'react-icons/md';
+import { FaAngleDown } from 'react-icons/fa';
+import { IoIosArrowUp } from 'react-icons/io';
+import { IoIosArrowDown } from 'react-icons/io';
+import { format, addHours } from 'date-fns';
+import ReactDOM from 'react-dom';
 
-import { Togle } from "@/shared/index";
-import { Color } from "@/shared/lib/styles/color";
-import Button from "@/shared/ui/button";
-import Input from "@/shared/ui/input";
-import {
-  createSchedule,
-  getScheduleDetailsResponse,
-  updateSchedule,
-} from "@/features/schedule/index";
-import { MiniCalendar } from "@/shared";
-import { intervalTime } from "@/shared/lib/data";
-import SelectTime from "@/shared/ui/selectTime";
+import { Togle } from '@/shared/index';
+import { Color } from '@/shared/lib/styles/color';
+import Button from '@/shared/ui/button';
+import Input from '@/shared/ui/input';
+import { createSchedule, getScheduleDetailsResponse, updateSchedule } from '@/features/schedule/index';
+import { MiniCalendar } from '@/shared';
+import { intervalTime } from '@/shared/lib/data';
+import SelectTime from '@/shared/ui/selectTime';
+import TextArea from '@/shared/ui/textArea';
 
-type colorT = "blue" | "green" | "orange" | "yellow" | "black50";
+type colorT = 'blue' | 'green' | 'orange' | 'yellow' | 'black50';
 
 interface ICreateScheduleProps {
   close: () => void;
   startDate: Date;
-  type: "MEETING" | "WORKING" | "PERSONAL";
+  type: 'MEETING' | 'WORKING' | 'PERSONAL';
   isUpdate?: boolean; // 일정 수정 여부
   data?: getScheduleDetailsResponse; // 일정 수정시 초기값
   isWORKING?: boolean; //  WORKING 일정 여부
@@ -55,9 +52,9 @@ export function CreateSchedule({
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -68,27 +65,27 @@ export function CreateSchedule({
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
-  const [name, setName] = useState<string>(data?.name || ""); // 일정 이름
+  const [name, setName] = useState<string>(data?.name || ''); // 일정 이름
   const [isDescription, setIsDescription] = useState<boolean>(!!data?.description);
-  const [description, setDescription] = useState<string>(data?.description || ""); // 일정 설명
+  const [description, setDescription] = useState<string>(data?.description || ''); // 일정 설명
   // 일정 수정시 초기값이 있으면 색상 초기값 설정
   const initiallColor =
     data?.color !== undefined && data?.color === 0
-      ? "blue"
+      ? 'blue'
       : data?.color === 1
-      ? "green"
+      ? 'green'
       : data?.color === 2
-      ? "orange"
+      ? 'orange'
       : data?.color === 3
-      ? "yellow"
-      : "blue";
-  const [selectedColor, setSelectedColor] = useState<colorT>(initiallColor || "blue");
+      ? 'yellow'
+      : 'blue';
+  const [selectedColor, setSelectedColor] = useState<colorT>(initiallColor || 'blue');
   const [startDatetime, setStartDatetime] = useState<string>(
     data?.startDatetime
       ? format(data.startDatetime, "yyyy-MM-dd'T'HH:mm:ss")
@@ -102,23 +99,16 @@ export function CreateSchedule({
   // 일정 수정시 종일 일정 여부 확인
   const initialIsAllDay =
     data?.startDatetime && data?.endDatetime
-      ? format(data.startDatetime, "HH:mm:ss") === "00:00:00" &&
-        format(data.endDatetime, "HH:mm:ss") === "23:59:59"
+      ? format(data.startDatetime, 'HH:mm:ss') === '00:00:00' && format(data.endDatetime, 'HH:mm:ss') === '23:59:59'
       : false;
   const [isAllDay, setIsAllDay] = useState<boolean>(initialIsAllDay); // 종일 여부
   const [isPublic, setIsPublic] = useState<boolean>(data?.isPublic || false); // 공개 여부
   const [isRecurrence, setIsRecurrence] = useState<boolean>(!!data?.recurrenceDetails); // 반복 여부
-  const [freq, setFreq] = useState<"DAILY" | "WEEKLY" | "MONTHLY">(
-    data?.recurrenceDetails?.freq || "WEEKLY"
-  ); // 반복 주기
+  const [freq, setFreq] = useState<'DAILY' | 'WEEKLY' | 'MONTHLY'>(data?.recurrenceDetails?.freq || 'WEEKLY'); // 반복 주기
   const [intv, setIntv] = useState<number>(data?.recurrenceDetails?.intv || 1); // 반복 간격
-  const [isExpiredDate, setIsExpiredDate] = useState<boolean>(
-    !!data?.recurrenceDetails?.expiredDate || false
-  ); // 종료 날짜 여부
+  const [isExpiredDate, setIsExpiredDate] = useState<boolean>(!!data?.recurrenceDetails?.expiredDate || false); // 종료 날짜 여부
   const [expiredDate, setExpiredDate] = useState<Date>(
-    !!data?.recurrenceDetails?.expiredDate
-      ? new Date(data?.recurrenceDetails?.expiredDate)
-      : startDate
+    !!data?.recurrenceDetails?.expiredDate ? new Date(data?.recurrenceDetails?.expiredDate) : startDate
   ); // 종료 날짜
   const [isCount, setIsCount] = useState<boolean>(
     data?.recurrenceDetails?.count && !data?.recurrenceDetails?.expiredDate ? true : false
@@ -129,45 +119,45 @@ export function CreateSchedule({
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     switch (value) {
-      case "never":
+      case 'never':
         setIsExpiredDate(false);
         setIsCount(false);
         break;
-      case "on":
+      case 'on':
         setIsExpiredDate(true);
         setIsCount(false);
         break;
-      case "after":
+      case 'after':
         setIsExpiredDate(false);
         setIsCount(true);
         break;
       default:
     }
   };
-  const dayOfWeek: ("MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN")[] = [
-    "SUN",
-    "MON",
-    "TUE",
-    "WED",
-    "THU",
-    "FRI",
-    "SAT",
+  const dayOfWeek: ('MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN')[] = [
+    'SUN',
+    'MON',
+    'TUE',
+    'WED',
+    'THU',
+    'FRI',
+    'SAT',
   ];
-  const [recurrenceDay, setRecurrenceDay] = useState<
-    ("MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN")[]
-  >(data?.recurrenceDetails?.recurrenceDay || [dayOfWeek[startDate.getDay()]]); // 반복 요일
+  const [recurrenceDay, setRecurrenceDay] = useState<('MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN')[]>(
+    data?.recurrenceDetails?.recurrenceDay || [dayOfWeek[startDate.getDay()]]
+  ); // 반복 요일
   const [expanded, setExpanded] = useState<boolean>(false);
-  const day: ("MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN")[] = [
-    "MON",
-    "TUE",
-    "WED",
-    "THU",
-    "FRI",
-    "SAT",
-    "SUN",
+  const day: ('MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN')[] = [
+    'MON',
+    'TUE',
+    'WED',
+    'THU',
+    'FRI',
+    'SAT',
+    'SUN',
   ];
   // 반복 요일 클릭시 실행될 함수
-  const handleDayClick = (day: "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN") => {
+  const handleDayClick = (day: 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN') => {
     setRecurrenceDay((prev) => {
       if (prev.includes(day)) {
         return prev.filter((d) => d !== day); // 요일 삭제
@@ -176,7 +166,7 @@ export function CreateSchedule({
       }
     });
   };
-  const user = sessionStorage.getItem("user") || "{}"; // 유저 정보
+  const user = sessionStorage.getItem('user') || '{}'; // 유저 정보
   // 일정 생성 api 호출
   const saveSchedule = async () => {
     await createSchedule({
@@ -184,16 +174,9 @@ export function CreateSchedule({
       name: name,
       description: description,
       type: type,
-      color:
-        selectedColor === "blue"
-          ? 0
-          : selectedColor === "green"
-          ? 1
-          : selectedColor === "orange"
-          ? 2
-          : 3,
-      startDatetime: isAllDay ? startDatetime.split("T")[0] + "T00:00:00" : startDatetime, //all day 일정이면 00:00:00으로 설정
-      endDatetime: isAllDay ? endDatetime.split("T")[0] + "T23:59:59" : endDatetime, // all day 일정이면 23:45:00으로 설정
+      color: selectedColor === 'blue' ? 0 : selectedColor === 'green' ? 1 : selectedColor === 'orange' ? 2 : 3,
+      startDatetime: isAllDay ? startDatetime.split('T')[0] + 'T00:00:00' : startDatetime, //all day 일정이면 00:00:00으로 설정
+      endDatetime: isAllDay ? endDatetime.split('T')[0] + 'T23:59:59' : endDatetime, // all day 일정이면 23:45:00으로 설정
       isPublic: isWORKING ? true : isPublic,
       isRecurrence: isRecurrence,
       recurrence: isRecurrence
@@ -228,29 +211,29 @@ export function CreateSchedule({
     if (selectedDate > selectedEndDate) {
       setSelectedEndDate(selectedDate);
     }
-    const startTime = startDatetime.split("T")[1]; // 기존 시작 시간
-    setStartDatetime(format(selectedDate, "yyyy-MM-dd") + "T" + startTime);
+    const startTime = startDatetime.split('T')[1]; // 기존 시작 시간
+    setStartDatetime(format(selectedDate, 'yyyy-MM-dd') + 'T' + startTime);
   };
 
   // 시작시간 값이 변경될 때 실행될 함수
   const startTimeChangeHandle = (value: number | string) => {
-    const startDate = startDatetime.split("T")[0]; // 기존 시작 날짜
-    setStartDatetime(startDate + "T" + value);
+    const startDate = startDatetime.split('T')[0]; // 기존 시작 날짜
+    setStartDatetime(startDate + 'T' + value);
     setDisabledIndex(intervalTime.findIndex((option) => option.value === value));
   };
   // 끝날짜 값이 변경될 때 실행될 함수
   const endDateHandle = (selectedDate: Date) => {
     setSelectedEndDate(selectedDate);
-    const endTime = endDatetime.split("T")[1]; // 기존 시작 시간
-    setEndDatetime(format(selectedDate, "yyyy-MM-dd") + "T" + endTime);
+    const endTime = endDatetime.split('T')[1]; // 기존 시작 시간
+    setEndDatetime(format(selectedDate, 'yyyy-MM-dd') + 'T' + endTime);
 
     // 두 날짜가 같은지 확인
     setSameDate(selectedDate.getDate() === selectedStartDate.getDate());
   };
   // 끝시간 값이 변경될 때 실행될 함수
   const endTimeChangeHandle = (value: number | string) => {
-    const endDate = endDatetime.split("T")[0]; // 기존 시작 날짜
-    setEndDatetime(endDate + "T" + value);
+    const endDate = endDatetime.split('T')[0]; // 기존 시작 날짜
+    setEndDatetime(endDate + 'T' + value);
   };
 
   const [isOneOff, setIsOneOff] = useState<boolean>(data?.recurrenceDetails ? true : false); // 반복 일정의 수정시 일회성 여부
@@ -264,16 +247,9 @@ export function CreateSchedule({
       name: name,
       description: description,
       type: data.type,
-      color:
-        selectedColor === "blue"
-          ? 0
-          : selectedColor === "green"
-          ? 1
-          : selectedColor === "orange"
-          ? 2
-          : 3,
-      startDatetime: isAllDay ? startDatetime.split("T")[0] + "T00:00:00" : startDatetime,
-      endDatetime: isAllDay ? endDatetime.split("T")[0] + "T23:59:59" : endDatetime,
+      color: selectedColor === 'blue' ? 0 : selectedColor === 'green' ? 1 : selectedColor === 'orange' ? 2 : 3,
+      startDatetime: isAllDay ? startDatetime.split('T')[0] + 'T00:00:00' : startDatetime,
+      endDatetime: isAllDay ? endDatetime.split('T')[0] + 'T23:59:59' : endDatetime,
       isPublic: isPublic,
       isRecurrence: data.recurrenceDetails ? true : isRecurrence,
       isOneOff: data.recurrenceDetails ? true : isOneOff,
@@ -304,12 +280,12 @@ export function CreateSchedule({
     <MainLayout
       id="createScheduleModal"
       ref={ref}
-      data-testid={"create schedule"}
+      data-testid={'create schedule'}
       left={left}
       top={top}
       onClick={(e) => e.stopPropagation()}
     >
-      {isUpdate ? <b>Update Schedule</b> : <b>Create Schedule</b>}
+      {isUpdate ? <b> &nbsp;Update Schedule</b> : <b> &nbsp;Create Schedule</b>}
       <Input
         id="name"
         placeholder="Add a title"
@@ -321,8 +297,8 @@ export function CreateSchedule({
       {/* 날짜 시간 설정 */}
       <PeriodDiv id="period">
         <DateButton onClick={() => setShowStartMiniCalendar((prev) => !prev)}>
-          {selectedStartDate.getFullYear()}.{("0" + (selectedStartDate.getMonth() + 1)).slice(-2)}.
-          {("0" + selectedStartDate.getDate()).slice(-2)}
+          {selectedStartDate.getFullYear()}.{('0' + (selectedStartDate.getMonth() + 1)).slice(-2)}.
+          {('0' + selectedStartDate.getDate()).slice(-2)}
         </DateButton>
         {showStartMiniCalendar && (
           <StartCalendarDiv>
@@ -343,9 +319,7 @@ export function CreateSchedule({
             onSelectChange={startTimeChangeHandle}
             standardIdx={
               data?.startDatetime instanceof Date
-                ? Math.round(
-                    (data?.startDatetime.getHours() * 60 + data?.startDatetime.getMinutes()) / 15
-                  )
+                ? Math.round((data?.startDatetime.getHours() * 60 + data?.startDatetime.getMinutes()) / 15)
                 : disabledIndex
             }
             disabledLastIndex={intervalTime.length}
@@ -355,8 +329,8 @@ export function CreateSchedule({
         )}
         <LineDiv>-</LineDiv>
         <DateButton onClick={() => setShowEndMiniCalendar((prev) => !prev)}>
-          {selectedEndDate.getFullYear()}.{("0" + (selectedEndDate.getMonth() + 1)).slice(-2)}.
-          {("0" + selectedEndDate.getDate()).slice(-2)}
+          {selectedEndDate.getFullYear()}.{('0' + (selectedEndDate.getMonth() + 1)).slice(-2)}.
+          {('0' + selectedEndDate.getDate()).slice(-2)}
         </DateButton>
         {showEndMiniCalendar && (
           <EndCalendarDiv>
@@ -377,9 +351,7 @@ export function CreateSchedule({
             onSelectChange={endTimeChangeHandle}
             standardIdx={
               data?.endDatetime instanceof Date
-                ? Math.round(
-                    (data?.endDatetime.getHours() * 60 + data?.endDatetime.getMinutes()) / 15
-                  )
+                ? Math.round((data?.endDatetime.getHours() * 60 + data?.endDatetime.getMinutes()) / 15)
                 : disabledIndex + 4
             }
             disabledIndex={sameDate ? disabledIndex : -1}
@@ -404,7 +376,7 @@ export function CreateSchedule({
       {/* WORKING 등록시에는 사용x */}
       {!isWORKING && (
         <TogleDiv>
-          allday
+          Allday
           <Togle
             $isOn={isAllDay}
             onToggle={() => {
@@ -416,7 +388,7 @@ export function CreateSchedule({
       {/* 반복설정 */}
       {!(isUpdate && !data?.recurrenceDetails) && (
         <TogleDiv>
-          Recurrence{" "}
+          Recurrence{' '}
           <Togle
             $isOn={isRecurrence}
             onToggle={() => {
@@ -426,26 +398,21 @@ export function CreateSchedule({
           ></Togle>
           {isRecurrence && (
             <RecurrenceRowLayout2>
-              <Button
-                width={3}
-                height={1.5}
-                fontSize={12}
-                onClick={() => setShowRecurrence((prev) => !prev)}
-              >
+              <Button width={3} height={1.5} fontSize={10} onClick={() => setShowRecurrence((prev) => !prev)}>
                 setting
               </Button>
               <RecurrenceText>
-                {" "}
-                every
+                {' '}
+                Every&nbsp;
                 {intv +
-                  " " +
-                  (freq === "MONTHLY" ? "MONTH" : freq === "WEEKLY" ? "WEEK" : "DAY") +
-                  " on " +
-                  (freq === "MONTHLY"
-                    ? format(new Date(), "dd")
-                    : freq === "WEEKLY"
-                    ? recurrenceDay.map((d) => d).join(", ")
-                    : format(new Date(), "dd"))}
+                  ' ' +
+                  (freq === 'MONTHLY' ? 'MONTH' : freq === 'WEEKLY' ? 'WEEK' : 'DAY') +
+                  ' on ' +
+                  (freq === 'MONTHLY'
+                    ? format(new Date(), 'dd')
+                    : freq === 'WEEKLY'
+                    ? recurrenceDay.map((d) => d).join(', ')
+                    : format(new Date(), 'dd'))}
               </RecurrenceText>
             </RecurrenceRowLayout2>
           )}
@@ -475,9 +442,9 @@ export function CreateSchedule({
                       {/* 확장 시 view 선택 버튼 렌더링 */}
                       {expanded && (
                         <DropdownLayout>
-                          <DropdownDiv onClick={() => setFreq("MONTHLY")}>MONTHLY</DropdownDiv>
-                          <DropdownDiv onClick={() => setFreq("WEEKLY")}>WEEKLY</DropdownDiv>
-                          <DropdownDiv onClick={() => setFreq("DAILY")}>DAILY</DropdownDiv>
+                          <DropdownDiv onClick={() => setFreq('MONTHLY')}>MONTHLY</DropdownDiv>
+                          <DropdownDiv onClick={() => setFreq('WEEKLY')}>WEEKLY</DropdownDiv>
+                          <DropdownDiv onClick={() => setFreq('DAILY')}>DAILY</DropdownDiv>
                         </DropdownLayout>
                       )}
                     </FreqLayout>
@@ -486,12 +453,12 @@ export function CreateSchedule({
                 {/* 반복요일 */}
                 <RecurrenceRowLayout>
                   Recurrence on
-                  {freq === "WEEKLY" && (
+                  {freq === 'WEEKLY' && (
                     <DayLayout>
-                      {day.map((d: "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN") => (
+                      {day.map((d: 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN') => (
                         <DayDiv
                           key={d}
-                          color={recurrenceDay.includes(d) ? "lightgray" : "white"}
+                          color={recurrenceDay.includes(d) ? 'lightgray' : 'white'}
                           onClick={() => handleDayClick(d)}
                         >
                           {d}
@@ -507,28 +474,18 @@ export function CreateSchedule({
                     <RadioDiv>
                       <input
                         type="radio"
-                        value={"never"}
+                        value={'never'}
                         checked={!isExpiredDate && !isCount}
                         onChange={handleRadioChange}
                       />
                       <div>never</div>
                     </RadioDiv>
                     <RadioDiv>
-                      <input
-                        type="radio"
-                        value={"on"}
-                        checked={isExpiredDate}
-                        onChange={handleRadioChange}
-                      />
+                      <input type="radio" value={'on'} checked={isExpiredDate} onChange={handleRadioChange} />
                       <div>on</div>
                     </RadioDiv>
                     <RadioDiv>
-                      <input
-                        type="radio"
-                        checked={isCount}
-                        onChange={handleRadioChange}
-                        value={"after"}
-                      />
+                      <input type="radio" checked={isCount} onChange={handleRadioChange} value={'after'} />
                       <div>after</div>
                     </RadioDiv>
                   </RadioLayout>
@@ -537,8 +494,8 @@ export function CreateSchedule({
                     <div></div>
                     {isExpiredDate ? (
                       <DateButton onClick={() => setShowRecurrenceMiniCalendar((prev) => !prev)}>
-                        {expiredDate.getFullYear()}.{("0" + (expiredDate.getMonth() + 1)).slice(-2)}
-                        .{("0" + expiredDate.getDate()).slice(-2)}
+                        {expiredDate.getFullYear()}.{('0' + (expiredDate.getMonth() + 1)).slice(-2)}.
+                        {('0' + expiredDate.getDate()).slice(-2)}
                       </DateButton>
                     ) : (
                       <div></div>
@@ -574,23 +531,18 @@ export function CreateSchedule({
                 </EndsLayout>
                 <ButtonLayout>
                   <div></div>
-                  <Button
-                    width={3}
-                    height={1.5}
-                    fontSize={12}
-                    onClick={() => setShowRecurrence(false)}
-                  >
+                  <Button width={4} height={2} fontSize={12} onClick={() => setShowRecurrence(false)}>
                     save
                   </Button>
                   <Button
-                    width={3}
-                    height={1.5}
+                    width={4}
+                    height={2}
                     fontSize={12}
                     onClick={() => {
                       setShowRecurrence(false);
                       setIsCount(false);
                       setIsExpiredDate(false);
-                      setCount(10);
+                      setCount(1);
                       setExpiredDate(startDate);
                     }}
                   >
@@ -605,7 +557,7 @@ export function CreateSchedule({
       {/* 공개여부 WORKING은 항상공개이기떄문에 비활성화 */}
       {!isWORKING && (
         <TogleDiv>
-          Public{" "}
+          Public{' '}
           <Togle
             $isOn={isPublic}
             onToggle={() => {
@@ -616,53 +568,37 @@ export function CreateSchedule({
       )}
       {/* 색상 */}
       <ColorDiv>
-        <ColorCircle
-          onClick={() => setSelectedColor("blue")}
-          selectedColor={selectedColor}
-          color="blue"
-        >
-          {selectedColor === "blue" && <CheckDiv>✔</CheckDiv>}
+        <ColorCircle onClick={() => setSelectedColor('blue')} selectedColor={selectedColor} color="blue">
+          {selectedColor === 'blue' && <CheckDiv>✔</CheckDiv>}
         </ColorCircle>
-        <ColorCircle
-          onClick={() => setSelectedColor("green")}
-          selectedColor={selectedColor}
-          color="green"
-        >
-          {selectedColor === "green" && <CheckDiv>✔</CheckDiv>}
+        <ColorCircle onClick={() => setSelectedColor('green')} selectedColor={selectedColor} color="green">
+          {selectedColor === 'green' && <CheckDiv>✔</CheckDiv>}
         </ColorCircle>
-        <ColorCircle
-          onClick={() => setSelectedColor("orange")}
-          selectedColor={selectedColor}
-          color="orange"
-        >
-          {selectedColor === "orange" && <CheckDiv>✔</CheckDiv>}
+        <ColorCircle onClick={() => setSelectedColor('orange')} selectedColor={selectedColor} color="orange">
+          {selectedColor === 'orange' && <CheckDiv>✔</CheckDiv>}
         </ColorCircle>
-        <ColorCircle
-          onClick={() => setSelectedColor("yellow")}
-          selectedColor={selectedColor}
-          color="yellow"
-        >
-          {selectedColor === "yellow" && <CheckDiv>✔</CheckDiv>}
+        <ColorCircle onClick={() => setSelectedColor('yellow')} selectedColor={selectedColor} color="yellow">
+          {selectedColor === 'yellow' && <CheckDiv>✔</CheckDiv>}
         </ColorCircle>
       </ColorDiv>
       {/* 설명 */}
       {!isDescription && (
-        <DescriptionText onClick={() => setIsDescription((prev) => !prev)}>
-          add description
-        </DescriptionText>
+        <DescriptionText onClick={() => setIsDescription((prev) => !prev)}>Add a description</DescriptionText>
       )}
       {isDescription && (
         <DescriptionLayout>
           <IconDiv onClick={() => setIsDescription((prev) => !prev)}>
             <MdOutlineDescription size={20} />
           </IconDiv>
-          <textarea
+          <TextArea
             placeholder="Add a description"
             value={description}
             onChange={(e) => {
               setDescription(e.target.value);
             }}
-          ></textarea>
+            width={25}
+            height={3}
+          ></TextArea>
         </DescriptionLayout>
       )}
       <ButtonLayout>
@@ -677,13 +613,13 @@ export function CreateSchedule({
           }}
         >
           save
-        </Button>{" "}
+        </Button>{' '}
         <Button width={5} height={2.5} onClick={close}>
           cancel
         </Button>
       </ButtonLayout>
     </MainLayout>,
-    document.getElementById("clickModal") as HTMLElement
+    document.getElementById('clickModal') as HTMLElement
   );
 }
 
@@ -709,12 +645,14 @@ const TogleDiv = styled.div`
   align-items: center;
   height: 20px;
   text-align: left;
+  margin-left: 0.5rem;
 `;
 const ColorDiv = styled.div`
   display: grid;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   text-align: left;
+  margin-left: 0.5rem;
 `;
 const ColorCircle = styled.div<{ color: colorT; selectedColor: colorT }>`
   margin-right: 5px;
@@ -733,11 +671,17 @@ const CheckDiv = styled.div`
   bottom: 1px;
 `;
 const DescriptionText = styled.div`
-  color: ${Color("black100")};
+  color: ${Color('black100')};
+  margin-left: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in;
+  &:hover {
+    color: ${Color('black300')};
+  }
 `;
 const DescriptionLayout = styled.div`
   margin-top: 5px;
-  border-top: 1px solid ${Color("black100")};
+  border-top: 1px solid ${Color('black100')};
   padding: 5px 0;
   width: 100%;
   height: 50px;
@@ -817,11 +761,13 @@ const RadioDiv = styled.div`
 
 const DayDiv = styled.div<{ color: string }>`
   background-color: ${(props) => props.color};
-  border: 1px solid ${Color("black100")};
-  padding: 2px;
+  border: 1px solid ${Color('black100')};
+  padding: 4px;
   width: 27px;
   text-align: center;
   cursor: pointer;
+  border-radius: 5px;
+  font-size: 11px;
 `;
 const RecurrenceText = styled.div`
   display: grid;
@@ -840,6 +786,7 @@ const PlusMinusLayout = styled.div`
 
 const PlusMinusDiv = styled.div`
   height: 10px;
+  cursor: pointer;
 `;
 
 const FreqLayout = styled.div`
@@ -849,13 +796,20 @@ const FreqLayout = styled.div`
   border: 1px solid lightgray;
   padding: 1px 5px;
   z-index: 100;
+  border-radius: 5px;
+  align-items: center;
+  font-size: 12px;
+  cursor: pointer;
 `;
 const FreqDiv = styled.div`
   width: 50px;
+  text-align: center;
 `;
 const ArrowDiv = styled.div`
   height: 25px;
   margin: 0 auto;
+  align-items: center;
+  display: grid;
 `;
 const DropdownLayout = styled.div`
   display: grid;
@@ -863,22 +817,30 @@ const DropdownLayout = styled.div`
   grid-template-rows: 1fr 1fr 1fr;
   background-color: white;
   top: 25px;
-  padding: 10px 20px 10px 10px;
+  width: 77px;
+  padding: 10px 5px 10px 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
 `;
 const DropdownDiv = styled.div`
   cursor: pointer;
+  border-radius: 5px;
+  padding: 5px;
+  &:hover {
+    background-color: ${Color('black50')};
+  }
 `;
 const PeriodDiv = styled.div`
-  width: 80%;
+  width: 90%;
   display: flex;
-  justify-content: start;
+  justify-content: space-evenly;
 `;
+
 const DateButton = styled.div`
   width: 4%.5rem;
   height: 2rem;
   background: none;
-  border: 1px solid ${Color("black200")};
+  border: 1px solid ${Color('black200')};
   border-radius: 3px;
   cursor: pointer;
   margin-right: 0.5rem;
@@ -904,13 +866,13 @@ const LineDiv = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${Color("black")};
+  color: ${Color('black')};
 `;
 
 const DisableDiv = styled.div`
   width: 7rem;
   padding: 0.1rem 0.7rem;
-  border: solid 1px ${Color("black200")};
+  border: solid 1px ${Color('black200')};
   border-radius: 3px;
   box-sizing: border-box;
   font-size: 14px;

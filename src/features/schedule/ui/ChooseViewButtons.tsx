@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { FaAngleDown } from "react-icons/fa6";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { FaAngleDown } from 'react-icons/fa6';
+import { Color } from '@/shared/lib/styles/color';
 
 interface IChooseViewButtonsProps {
   view: string; // 현재 view
@@ -25,9 +26,9 @@ export function ChooseViewButtons({ view, changeView }: IChooseViewButtonsProps)
       {/* 확장 시 view 선택 버튼 렌더링 */}
       {expanded && (
         <ToggleLayout>
-          <div onClick={() => handleButtonClick("month")}>month</div>
-          <div onClick={() => handleButtonClick("week")}>week</div>
-          <div onClick={() => handleButtonClick("day")}>day</div>
+          <div onClick={() => handleButtonClick('month')}>month</div>
+          <div onClick={() => handleButtonClick('week')}>week</div>
+          <div onClick={() => handleButtonClick('day')}>day</div>
         </ToggleLayout>
       )}
     </ButtonsLayout>
@@ -39,11 +40,12 @@ const ButtonsLayout = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   border: 1px solid lightgray;
-  border-radius: 5px;
-  padding-left: 5px;
+  border-radius: 3px;
+  padding: 0.2rem 0.5rem;
   z-index: 100;
   align-items: center;
-  height: 2.5rem;
+  height: 2rem;
+  font-size: 13px;
 `;
 const ToggleLayout = styled.div`
   display: grid;
@@ -51,13 +53,18 @@ const ToggleLayout = styled.div`
   grid-template-rows: 1fr 1fr 1fr;
   background-color: white;
   top: 40px;
-  padding: 10px 20px 10px 10px;
+  padding: 0.2rem 0.5rem;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 87%;
+  border-radius: 3px;
 `;
 const ViewDiv = styled.div`
   width: 50px;
+  cursor: pointer;
 `;
 const ArrowDiv = styled.div`
   height: 25px;
   margin: 0 auto;
+  display: flex;
+  align-items: center;
 `;

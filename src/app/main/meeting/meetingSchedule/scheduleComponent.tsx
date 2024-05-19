@@ -1,39 +1,27 @@
-"use client";
-import { styled } from "styled-components";
-import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
-import { Color } from "@/shared/lib/styles/color";
-import {
-  ScheduleComponentProps,
-  userList,
-  isRequiredDiv,
-  SchedulesAndAvailabilitiesProps,
-} from "@/shared/lib/type";
-import TimeDiv from "@/features/meetingSchedule/ui/TimeDiv";
-import TimeStampDiv from "@/features/meetingSchedule/ui/TimeStampDiv";
-import RecommendTimeDiv from "@/features/meetingSchedule/ui/RecommendTimeDiv";
-import useMeetStore, { MeetState } from "@/store/meetStore";
+'use client';
+import { styled } from 'styled-components';
+import Image from 'next/image';
+import React, { useEffect, useRef, useState } from 'react';
+import { Color } from '@/shared/lib/styles/color';
+import { ScheduleComponentProps, userList, isRequiredDiv, SchedulesAndAvailabilitiesProps } from '@/shared/lib/type';
+import TimeDiv from '@/features/meetingSchedule/ui/TimeDiv';
+import TimeStampDiv from '@/features/meetingSchedule/ui/TimeStampDiv';
+import RecommendTimeDiv from '@/features/meetingSchedule/ui/RecommendTimeDiv';
+import useMeetStore, { MeetState } from '@/store/meetStore';
 
 const startTime: number[] = [0];
 
-export default function ScheduleComponent({
-  recommendedTimes,
-  schedulesAndAvailabilities,
-}: ScheduleComponentProps) {
-  schedulesAndAvailabilities.forEach(
-    (schedulesAndAvailability, index: number) => {
-      if (index === 0) {
-        return;
-      }
-      const standardTimeArr = schedulesAndAvailabilities[0].tzOffset.split(":");
-      const timeArr = schedulesAndAvailability.tzOffset.split(":");
-      const timeDiff =
-        Number(standardTimeArr[0]) -
-        Number(timeArr[0]) +
-        (Number(standardTimeArr[1]) - Number(timeArr[1])) / 60;
-      startTime.push(timeDiff);
+export default function ScheduleComponent({ recommendedTimes, schedulesAndAvailabilities }: ScheduleComponentProps) {
+  schedulesAndAvailabilities.forEach((schedulesAndAvailability, index: number) => {
+    if (index === 0) {
+      return;
     }
-  );
+    const standardTimeArr = schedulesAndAvailabilities[0].tzOffset.split(':');
+    const timeArr = schedulesAndAvailability.tzOffset.split(':');
+    const timeDiff =
+      Number(standardTimeArr[0]) - Number(timeArr[0]) + (Number(standardTimeArr[1]) - Number(timeArr[1])) / 60;
+    startTime.push(timeDiff);
+  });
 
   let fixedIndex = -1;
 
@@ -60,16 +48,11 @@ export default function ScheduleComponent({
 
   // 첫지점과 끝지점을 통해 scope 설정에 이용할 예정
 
-  const [timeDivGroupRef, timeDivGroupleftX] = [
-    useRef<HTMLDivElement | null>(null),
-    useRef(0),
-  ];
+  const [timeDivGroupRef, timeDivGroupleftX] = [useRef<HTMLDivElement | null>(null), useRef(0)];
 
   const handleMouseMove = (event: MouseEvent) => {
     const nowPosition = event.clientX + timeDivGroupRef.current!.scrollLeft;
-    let tmpIndex: number = Math.floor(
-      (nowPosition - timeDivGroupleftX.current) / 16
-    );
+    let tmpIndex: number = Math.floor((nowPosition - timeDivGroupleftX.current) / 16);
     let timeIndex: number;
     if (tmpIndex < 0) {
       timeIndex = 0;
@@ -87,25 +70,22 @@ export default function ScheduleComponent({
     } // 초기위치보다 왼쪽이면 startIndex변경
   }; // 마우스 무브 이벤트 추가 테스트용
   const handleMouseUp = (evnet: MouseEvent) => {
-    window.removeEventListener("mousemove", handleMouseMove);
+    window.removeEventListener('mousemove', handleMouseMove);
   }; // 마우스 업 이벤트(클릭 뗄시 발생) mousemove이벤트 삭제용
-  const handleMouseDown = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const nowPositionX = event.clientX + timeDivGroupRef.current!.scrollLeft;
     fixedIndex = Math.floor((nowPositionX - timeDivGroupleftX.current) / 16);
     updateStartIndex(fixedIndex);
     updateEndIndex(fixedIndex);
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp, { once: true });
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp, { once: true });
 
     // mouseUp은 cleanup 함수 성질이기에 한번만 실행하면 효력을 다하므로 once : true 추가
   }; // 마우스 클릭 중 시 발생
 
   useEffect(() => {
     if (timeDivGroupRef.current) {
-      timeDivGroupleftX.current =
-        timeDivGroupRef.current.getBoundingClientRect().left;
+      timeDivGroupleftX.current = timeDivGroupRef.current.getBoundingClientRect().left;
     }
   }, [timeDivGroupRef, timeDivGroupleftX]);
 
@@ -120,46 +100,23 @@ export default function ScheduleComponent({
     if (Number.isInteger(startTime[personindex])) {
       if (timeIndex % 4 === 0) {
         return (
-          <TimeStampDiv
-            key={timeIndex}
-            personindex={personindex}
-            timeindex={timeIndex}
-          >
+          <TimeStampDiv key={timeIndex} personindex={personindex} timeindex={timeIndex}>
             {(startTime[personindex] + Math.floor(timeIndex / 4) + 24) % 24}
           </TimeStampDiv>
         );
       } else {
-        return (
-          <TimeStampDiv
-            key={timeIndex}
-            personindex={personindex}
-            timeindex={timeIndex}
-          ></TimeStampDiv>
-        );
+        return <TimeStampDiv key={timeIndex} personindex={personindex} timeindex={timeIndex}></TimeStampDiv>;
       }
     } // startTime 이 정수일때
     else {
       if (timeIndex % 4 === 2) {
         return (
-          <TimeStampDiv
-            key={timeIndex}
-            personindex={personindex}
-            timeindex={timeIndex}
-          >
-            {(Math.floor(startTime[personindex]) +
-              Math.ceil(timeIndex / 4) +
-              24) %
-              24}
+          <TimeStampDiv key={timeIndex} personindex={personindex} timeindex={timeIndex}>
+            {(Math.floor(startTime[personindex]) + Math.ceil(timeIndex / 4) + 24) % 24}
           </TimeStampDiv>
         );
       } else {
-        return (
-          <TimeStampDiv
-            key={timeIndex}
-            personindex={personindex}
-            timeindex={timeIndex}
-          ></TimeStampDiv>
-        );
+        return <TimeStampDiv key={timeIndex} personindex={personindex} timeindex={timeIndex}></TimeStampDiv>;
       }
     }
   };
@@ -180,33 +137,22 @@ export default function ScheduleComponent({
             </NecDiv>
           </PersonInfo>
         </PersonTitleLayout>
-        {memberList.map(
-          (member: { user: userList; isRequired: boolean }, index: number) => {
-            return (
-              <PersonLayout key={index} $isRequired={member.isRequired}>
-                <PersonImagePart>
-                  <Image
-                    src="/images/profile.webp"
-                    width="30"
-                    height="30"
-                    alt="image"
-                    style={{ borderRadius: "50%" }}
-                  />
-                </PersonImagePart>
-                <PersonNamePart>
-                  <div> {member.user.name}</div>
-                  <PersonRelateTeamDiv>
-                    {" "}
-                    {member.user.department}
-                  </PersonRelateTeamDiv>
-                </PersonNamePart>
-                <PersonTimePart>
-                  <div>{member.user.zoneId}</div>
-                </PersonTimePart>
-              </PersonLayout>
-            );
-          }
-        )}
+        {memberList.map((member: { user: userList; isRequired: boolean }, index: number) => {
+          return (
+            <PersonLayout key={index} $isRequired={member.isRequired}>
+              <PersonImagePart>
+                <Image src="/images/profile.webp" width="30" height="30" alt="image" style={{ borderRadius: '50%' }} />
+              </PersonImagePart>
+              <PersonNamePart>
+                <div> {member.user.name}</div>
+                <PersonRelateTeamDiv>{member.user.department}</PersonRelateTeamDiv>
+              </PersonNamePart>
+              <PersonTimePart>
+                <div>{member.user.zoneId}</div>
+              </PersonTimePart>
+            </PersonLayout>
+          );
+        })}
       </PeopleLayout>
       <TimeTableLayout
         data-testid="timeTableLayout"
@@ -226,10 +172,7 @@ export default function ScheduleComponent({
           })}
         </RecommendTimeScheduleLayout>
         {schedulesAndAvailabilities.map(
-          (
-            personalScheduleInformation: SchedulesAndAvailabilitiesProps,
-            personindex: number
-          ) => {
+          (personalScheduleInformation: SchedulesAndAvailabilitiesProps, personindex: number) => {
             return (
               <PersonTime key={personindex}>
                 <TimeDivGroup>
@@ -237,11 +180,10 @@ export default function ScheduleComponent({
                     .slice(dayCount * 96, dayCount * 96 + 112)
                     .map((type: string, timeindex: number) => {
                       let isScheduled = false;
-                      let scheduleName = "";
+                      let scheduleName = '';
                       personalScheduleInformation.schedules.some((schedule) => {
                         if (
-                          schedule.startIndexInclusive <=
-                            timeindex + dayCount * 96 &&
+                          schedule.startIndexInclusive <= timeindex + dayCount * 96 &&
                           schedule.endIndexExclusive > timeindex + dayCount * 96
                         ) {
                           isScheduled = true;
@@ -329,8 +271,7 @@ const PersonLayout = styled.div<isRequiredDiv>`
   height: 3rem;
   padding: 0 0.5rem;
   margin-bottom: 10px;
-  background-color: ${({ $isRequired }) =>
-    $isRequired ? Color("yellow100") : Color("blue50")};
+  background-color: ${({ $isRequired }) => ($isRequired ? Color('yellow100') : Color('blue50'))};
 `;
 
 const RecommendTimeScheduleLayout = styled.div`
@@ -338,13 +279,13 @@ const RecommendTimeScheduleLayout = styled.div`
   padding-left: 3px;
   height: 3rem;
   width: 112rem;
-  background-color: ${Color("black50")};
+  background-color: ${Color('black50')};
 `;
 
 const TimeDivGroup = styled.div`
   display: flex;
   box-sizing: border-box;
-  border-right: 2px solid ${Color("black200")};
+  border-right: 2px solid ${Color('black200')};
   margin-left: 3px;
 `;
 
@@ -366,14 +307,14 @@ const PersonInfo = styled.div`
 const NecessaryDiv = styled.div`
   width: 10px;
   height: 10px;
-  background-color: ${Color("yellow100")};
+  background-color: ${Color('yellow100')};
   margin-right: 3px;
 `;
 
 const NotNecDiv = styled.div`
   width: 10px;
   height: 10px;
-  background-color: ${Color("blue100")};
+  background-color: ${Color('blue100')};
   margin-right: 3px;
 `;
 
@@ -403,5 +344,5 @@ const PersonTimePart = styled(PersonNamePart)`
 `;
 
 const PersonRelateTeamDiv = styled.div`
-  font-size: small;
+  font-size: 10px;
 `;
