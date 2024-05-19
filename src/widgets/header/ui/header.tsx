@@ -95,7 +95,7 @@ export function Header() {
           {showInfoDropDown ? <RiArrowDropUpLine size={25} /> : <RiArrowDropDownLine size={25} />}
         </ProfileDiv>
         {showInfoDropDown && (
-          <InfoDropDown>
+          <InfoDropDown ref={ref}>
             <InfoDiv>
               <RiAccountCircleLine size={18} />
               <MyInfoLink href="/main/myPage/notificationBox">UserInfo</MyInfoLink>
