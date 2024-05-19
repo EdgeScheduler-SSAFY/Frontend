@@ -63,12 +63,15 @@ export function Header() {
       }
     };
 
-    if (showNoticeList) document.addEventListener('mousedown', handleClickOutside);
+    if (showNoticeList || showInfoDropDown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showNoticeList]);
+  }, [showNoticeList, showInfoDropDown]);
+
   return (
     <HeaderNav>
       <NewNotice />
