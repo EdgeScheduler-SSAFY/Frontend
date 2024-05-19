@@ -93,13 +93,13 @@ export function Header() {
         </StyledLink>
       </LinkDiv>
       <ProfileInfoDiv>
-        <ProfileDiv ref={ref} onClick={() => setShowInfoDropDown((prev) => !prev)}>
+        <ProfileDiv onClick={() => setShowInfoDropDown((prev) => !prev)}>
           <ProfileImage src="/images/profile.webp" alt="프로필사진" width={25} height={25} />
           {sessoionUserName}
           {showInfoDropDown ? <RiArrowDropUpLine size={25} /> : <RiArrowDropDownLine size={25} />}
         </ProfileDiv>
         {showInfoDropDown && (
-          <InfoDropDown>
+          <InfoDropDown ref={ref}>
             <InfoDiv>
               <RiAccountCircleLine size={18} />
               <MyInfoLink href="/main/myPage/notificationBox">UserInfo</MyInfoLink>
