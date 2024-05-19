@@ -74,8 +74,7 @@ export function WeekViewCalendar({
     if (start !== end) {
       // 첫날이 partial event인지 확인
       const firstDayPartial =
-        (schedule.startDatetime.getHours() !== 0 || schedule.startDatetime.getMinutes() !== 0) &&
-        format(schedule.startDatetime, "yyyy-MM-dd") === format(startDate, "yyyy-MM-dd");
+        schedule.startDatetime.getHours() !== 0 || schedule.startDatetime.getMinutes() !== 0;
       if (firstDayPartial) {
         // 첫날의 partial 스케줄 추가
         partialSchedules[differenceInCalendarDays(currentDate, startDate)].push({
