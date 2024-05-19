@@ -59,6 +59,7 @@ export function Header() {
         !document.getElementById('detailProposal')?.contains(e.target as Node)
       ) {
         setShowNoticeList(false);
+        setShowInfoDropDown(false);
       }
     };
 
@@ -89,13 +90,13 @@ export function Header() {
         </StyledLink>
       </LinkDiv>
       <ProfileInfoDiv>
-        <ProfileDiv onClick={() => setShowInfoDropDown((prev) => !prev)}>
+        <ProfileDiv ref={ref} onClick={() => setShowInfoDropDown((prev) => !prev)}>
           <ProfileImage src="/images/profile.webp" alt="프로필사진" width={25} height={25} />
           {sessoionUserName}
           {showInfoDropDown ? <RiArrowDropUpLine size={25} /> : <RiArrowDropDownLine size={25} />}
         </ProfileDiv>
         {showInfoDropDown && (
-          <InfoDropDown ref={ref}>
+          <InfoDropDown>
             <InfoDiv>
               <RiAccountCircleLine size={18} />
               <MyInfoLink href="/main/myPage/notificationBox">UserInfo</MyInfoLink>
