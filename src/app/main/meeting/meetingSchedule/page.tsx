@@ -47,6 +47,7 @@ export default function MeetingSchedule() {
     isUpdate,
     scheduleId,
   } = useMeetStore((state: MeetState) => state);
+
   const todayDate = new Date(startDatetime); // 회의 추천받는 시작 날짜
   const finalDate = new Date(endDatetime); // 회의 추천받는 시작 날짜
   const [date, setDate] = useState<Date>(todayDate); // 현재 날짜
@@ -65,7 +66,7 @@ export default function MeetingSchedule() {
   const router = useRouter();
   const [schedulesAndAvailabilities, setSchedulesAndAvailabilities] = useState<SchedulesAndAvailabilitiesProps[]>([]);
   const [showStartMiniCalendar, setShowStartMiniCalendar] = useState<boolean>(false);
-  const [endDate, setEndDate] = useState<string>(startDate);
+  const [endDate, setEndDate] = useState<string>(startDate); // 끝날짜
   const [selectedOption, setSelectedOption] = useState(0);
   const [startTime, setStartTime] = useState<string>('AM 00:00');
   const [endTime, setEndTime] = useState<string>('AM 01:00');
@@ -227,10 +228,6 @@ export default function MeetingSchedule() {
   }, [zuEndIndex, selectedDate]);
 
   useEffect(() => {
-    console.log('dayCount', dayCount);
-  }, [dayCount]);
-
-  useEffect(() => {
     setDayCount(0);
   }, [setDayCount]);
 
@@ -369,6 +366,17 @@ export default function MeetingSchedule() {
   // }, [startIndex, endIndex]);
 
   useEffect(() => {
+    if (selectedRecommend.length > 0) {
+      let start = new Date(startDatetime.split('T')[0] + 'T00:00:00');
+      start = new Date(start.getTime() + Math.floor(selectedRecommend[0].startIndex / 96) * 24 * 60 * 60 * 1000);
+      console.log(start);
+      setDayCount(Math.floor(selectedRecommend[0].startIndex / 96));
+      const dateWithNoTime = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      setSelectedDate(dateWithNoTime);
+    }
+  }, [selectedRecommend]);
+
+  useEffect(() => {
     console.log(new Date(endDatetime));
   }, [endDatetime]);
   return (
@@ -465,15 +473,13 @@ export default function MeetingSchedule() {
       <ButtonAndRecommendLayout>
         <RecommendLayout>
           {selectedRecommend.map((indexes: { startIndex: number; endIndex: number }, i: number) => {
-            let startDate = new Date(startDatetime);
-            let endDate = new Date(startDatetime);
-            startDate.setMinutes(date.getMinutes() + indexes.startIndex * 15);
-            endDate.setMinutes(date.getMinutes() + indexes.endIndex * 15);
-            return (
-              <RecTimeLayout key={i}>
-                {`추천시간 ${i + 1}. ${startDate.toISOString().slice(0, 19)} ~ ${endDate.toISOString().slice(0, 19)}`}
-              </RecTimeLayout>
-            );
+            let recStartDate = new Date(startDatetime.split('T')[0] + 'T00:00:00');
+            let recEndDate = new Date(startDatetime.split('T')[0] + 'T00:00:00');
+            recStartDate.setMinutes(recStartDate.getMinutes() + indexes.startIndex * 15);
+            recEndDate.setMinutes(recEndDate.getMinutes() + indexes.endIndex * 15);
+            const startDate = format(recStartDate, 'yyyy.MM.dd HH:mm');
+            const endDate = format(recEndDate, 'yyyy.MM.dd HH:mm');
+            return <RecTimeLayout key={i}>{`추천시간 ${i + 1}. ${startDate} ~ ${endDate} `}</RecTimeLayout>;
           })}
         </RecommendLayout>
         <ButtonLayout>
@@ -621,7 +627,6 @@ const ButtonLayout = styled.div`
   justify-content: right;
   margin-top: 1rem;
   gap: 2rem;
-  height: 3rem;
 `;
 
 const RecommendLayout = styled.div`
