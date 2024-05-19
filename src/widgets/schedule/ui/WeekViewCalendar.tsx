@@ -72,10 +72,10 @@ export function WeekViewCalendar({
     }
     // 시작일과 종료일이 다른 경우
     if (start !== end) {
-      console.log(differenceInCalendarDays(schedule.startDatetime, schedule.endDatetime));
       // 첫날이 partial event인지 확인
       const firstDayPartial =
-        schedule.startDatetime.getHours() !== 0 || schedule.startDatetime.getMinutes() !== 0;
+        (schedule.startDatetime.getHours() !== 0 || schedule.startDatetime.getMinutes() !== 0) &&
+        format(schedule.startDatetime, "yyyy-MM-dd") === format(startDate, "yyyy-MM-dd");
       if (firstDayPartial) {
         // 첫날의 partial 스케줄 추가
         partialSchedules[differenceInCalendarDays(currentDate, startDate)].push({
@@ -87,7 +87,7 @@ export function WeekViewCalendar({
       // 마지막날이 partial event인지 확인
       const lastDayPartial =
         schedule.endDatetime.getHours() !== 23 || schedule.endDatetime.getMinutes() > 45;
-      if (lastDayPartial) {
+      if (lastDayPartial && differenceInCalendarDays(endDate, startDate) < 7) {
         partialSchedules[differenceInCalendarDays(endDate, startDate)].push({
           ...schedule,
           startDatetime: setHours(setMinutes(setSeconds(schedule.startDatetime, 0), 0), 0),

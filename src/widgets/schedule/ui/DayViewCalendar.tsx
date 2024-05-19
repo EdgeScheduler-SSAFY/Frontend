@@ -34,7 +34,7 @@ export function DayViewCalendar({
     if (start !== end) {
       const firstDayPartial =
         schedule.startDatetime.getHours() !== 0 || schedule.startDatetime.getMinutes() !== 0;
-      if (firstDayPartial) {
+      if (firstDayPartial && start === format(selectedDate, "yyyy-MM-dd")) {
         // 첫날의 partial 스케줄 추가
         partialSchedules.push({
           ...schedule,
@@ -42,7 +42,6 @@ export function DayViewCalendar({
         });
         return;
       }
-      // 시작일부터 종료일까지 반복
       allDaySchedules.push(
         <AllDaySchedule
           triggerReload={triggerReload}
