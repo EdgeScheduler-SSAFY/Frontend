@@ -63,7 +63,7 @@ export function DetailProposal({
 
   return ReactDOM.createPortal(
     <BackLayout id="detailProposal" onClick={close}>
-      <MainLayout>
+      <MainLayout onClick={(e) => e.stopPropagation()}>
         <NameLayout>
           <div>suggested time</div>
         </NameLayout>
