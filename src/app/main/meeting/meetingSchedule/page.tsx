@@ -471,7 +471,7 @@ export default function MeetingSchedule() {
         schedulesAndAvailabilities={schedulesAndAvailabilities}
       />
       <ButtonAndRecommendLayout>
-        <RecommendLayout>
+        {/* <RecommendLayout>
           {selectedRecommend.map((indexes: { startIndex: number; endIndex: number }, i: number) => {
             let recStartDate = new Date(startDatetime.split('T')[0] + 'T00:00:00');
             let recEndDate = new Date(startDatetime.split('T')[0] + 'T00:00:00');
@@ -481,7 +481,7 @@ export default function MeetingSchedule() {
             const endDate = format(recEndDate, 'yyyy.MM.dd HH:mm');
             return <RecTimeLayout key={i}>{`추천시간 ${i + 1}. ${startDate} ~ ${endDate} `}</RecTimeLayout>;
           })}
-        </RecommendLayout>
+        </RecommendLayout> */}
         <ButtonLayout>
           <CancelButton onClick={() => router.push('/')}>Cancel</CancelButton>
           <SubmitButton onClick={() => submitHandler()}>Submit</SubmitButton>
@@ -627,6 +627,7 @@ const ButtonLayout = styled.div`
   justify-content: right;
   margin-top: 1rem;
   gap: 2rem;
+  width: 100%;
 `;
 
 const RecommendLayout = styled.div`
