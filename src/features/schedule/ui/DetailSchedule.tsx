@@ -43,7 +43,7 @@ export function DetailSchedule({
   const [data, setData] = useState<getScheduleDetailsResponse | null>(null); //data api 가져온다.
   const [trigger, setTrigger] = useState(false); //
   const [buttonClicked, setButtonClicked] = useState<string>('');
-  const colorList = ['blue', 'green', 'orange', 'yellow', 'black50'];
+  const colorList: ColorName[] = ['blue', 'green', 'orange', 'yellow', 'black50'];
 
   //api 호출
   useEffect(() => {
@@ -195,7 +195,7 @@ export function DetailSchedule({
         <NameLayout>
           <TextDiv>
             {/* 일정 이름 */}
-            <ColorDiv $bgColor={colorList[data.color]}></ColorDiv>
+            <ColorDiv $bgColor={colorList[data.color] || 'blue'}></ColorDiv>
             <div>{data.name}</div>
           </TextDiv>
           <div></div>
