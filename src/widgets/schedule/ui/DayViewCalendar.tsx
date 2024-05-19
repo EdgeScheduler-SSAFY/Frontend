@@ -1,6 +1,6 @@
 import React, { useState, ReactNode } from "react";
 import styled from "styled-components";
-import { format, differenceInCalendarDays } from "date-fns";
+import { format, differenceInCalendarDays, setSeconds, setMinutes, setHours } from "date-fns";
 import { DayForWeek, AllDaySchedule, CreateSchedule } from "@/features/schedule/index";
 import { schedule } from "@/widgets/schedule/model/type";
 
@@ -32,7 +32,16 @@ export function DayViewCalendar({
     const end = format(schedule.endDatetime, "yyyy-MM-dd"); // 종료일
     // 시작일과 종료일이 다른 경우
     if (start !== end) {
-      // 시작일부터 종료일까지 반복
+      const firstDayPartial =
+        schedule.startDatetime.getHours() !== 0 || schedule.startDatetime.getMinutes() !== 0;
+      if (firstDayPartial && start === format(selectedDate, "yyyy-MM-dd")) {
+        // 첫날의 partial 스케줄 추가
+        partialSchedules.push({
+          ...schedule,
+          endDatetime: new Date(schedule.endDatetime.setHours(23, 59, 59, 999)),
+        });
+        return;
+      }
       allDaySchedules.push(
         <AllDaySchedule
           triggerReload={triggerReload}

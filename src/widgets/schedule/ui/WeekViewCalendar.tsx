@@ -1,6 +1,15 @@
 import React, { useState, ReactNode } from "react";
 import styled from "styled-components";
-import { startOfWeek, endOfWeek, format, addDays, differenceInCalendarDays, set } from "date-fns";
+import {
+  startOfWeek,
+  endOfWeek,
+  format,
+  addDays,
+  differenceInCalendarDays,
+  setSeconds,
+  setHours,
+  setMinutes,
+} from "date-fns";
 import { DayForWeek, WeekAllday } from "@/features/schedule/index";
 import { AllDaySchedule } from "@/features/schedule/index";
 import { SeparateSchedule, CreateSchedule } from "@/features/schedule/index";
@@ -63,41 +72,43 @@ export function WeekViewCalendar({
     }
     // 시작일과 종료일이 다른 경우
     if (start !== end) {
-      // 시작일부터 종료일까지 반복
-      while (currentDate <= endDate && currentDate <= endOfWeek(selectedDate)) {
-        // 시작일의 포맷
-        const startFormat = format(currentDate, "yyyy-MM-dd");
-        // 차이
-        const dayDiff = differenceInCalendarDays(endDate, currentDate);
-        // 차이만큼 길이를 계산해서 추가
-        allDaySchedules[differenceInCalendarDays(currentDate, startDate)].push(
-          <AllDaySchedule
-            triggerReload={triggerReload}
-            color={
-              schedule.color === 0
-                ? "blue"
-                : schedule.color === 1
-                ? "green"
-                : schedule.color === 2
-                ? "orange"
-                : schedule.color === 3
-                ? "yellow"
-                : "black50" || "blue"
-            }
-            endDatetime={format(schedule.endDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
-            startDatetime={format(schedule.startDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
-            scheduleId={schedule.scheduleId}
-            width={100 * dayDiff + 90}
-            key={`${schedule.scheduleId}-${startFormat}`}
-            title={schedule.name}
-          />
-        );
-        //하루 증가
+      // 첫날이 partial event인지 확인
+      const firstDayPartial =
+        schedule.startDatetime.getHours() !== 0 || schedule.startDatetime.getMinutes() !== 0;
+      if (firstDayPartial) {
+        // 첫날의 partial 스케줄 추가
+        partialSchedules[differenceInCalendarDays(currentDate, startDate)].push({
+          ...schedule,
+          endDatetime: setSeconds(setMinutes(setHours(schedule.startDatetime, 23), 59), 59),
+        });
         currentDate = addDays(currentDate, 1);
-        // 첫날이후로 빈공간을 체우기 위한 SeparateSchedule 추가
-        while (currentDate <= endDate && currentDate < endOfWeek(selectedDate)) {
+      }
+      // 마지막날이 partial event인지 확인
+      const lastDayPartial =
+        schedule.endDatetime.getHours() !== 23 || schedule.endDatetime.getMinutes() > 45;
+      if (lastDayPartial && differenceInCalendarDays(endDate, startDate) < 7) {
+        partialSchedules[differenceInCalendarDays(endDate, startDate)].push({
+          ...schedule,
+          startDatetime: setHours(setMinutes(setSeconds(schedule.startDatetime, 0), 0), 0),
+        });
+      }
+      if (
+        !(
+          firstDayPartial &&
+          lastDayPartial &&
+          differenceInCalendarDays(schedule.endDatetime, schedule.startDatetime) === 1
+        )
+      ) {
+        // 시작일부터 종료일까지 반복
+        while (currentDate <= endDate && currentDate <= endOfWeek(selectedDate)) {
+          // 시작일의 포맷
+          const startFormat = format(currentDate, "yyyy-MM-dd");
+          // 차이
+          const dayDiff = differenceInCalendarDays(endDate, currentDate);
+          const width = lastDayPartial ? 100 * (dayDiff - 1) + 90 : 100 * dayDiff + 90;
+          // 차이만큼 길이를 계산해서 추가
           allDaySchedules[differenceInCalendarDays(currentDate, startDate)].push(
-            <SeparateSchedule
+            <AllDaySchedule
               triggerReload={triggerReload}
               color={
                 schedule.color === 0
@@ -113,14 +124,44 @@ export function WeekViewCalendar({
               endDatetime={format(schedule.endDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
               startDatetime={format(schedule.startDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
               scheduleId={schedule.scheduleId}
-              view="hide"
+              width={width}
+              key={`${schedule.scheduleId}-${startFormat}`}
               title={schedule.name}
-              width={100}
-            ></SeparateSchedule>
+            />
           );
+          //하루 증가
           currentDate = addDays(currentDate, 1);
+          // 첫날이후로 빈공간을 체우기 위한 SeparateSchedule 추가
+          while (currentDate <= endDate && currentDate < endOfWeek(selectedDate)) {
+            if (lastDayPartial && differenceInCalendarDays(currentDate, endDate) === 0) {
+              break;
+            }
+            allDaySchedules[differenceInCalendarDays(currentDate, startDate)].push(
+              <SeparateSchedule
+                triggerReload={triggerReload}
+                color={
+                  schedule.color === 0
+                    ? "blue"
+                    : schedule.color === 1
+                    ? "green"
+                    : schedule.color === 2
+                    ? "orange"
+                    : schedule.color === 3
+                    ? "yellow"
+                    : "black50" || "blue"
+                }
+                endDatetime={format(schedule.endDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
+                startDatetime={format(schedule.startDatetime, "yyyy-MM-dd'T'HH:mm:ss")}
+                scheduleId={schedule.scheduleId}
+                view="hide"
+                title={schedule.name}
+                width={100}
+              ></SeparateSchedule>
+            );
+            currentDate = addDays(currentDate, 1);
+          }
+          return null;
         }
-        return null;
       }
     } else {
       // 시작일과 종료일이 같은 경우
@@ -156,7 +197,6 @@ export function WeekViewCalendar({
     }
     return null;
   });
-
   const [more, setMore] = useState<boolean>(false);
   const getTimeFromPosition = (y: number, height: number) => {
     const totalMinutes = (y / height) * 1440; // 1440은 하루의 총 분 수
