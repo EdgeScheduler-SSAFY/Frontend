@@ -16,7 +16,14 @@ export function MoreSchedule({ schdules, count, date }: IMoreScheduleProps) {
   // 외부영역 클릭시 더보기 일정 닫기
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
+      if (
+        ref.current &&
+        !ref.current.contains(event.target as Node) &&
+        !document.getElementById("createScheduleModal")?.contains(event.target as Node) &&
+        !document.getElementById("detailProposal")?.contains(event.target as Node) &&
+        !document.getElementById("detailSchedule")?.contains(event.target as Node) &&
+        !document.getElementById("proposalModal")?.contains(event.target as Node)
+      ) {
         setShowMore(false);
       }
     };
@@ -60,6 +67,7 @@ const MainLayout = styled.div`
   font-size: small;
   text-align: left;
   position: relative;
+  cursor: pointer;
 `;
 
 const MoreDiv = styled.div`
@@ -67,7 +75,7 @@ const MoreDiv = styled.div`
   padding: 15px;
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 0;
   transform: translate(-50%, -50%);
   width: 150%;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);

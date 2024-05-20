@@ -1,29 +1,35 @@
 import { Color } from "@/shared/lib/styles/color";
-import { RecommendTimeDivProps } from "@/shared/lib/type";
+import { RecommendTimeDivProps, RecommendeTime } from "@/shared/lib/type";
 import React from "react";
 import styled from "styled-components";
 
 const StyledDiv = styled.div<RecommendTimeDivProps>`
   box-sizing: border-box;
   width: 1rem;
-  height: 2rem;
-  background-color: ${({ timeindex, startindex, endindex }) => {
-    if (timeindex <= endindex && timeindex >= startindex) {
-      return Color("green300");
-    }
+  height: 3rem;
+  background-color: ${({ $dayCount, $timeindex, $recommendedTimes }) => {
+    const isRecommended = $recommendedTimes.some(
+      (recommendTime: RecommendeTime) => {
+        return (
+          $timeindex + $dayCount * 96 < recommendTime.endIndex &&
+          $timeindex + $dayCount * 96 >= recommendTime.startIndex
+        );
+      }
+    );
+    return isRecommended ? Color("green300") : "black100";
   }};
 `;
 
 const RecommendTimeDiv: React.FC<RecommendTimeDivProps> = ({
-  timeindex,
-  startindex,
-  endindex,
+  $dayCount,
+  $timeindex,
+  $recommendedTimes,
 }) => {
   return (
     <StyledDiv
-      timeindex={timeindex}
-      startindex={startindex}
-      endindex={endindex}
+      $dayCount={$dayCount}
+      $timeindex={$timeindex}
+      $recommendedTimes={$recommendedTimes}
     ></StyledDiv>
   );
 };

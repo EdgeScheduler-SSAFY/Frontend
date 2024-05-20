@@ -1,4 +1,7 @@
 "use client";
+import React, { useEffect } from "react";
+import { fetchWithInterceptor } from "@/shared/index";
+import { useRouter } from "next/navigation";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import { Noto_Sans_KR } from "next/font/google";
@@ -25,16 +28,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en' className={noto.className}>
+    <html lang="en" className={noto.className}>
       <body>
         <ThemeProvider theme={theme}>
           <GlobalStyle theme={theme} />
           <StyledComponentsRegistry>
-            <Header />
-            <Main>
-              {children}
-              <Footer />
-            </Main>
+            <Main>{children}</Main>
+            <div id="globalModal"></div>
+            <div id="clickModal"></div>
           </StyledComponentsRegistry>
         </ThemeProvider>
       </body>
@@ -43,5 +44,5 @@ export default function RootLayout({
 }
 
 const Main = styled.main`
-  min-height: calc(100% - 50px);
+  height: 100%;
 `;

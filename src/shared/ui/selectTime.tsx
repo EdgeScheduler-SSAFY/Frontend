@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
+import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 
 import { Color } from "../lib/styles/color";
 import { selectList } from "../lib/type";
@@ -11,9 +12,11 @@ interface SelectProps {
   options: selectList[];
   standardIdx?: number;
   disabledIndex?: number;
-  disabledLastIndex?: boolean;
+  disabledLastIndex?: number;
   show: boolean;
   onSelectChange: (value: number | string) => void;
+  onStartIndexChange?: (value: number) => void;
+  onEndIndexChange?: (value: number) => void;
 }
 
 export default function SelectTime(props: SelectProps) {
@@ -24,7 +27,7 @@ export default function SelectTime(props: SelectProps) {
   useEffect(() => {
     if (props.options.length > 0 && props.standardIdx !== undefined) {
       // 시작시간 선택하면 끝 시간은 idx + 1 되는데
-      // 시작시간에서 마지막 idx 선택하면  idx로 되도록 설정
+      // 시작시간에서 마지막 idx 선택하면  idx로 되도록
       const lastIdx = props.options.length - 1;
       const finalIdx =
         props.standardIdx > lastIdx ? lastIdx : props.standardIdx;
@@ -45,11 +48,15 @@ export default function SelectTime(props: SelectProps) {
   };
 
   const isLastDisabled = (index: number) => {
-    if (props.disabledLastIndex) return index === props.options.length - 1;
+    if (props.disabledLastIndex === undefined) return false;
+    return index >= props.disabledLastIndex;
   };
   // 선택값
   const handleOptionClick = (value: number | string) => {
     // value에 해당하는 option 찾기
+    const selectedIndex = props.options.findIndex(
+      (option) => option.value === value
+    );
     const selectedOption = props.options.find(
       (option) => option.value === value
     );
@@ -57,6 +64,12 @@ export default function SelectTime(props: SelectProps) {
       setSelectedValue(selectedOption.option); // option으로 설정
       setSelectFlag(false);
       props.onSelectChange(value);
+      if (props.onStartIndexChange) {
+        props.onStartIndexChange(selectedIndex);
+      }
+      if (props.onEndIndexChange) {
+        props.onEndIndexChange(selectedIndex);
+      }
     }
   };
 
@@ -83,13 +96,14 @@ export default function SelectTime(props: SelectProps) {
       <SelectDiv id={props.id} width={props.width}>
         <SelectedDiv width={props.width} onClick={toggleSelect}>
           <SelectedValue>{selectedValue}</SelectedValue>
+          {selectFlag ? <CustomIoMdArrowDropup /> : <CustomIoMdArrowDropdown />}
         </SelectedDiv>
         <SelectList width={props.width} $show={selectFlag}>
           {props.options.map((option, index) => (
             <SelectOption
-              key={option.value}
+              key={index}
               onClick={
-                isDisabled(index)
+                isDisabled(index) || isLastDisabled(index)
                   ? undefined
                   : () => handleOptionClick(option.value)
               }
@@ -118,6 +132,9 @@ const SelectedDiv = styled.div<{ width: number }>`
   font-size: 14px;
   cursor: pointer;
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const SelectedValue = styled.span`
@@ -155,11 +172,19 @@ const SelectOption = styled.li<{ $disabled: boolean }>`
   padding-left: 0.7rem;
   cursor: ${({ $disabled }) => ($disabled ? "default" : "pointer")};
   box-sizing: border-box;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in;
   &:hover {
     font-weight: 500;
     background-color: ${({ $disabled }) =>
       $disabled ? Color("black50") : Color("blue50")};
     box-sizing: border-box;
   }
+`;
+
+const CustomIoMdArrowDropdown = styled(IoMdArrowDropdown)`
+  margin-right: 0.5rem;
+`;
+
+const CustomIoMdArrowDropup = styled(IoMdArrowDropup)`
+  margin-right: 0.5rem;
 `;

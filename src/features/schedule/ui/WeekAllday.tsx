@@ -8,23 +8,23 @@ interface IWeekAlldayProps {
   schedules: React.ReactNode[][] | null;
   more: boolean;
   changeMore: () => void;
+  isWORKING?: boolean; // 근무시간 설정인지 여부
 }
 
-export function WeekAllday({ date, schedules, changeMore, more }: IWeekAlldayProps) {
-  console.log(schedules);
+export function WeekAllday({ date, schedules, changeMore, more, isWORKING }: IWeekAlldayProps) {
   return (
     <MainLayout>
       <AlldayMoreDiv>
-        <div>allday</div>
+        {!isWORKING && <div>allday</div>} {/* 근무시간 설정창에서는 표시 x */}
         {schedules && schedules.some((schedule) => schedule.length >= 3) && (
           <div onClick={changeMore}>more</div>
         )}
       </AlldayMoreDiv>
       {Array.from({ length: 7 }, (_, index) => (
-        <div key={index}>
+        <DayDiv key={index}>
           <TextDiv key={index}>{addDays(date, index).getDate()}</TextDiv>
           {schedules && renderSchedules({ date, schedules: schedules[index] }, false)}
-        </div>
+        </DayDiv>
       ))}
     </MainLayout>
   );
@@ -40,5 +40,9 @@ const TextDiv = styled.div`
 `;
 const AlldayMoreDiv = styled.div`
   display: grid;
-  grid-template-rows: 1fr 1.5fr;
+  grid-template-rows: 40px;
+  align-items: start;
+`;
+const DayDiv = styled.div`
+  width: 100%;
 `;

@@ -5,6 +5,7 @@ import styled from "styled-components";
 
 interface SubmitButtonProps {
   children: React.ReactNode;
+  onClick: () => void;
 }
 
 const StyledButton = styled.button<SubmitButtonProps>`
@@ -22,8 +23,8 @@ const StyledButton = styled.button<SubmitButtonProps>`
     background-color: ${Color("green600")};
   }
 `;
-const SubmitButton: React.FC<SubmitButtonProps> = ({ children }) => (
-  <StyledButton>{children}</StyledButton>
+const SubmitButton: React.FC<SubmitButtonProps> = ({ children, onClick }) => (
+  <StyledButton onClick={onClick}>{children}</StyledButton>
 );
 
 export default SubmitButton;

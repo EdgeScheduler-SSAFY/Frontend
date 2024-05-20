@@ -3,39 +3,37 @@ import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 
 import { Color } from "../lib/styles/color";
-import { selectList } from "../lib/type";
-import useUserStore, { userState } from "@/store/userStore";
+import { selectList, userList } from "../lib/type";
 
 interface SelectLocalTimeProps {
   width: number;
   id?: string;
   options: selectList[];
   margin: number;
-  onSelectChange: (value: string | number) => void;
+  onSelectChange: (option: selectList) => void;
 }
 
 export default function SelectLocalTime(props: SelectLocalTimeProps) {
   // 초기값 설정
-
-  const { localValue, setLocalValue } = useUserStore((state: userState) => ({
-    localValue: state.localValue,
-    setLocalValue: state.setLocalValue,
-  }));
   const [selectFlag, setSelectFlag] = useState<boolean>(false);
-  const [local, setLocal] = useState<string>("Albania");
+  const [region, setRegion] = useState<string>("Albania");
+
+  // const { localValue, setLocalValue } = useUserStore((state: userState) => ({
+  //   localValue: state.localValue,
+  //   setLocalValue: state.setLocalValue,
+  // }));
+  useEffect(() => {
+    const userItem = sessionStorage.getItem("user");
+    if (userItem) {
+      const user: userList = JSON.parse(userItem);
+      if (user.region) {
+        setRegion(user.region);
+      }
+    }
+  }, []);
   // 보여지는 이름
-  const [value, setValue] = useState<string | number>(localValue);
-  //실제 값
 
   // value에 해당하는 option 찾기
-  useEffect(() => {
-    const selectedOption = props.options.find(
-      (option) => option.value === value
-    );
-    if (selectedOption) {
-      setLocal(selectedOption.option);
-    }
-  }, [props.options, value]);
 
   const toggleSelect = () => {
     setSelectFlag((prevFlag) => !prevFlag);
@@ -43,10 +41,9 @@ export default function SelectLocalTime(props: SelectLocalTimeProps) {
   // dropdown 열고닫기
 
   const handleOptionClick = (option: selectList) => {
-    // value에 해당하는 option 찾기
-    setValue(option.value);
     setSelectFlag(false);
-    props.onSelectChange(option.value);
+    setRegion(option.option);
+    props.onSelectChange(option);
   }; // 핸들 옵션 클릭
 
   // 외부 영역 클릭하면 닫히도록 구현
@@ -76,7 +73,7 @@ export default function SelectLocalTime(props: SelectLocalTimeProps) {
           onClick={toggleSelect}
           data-testid="selectdiv"
         >
-          <SelectedValue>{local}</SelectedValue>
+          <SelectedValue>{region}</SelectedValue>
         </SelectedDiv>
         <SelectList width={props.width} $show={selectFlag}>
           {props.options.map((option, index) => (
